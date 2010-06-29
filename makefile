@@ -45,7 +45,6 @@ SOURCES       = ancestralnode.cpp \
 		terminalsequence.cpp \
 		translatesequences.cpp \
 		treenode.cpp \
-		ureadseq.cpp \
 		writefile.cpp 
 OBJECTS       = ancestralnode.o \
 		ancestralsequence.o \
@@ -77,7 +76,6 @@ OBJECTS       = ancestralnode.o \
 		terminalsequence.o \
 		translatesequences.o \
 		treenode.o \
-		ureadseq.o \
 		writefile.o
 
 TARGET        = prank
@@ -379,8 +377,7 @@ readannotation.o: readannotation.cpp readannotation.h \
 		ancestralsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readannotation.o readannotation.cpp
 
-readfile.o: readfile.cpp readfile.h \
-		ureadseq.h
+readfile.o: readfile.cpp readfile.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readfile.o readfile.cpp
 
 readnewick.o: readnewick.cpp readnewick.h \
@@ -479,9 +476,5 @@ treenode.o: treenode.cpp config.h \
 		characterprobability.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o treenode.o treenode.cpp
 
-ureadseq.o: ureadseq.cpp ureadseq.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ureadseq.o ureadseq.cpp
-
-writefile.o: writefile.cpp writefile.h \
-		ureadseq.h
+writefile.o: writefile.cpp writefile.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writefile.o writefile.cpp

@@ -167,7 +167,7 @@ void WriteFile::writeSequential(const char* outputfile,std::vector<std::string> 
     for (; si != seqs->end(); ni++,si++)
     {
         if(truncate)
-            output << ni->substr(0,10)<< endl;
+            output << (*ni+"          ").substr(0,10)<<" "<< endl;
         else
             output << *ni<< endl;
 
