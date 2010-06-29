@@ -54,16 +54,14 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
               cout<<endl<<"PRANK: creating a DNA alignment '"<<outfile<<this->formatExtension(format)
                       <<"' based on a protein alignment '"<<seqfile<<"' and DNA sequences in '"<<dnafile<<"'."<<endl<<endl;
           } else {
-            cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".?"<<this->formatExtension(format)<<"' [plain alignment]";
-            if (WRITEXML)
-                cout<<" and '"<<outfile<<".?.xml' [xml alignment]";
-            if (PRINTTREE)
-              cout<<" and '"<<outfile<<".?.dnd' [guidetree]";
-            if (treefile!="")
-              cout<<"; guidetree used '"<<treefile<<"'";
-            if (hmmname!="")
-              cout<<"; alignment model '"<<hmmname<<"'";
-            cout<<"."<<endl<<endl;
+            cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+            if (treefile!="" & hmmname!="")
+              cout<<"Using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'.\n";
+            else if (treefile!="")
+              cout<<"Using alignment guidetree '"<<treefile<<"'.\n";
+            else if (hmmname!="")
+              cout<<"Using alignment model '"<<hmmname<<"'.\n";
+            cout<<endl;
           }
       }
     }

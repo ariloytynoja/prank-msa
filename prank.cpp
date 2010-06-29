@@ -624,7 +624,7 @@ void readArguments(int argc, char *argv[])
     if (!FOREVER && !PREALIGNED && !CONVERT && !BACKTRANSLATE){
       DOTS=false;
 
-      cout<<endl<<"Warning: option '+F' is not selected.";
+      cout<<endl<<"Note: option '+F' is by default not selected.";
       if(argc==2 && seqfile!="")
         cout<<" You can select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
       else

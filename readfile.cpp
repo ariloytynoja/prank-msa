@@ -133,6 +133,12 @@ int ReadFile::readFile(const char* inputfile)
     set<string> nameset;
     for(int i=0;i<(int)seqs.size();i++)
     {
+        if((int)seqs.at(i).length()<1)
+        {
+            cout<<"Failed to read sequence "<<names.at(i)<<". Exiting.\n\n";
+            exit(-1);
+        }
+
         string name = names.at(i);
         while(nameset.find(name) != nameset.end())
         {
@@ -146,8 +152,11 @@ int ReadFile::readFile(const char* inputfile)
 
     if (names.size() == seqs.size())
         return names.size();
-    return 0;
-
+    else
+    {
+        cout<<"Reading sequence data failed. Found "<<names.size()<<" names but "<<seqs.size()<<" sequences. Exiting.\n\n";
+        exit(-1);
+    }
 }
 
 
