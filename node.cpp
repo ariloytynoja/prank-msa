@@ -46,9 +46,11 @@ Node::~Node()
 
     if (node_has_left_child){
         delete child0;
+        node_has_left_child = false;
     }
     if (node_has_right_child){
         delete child1;
+        node_has_right_child = false;
     }
 
 //    cout<<"delete "<<this->get_name()<<endl;
@@ -468,7 +470,7 @@ void Node::prune_up()
 
     if(!this->is_leaf() && !this->has_left_child() && this->has_right_child())
     {
-        Node* tmp_child = child0;
+        Node* tmp_child = child1;
 
         child0 = tmp_child->child0;
         child1 = tmp_child->child1;

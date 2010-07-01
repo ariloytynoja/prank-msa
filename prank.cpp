@@ -643,7 +643,7 @@ void readArguments(int argc, char *argv[])
 
 void printHelp(bool complete)
 {
-    cout<<endl<<"prank v.100628. ";
+    cout<<endl<<"prank v.100701. ";
     cout<<"Minimal usage: 'prank sequence_file'"<<endl<<endl;;
     cout<<"Advanced usage: 'prank [optional parameters] -d=sequence_file [optional parameters]'"<<endl;;
     cout<<"\n input/output parameters:"<<endl;
