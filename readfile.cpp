@@ -270,6 +270,12 @@ void ReadFile::readNexus(std::istream & input)
 
         if(name.length()>0 && seq.length()>0)
         {
+            if(name.at(0)=='\'')
+                name=name.substr(1);
+
+            if(name.at(name.length()-1)=='\'')
+                name=name.substr(0,name.length()-1);
+
             map<string,string>::iterator mi = data.find(name);
             if(mi==data.end())
             {

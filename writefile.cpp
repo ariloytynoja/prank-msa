@@ -219,16 +219,21 @@ void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *name
 
         for(;ni!=names->end();ni++,si++)
         {
-            string tmp = ni->substr(0,20)+"                    ";
-            output << tmp.substr(0,20)<<"     ";
+            string tmp = ni->substr(0,20)+"'                    ";
+            output << "'"<<tmp.substr(0,21)<<"     ";
 
             output<<si->substr(offset,chars_by_line)<<endl;
         }
     }
     output<<";\nend;\nbegin trees;\n translate\n";
     for(int i=0;i<(int)names->size();i++)
-        output<<"  "<<i+1<<" "<<names->at(i).substr(0,20)<<",\n";
-
+    {
+        output<<"  "<<i+1<<" '"<<names->at(i).substr(0,20)<<"'";
+        if(i<(int)names->size()-1)
+            output<<",\n";
+        else
+            output<<"\n";
+    }
 
     string tree = "";
     int count = 1;
@@ -291,8 +296,8 @@ void WriteFile::writeSimpleNexus(const char* outputfile, vector<string> * names,
 
         for(;ni!=names->end();ni++,si++)
         {
-            string tmp = ni->substr(0,20)+"                    ";
-            output << tmp.substr(0,20)<<"     ";
+            string tmp = ni->substr(0,20)+"'                    ";
+            output << "'"<<tmp.substr(0,21)<<"     ";
 
             output<<si->substr(offset,chars_by_line)<<endl;
         }
