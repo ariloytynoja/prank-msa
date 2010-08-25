@@ -443,6 +443,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         {
             n->prune_tree();
             tree=n->print_tree();
+        } else if(PARTLYALIGNED) {
+            cout<<"Warning: The guide tree names do not match those in the sequence data.\n\n";
         } else {
             cout<<"The guide tree has "<<treeleaves<<" leaves but only "<<treematches<<" match with the names in the sequence data.\n"
                     "The tree can be pruned to match the data using the flag '-prunetree'. Now exiting.\n\n";

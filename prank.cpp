@@ -658,7 +658,7 @@ void printHelp(bool complete)
     {
         cout<<"  -f=output_format_number [default: 8] (deprecated; use format names)"<<endl;
         cout<<"     8. Pearson/Fasta"<<endl;
-        cout<<"    11. Phylsip sequential"<<endl;
+        cout<<"    11. Phylip sequential"<<endl;
         cout<<"    12. Phylip interleaved"<<endl;
         cout<<"    17. PAUP/NEXUS"<<endl;
         cout<<"    18. PAML"<<endl;
