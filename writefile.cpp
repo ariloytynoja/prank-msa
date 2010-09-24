@@ -85,13 +85,14 @@ void WriteFile::writeFasta(const char* outputfile, vector<string> * names, vecto
     vector<string>::iterator ni = names->begin();
 
     // Main loop : for all sequences in vector container
-    for (; si != seqs->end(); ni++,si++)
+    for (; ni != names->end(); ni++,si++)
     {
         output << ">" << *ni;
         output << endl;
 
         // Sequence cutting to specified characters number per line
         seq = *si;
+//        cout<<*ni<<"\n"<<seq<<"\n\n";
         while (seq != "")
         {
             if ((int)seq.size() > chars_by_line)
@@ -107,6 +108,8 @@ void WriteFile::writeFasta(const char* outputfile, vector<string> * names, vecto
             }
         }
     }
+
+    output.close();
 }
 
 void WriteFile::writeInterleaved(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs)
@@ -164,7 +167,7 @@ void WriteFile::writeSequential(const char* outputfile,std::vector<std::string> 
     output<<seqs->size()<<" "<<si->length()<<endl;
 
     // Main loop : for all sequences in vector container
-    for (; si != seqs->end(); ni++,si++)
+    for (; ni != names->end(); ni++,si++)
     {
         if(truncate)
             output << (*ni+"          ").substr(0,10)<<" "<< endl;
@@ -188,6 +191,8 @@ void WriteFile::writeSequential(const char* outputfile,std::vector<std::string> 
             }
         }
     }
+
+    output.close();
 }
 
 void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs, bool isDna, AncestralNode *root, bool translate)
@@ -264,6 +269,8 @@ void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *name
 
         output<<";\nend;\n";
     }
+
+    output.close();
 }
 
 
@@ -303,6 +310,8 @@ void WriteFile::writeSimpleNexus(const char* outputfile, vector<string> * names,
         }
     }
     output<<";\nend;";
+
+    output.close();
 }
 
 bool WriteFile::dnaSeqs(vector<string> * seqs) {

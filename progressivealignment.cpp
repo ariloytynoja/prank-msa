@@ -608,9 +608,16 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
           names.clear();
           root->getTerminalNames(&names);
 
-          vector<string>::iterator si = sequences.begin();
-          for (;si!=sequences.end();si++) {
-              si->clear();
+//          vector<string>::iterator si = sequences.begin();
+//          for (;si!=sequences.end();si++) {
+//              si->erase();
+//          }
+
+          sequences.erase(sequences.begin(),sequences.end());
+
+          vector<string>::iterator ni = names.begin();
+          for (;ni!=names.end();ni++) {
+              sequences.push_back(string());
           }
 
           vector<string> col;
