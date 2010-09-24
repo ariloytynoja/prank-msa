@@ -610,7 +610,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
 //          vector<string>::iterator si = sequences.begin();
 //          for (;si!=sequences.end();si++) {
-//              si->erase();
+//              si->clear();
 //          }
 
           sequences.erase(sequences.begin(),sequences.end());
