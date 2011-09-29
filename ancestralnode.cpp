@@ -788,6 +788,21 @@ void AncestralNode::getNewickBrl(string* tree)
     return;
 }
 
+void AncestralNode::getLabelledNewickBrl(string* tree)
+{
+    *tree += '(';
+    lChild->getLabelledNewickBrl(tree);
+    *tree += ',';
+    rChild->getLabelledNewickBrl(tree);
+    *tree += + ')';
+    *tree += nodeName;
+    char str[10];
+    sprintf(str,":%.5f",branchLength);
+    *tree += str;
+
+    return;
+}
+
 void AncestralNode::getCleanNewick(string* tree)
 {
     *tree += "(";

@@ -78,6 +78,7 @@ int reportLimit = 100;
 
 // write reconstructed ancestral seqs
 bool WRITEANC = false;
+bool WRITEANCSEQ = false;
 
 // write ancestral nodes as they are solved
 bool PRINTNODES = false;

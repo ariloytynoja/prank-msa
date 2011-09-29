@@ -62,6 +62,7 @@ public:
 
     void writeNewick(std::string* tree,int* sInd);
     void getNewick(std::string* tree);
+    void getLabelledNewickBrl(std::string* tree);
     void getNewickBrl(std::string* tree);
     void getNexusTree(std::string* tree, int *count);
     void writeAncCharacters(int *parSite,int iteration);

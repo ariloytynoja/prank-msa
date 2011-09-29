@@ -200,6 +200,12 @@ void readArguments(int argc, char *argv[])
                 WRITEANC = true;
             }
 
+            // write reconstructed ancestral seqs
+            else if (s=="-writeancseq")
+            {
+                WRITEANCSEQ = true;
+            }
+
             // write ancestral nodes as they are solved
             else if (s=="-printnodes")
             {
@@ -643,7 +649,7 @@ void readArguments(int argc, char *argv[])
 
 void printHelp(bool complete)
 {
-    cout<<endl<<"prank v.100924. ";
+    cout<<endl<<"prank v.101018. ";
     cout<<"Minimal usage: 'prank sequence_file'"<<endl<<endl;;
     cout<<"Advanced usage: 'prank [optional parameters] -d=sequence_file [optional parameters]'"<<endl;;
     cout<<"\n input/output parameters:"<<endl;
@@ -699,6 +705,7 @@ void printHelp(bool complete)
     if(complete)
     {
         cout<<"  -writeanc [output ancestral sequences]"<<endl;
+//        cout<<"  -writeancseq [output ancestral sequences; another format]"<<endl;
         cout<<"  -printnodes [output each node; mostly for debugging]"<<endl;
         cout<<"  -matresize=# [matrix resizing multiplier]"<<endl;
         cout<<"  -matinitsize=# [matrix initial size multiplier]"<<endl;

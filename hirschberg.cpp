@@ -3007,7 +3007,8 @@ double Hirschberg::max(double a,double b, double c)
 void Hirschberg::printMatrix(string n,int i,DbMatrix* m)
 {
     cout<<n<<i<<": ";
-    m->print(i);
+    m->print();
+//    m->print(i);
 }
 
 void Hirschberg::printMatrix(string n,int i,IntMatrix* m)

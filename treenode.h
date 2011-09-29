@@ -130,6 +130,7 @@ public:
 
     virtual void writeNewick(std::string* ,int* ){}
     virtual void getNewick(std::string* tree) = 0;
+    virtual void getLabelledNewickBrl(std::string* tree) = 0;
     virtual void getNewickBrl(std::string* tree) = 0;
     virtual void getNexusTree(std::string* tree, int *count) = 0;
     virtual void writeAncCharacters(int *parSite,int iteration) = 0;

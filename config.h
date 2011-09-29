@@ -56,6 +56,7 @@ extern bool SCREEN;
 extern int reportLimit;
 
 extern bool WRITEANC;
+extern bool WRITEANCSEQ;
 extern bool PRINTNODES;
 extern bool PRINTTREE;
 extern bool WRITEXML;

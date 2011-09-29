@@ -924,11 +924,19 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
 
 void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nms,vector<string> *sqs,int iteration)
 {
-    if (!WRITEANC)
+    if (!(WRITEANC || WRITEANCSEQ))
         return;
 
     string tree = "";
-    root->getNewick(&tree);
+    if(WRITEANCSEQ)
+    {
+        root->getLabelledNewickBrl(&tree);
+        tree += ';';
+    }
+    else
+    {
+        root->getNewick(&tree);
+    }
 
     vector<string> anms;
     root->getInternalNames(&anms);
@@ -991,6 +999,8 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nm
     delete []alignment;
     ancSeq.close();
 
+    if(WRITEANCSEQ && !WRITEANC)
+        return;
 
     FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"w");
     fclose(ancPro);
