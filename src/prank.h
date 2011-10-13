@@ -31,7 +31,7 @@ void readArguments(int argc, char *argv[]);
 int parseFormat(string format);
 void printHelp(bool complete);
 
-
+int version;
 
 int NOISE = 0;
 

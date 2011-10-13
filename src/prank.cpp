@@ -25,12 +25,14 @@
 #include <string>
 #include <sstream>
 #include "progressivealignment.h"
+#include "check_version.h"
 #include "prank.h"
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
+    version = 101018;
 
     readArguments(argc, argv);
 	int time1 = time(0);
@@ -100,6 +102,12 @@ void readArguments(int argc, char *argv[])
             // print help
             else if (s=="-help") {
                 printHelp(true);
+                exit(0);
+            }
+
+            // check version
+            else if (s=="-version") {
+                Check_version ch(version);
                 exit(0);
             }
 
@@ -649,7 +657,7 @@ void readArguments(int argc, char *argv[])
 
 void printHelp(bool complete)
 {
-    cout<<endl<<"prank v.101018. ";
+    cout<<endl<<"prank v."<<version<<". ";
     cout<<"Minimal usage: 'prank sequence_file'"<<endl<<endl;;
     cout<<"Advanced usage: 'prank [optional parameters] -d=sequence_file [optional parameters]'"<<endl;;
     cout<<"\n input/output parameters:"<<endl;

@@ -39,8 +39,10 @@ SOURCES += writefile.cpp \
     chaosanchors.cpp \
     boolmatrix.cpp \
     ancestralsequence.cpp \
-    ancestralnode.cpp
-OTHER_FILES += 
+    ancestralnode.cpp \
+    check_version.cpp
+OTHER_FILES += \  
+    ../VERSION_HISTORY
 HEADERS += writefile.h \
     treenode.h \
     translatesequences.h \
@@ -72,4 +74,12 @@ HEADERS += writefile.h \
     chaosanchors.h \
     boolmatrix.h \
     ancestralsequence.h \
-    ancestralnode.h
+    ancestralnode.h \
+    check_version.h
+
+
+
+
+
+
+
