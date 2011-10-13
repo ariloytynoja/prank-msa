@@ -24,6 +24,7 @@
 #include <sstream>
 #include "config.h"
 #include "chaosanchors.h"
+#include "exonerate_reads.h"
 #include "hirschberg.h"
 
 using namespace std;
@@ -407,119 +408,7 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
     }
 
 
-    // alignment with anchors for Jacky
-    if(HARDANCHORS) {
-
-      int len = sl1;
-      if(sl2>len) len = sl2;
-
-      if(len+1>matrixSize){
-        cleanUp();
-        initialiseMatrices((int)(((float)len+1)*initialMatrixSize));
-      }
-
-
-      defineBegin();
-
-      stringstream cmd;
-      cmd << "python prank_anchors.py "<<seqfile<<" "<<outfile+".left_ach "<<outfile+".right_ach "<<anchorfile<<" "<<outfile+".anchors";
-      if(NOISE>0) cout<<endl<<"Calling Jacky's code: "<<cmd.str()<<endl;
-
-      int tmp = system(cmd.str().c_str());
-
-      ifstream read((outfile+".anchors").c_str());
-      string s;
-
-      int j=0;
-      while (getline(read,s)){
-        int site1 = atoi(s.substr(0,s.find(" ")).c_str());
-        int site2 = atoi(s.substr(s.find(" ")+1).c_str());
-        if(site1>0 && site2>0){j++;}
-      }
-
-      if(j>0)
-        anchors = new IntMatrix(2,j,"hardanchors");
-
-      ifstream read2((outfile+".anchors").c_str());
-
-      j=0;
-      int max1 = -1;
-      int max2 = -1;
-
-      while (getline(read2,s)){
-
-        int site1 = atoi(s.substr(0,s.find(" ")).c_str());
-        int site2 = atoi(s.substr(s.find(" ")+1).c_str());
-        if(site1+1>sl1) {
-          cout<<"Anchor '"<<site1<<"' is outside the left child node sequence (of length "<<sl1<<")."<<endl;
-          exit(-1);
-        }
-        if(site2+1>sl2) {
-          cout<<"Anchor '"<<site2<<"' is outside the right child node sequence (of length "<<sl2<<")."<<endl;
-          exit(-1);
-        }
-        if(NOISE>0) cout<<"Anchor pair: "<<site1<<" "<<site2<<endl;
-        if(site1==1 && site2==1){
-          if(NOISE>0) cout<<"Anchor pair: "<<site1<<" "<<site2<<" not used!"<<endl;
-        } else if(site1>0 && site2>0){
-          if(site1>max1 && site2>max2) {
-            anchors->s( site1, 0, j );
-            anchors->s( site2, 1, j );
-            j++;
-            max1=site1;
-            max2=site2;
-          } else {
-            cout<<endl<<"Inconsistent anchors! Anchor pair: "<<site1<<" "<<site2<<" not used!"<<endl<<endl;
-          }
-        }
-      }
-      if(j==0) {
-        cout<<"Warning: no anchors found!"<<endl;
-      }
-      if (j>0) {
-        for (int i=0;i<j;i++) {
-
-          defineSite(i);
-
-          if (NOISE>0){
-            cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
-            cout<<" anc: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
-          }
-
-          divideSeq();
-        }
-      }
-
-      if (NOISE>0){
-        cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
-        cout<<" end: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
-      }
-
-      if(NOISE>0) {
-        string cpcmd = "mv "+outfile+".anchors "+outfile+".anchors."+tmpNodeName;
-        int tmp = system(cpcmd.c_str());
-        cpcmd = "cp "+anchorfile+" "+anchorfile+"."+tmpNodeName;
-        tmp = system(cpcmd.c_str());
-        cpcmd = "cp "+seqfile+" "+seqfile+"."+tmpNodeName;
-        tmp = system(cpcmd.c_str());
-        cpcmd = "mv "+outfile+".left_ach "+outfile+".left_ach."+tmpNodeName;
-        tmp = system(cpcmd.c_str());
-        cpcmd = "mv "+outfile+".right_ach "+outfile+".right_ach."+tmpNodeName;
-        tmp = system(cpcmd.c_str());
-      } else {
-        string cpcmd = "rm "+outfile+".anchors";
-        int tmp = system(cpcmd.c_str());
-      }
-
-      defineEnd();
-
-      divideSeq();
-
-      if(j>0)
-        delete anchors;
-
-    // alignment with Chaos anchors
-    } else if (ANCHORS){
+    if (ANCHORS){
 
         defineBegin();
 
@@ -578,13 +467,101 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
 
         } else {
             initialiseMatrices(sl1+1);
+                defineEnd();
+            }
 
-			defineEnd();
-		}
+            divideSeq();
+
+        } else if (EXONERATE){
+
+
+            defineBegin();
+
+            if (NOISE>0)
+                cout<<"lengths: "<<sl1<<" and "<<sl2<<" ("<<anchSkipDist<<")"<<endl;
+
+            if (sl1>anchSkipDist && sl2>anchSkipDist) {
+
+                vector<hit> exonerate_hits;
+                Exonerate_reads er;
+                if(!er.test_executable())
+                    cout<<"The executable for exonerate not found! The fast placement search not used!";
+                else
+                {
+                    er.local_alignment(seq1->getMLsequence(),seq2->getMLsequence(),&exonerate_hits, true);
+                }
+
+                if (NOISE>0)
+                    cout<<"anchors done: "<<nanch<<endl;
+
+                vector<pair<int,int> > anchor_pairs;
+
+                for(int i=0;i<exonerate_hits.size();i++)
+                {
+                    hit h = exonerate_hits.at(i);
+                    if (NOISE>0)
+                        cout<<"e "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
+
+                    for(int j=0;j+h.q_start<h.q_end;j+=5)
+                    {
+                        if(h.q_start>4 && h.t_start>4)
+                        anchor_pairs.push_back(make_pair(j+h.q_start,j+h.t_start));
+                    }
+                }
+
+                if (anchor_pairs.size()>0) {
+                    for (int i=0;i<anchor_pairs.size();i++) {
+
+                        if (NOISE>0)
+                            cout<<" ex anchor "<<anchor_pairs.at(i).first<<","<<anchor_pairs.at(i).second<<" *"<<endl;
+
+                        if ( SKIPGAPANCH && ( seq1->hasNeighborGaps(anchor_pairs.at(i).first) || seq2->hasNeighborGaps(anchor_pairs.at(i).second) ) ) {
+                            if (NOISE>0)
+                                cout<<"drop anchor "<<anchor_pairs.at(i).first<<","<<anchor_pairs.at(i).second<<" [gap]"<<endl;
+                            continue;
+                        }
+
+                        defineESite(anchor_pairs.at(i).first,anchor_pairs.at(i).second);
+
+                        if (NOISE>0){
+                            cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
+                            cout<<" anc: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
+                        }
+
+                        if (end->lInd1() - beg->lInd1() > matrixSize) {
+                            cleanUp();
+                            initialiseMatrices(end->lInd1() - beg->lInd1());
+                        }
+
+                        divideSeq();
+                    }
+                }
+
+                if (NOISE>0){
+                    cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
+                    cout<<" end: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
+                }
+
+                defineEnd();
+
+                    if (seq1->length()+1-beg->lInd1() > matrixSize) {
+                    if (nanch>0)
+                        cleanUp();
+                    initialiseMatrices(seq1->length() + 1 - beg->lInd1());
+                }
+
+
+
+        } else {
+            initialiseMatrices(sl1+1);
+
+            defineEnd();
+        }
 
         divideSeq();
 
-        // plain alignment, no anchors
+
+    // plain alignment, no anchors
     } else {
 
 // 		cout<<sl1<<" "<<sl2<<" "<<matrixSize<<endl;
@@ -652,24 +629,44 @@ void Hirschberg::defineSite(int idx)
 	end->vitbS(-1);
 }
 
+void Hirschberg::defineESite(int l,int r)
+{
+    end->index(1);
+    end->isAnchor(true);
+    end->nullSite(true);
+
+    end->cInd1(l); end->nInd1(l);
+    end->lInd1(l); end->cInd2(r);
+    end->nInd2(r); end->lInd2(r);
+    end->rInd1(l-1); end->rInd2(r-1);
+
+        end->vitf(small);
+        end->vitfM(-1);
+        end->vitfS(-1);
+
+        end->vitb(small);
+        end->vitbM(-1);
+        end->vitbS(-1);
+}
+
 void Hirschberg::defineEnd()
 {
     end->index(1);
     end->isAnchor(false);
     end->nullSite(true);
 
-	end->cInd1(-1); end->nInd1(-1);
-	end->cInd2(-1); end->nInd2(-1);
+    end->cInd1(-1); end->nInd1(-1);
+    end->cInd2(-1); end->nInd2(-1);
     end->rInd1(seq1->length()); end->rInd2(seq2->length());
     end->lInd1(-1); end->lInd2(-1);
 
-	end->vitf(small);
-	end->vitfM(-1);
-	end->vitfS(-1);
+    end->vitf(small);
+    end->vitfM(-1);
+    end->vitfS(-1);
 
-	end->vitb(small);
-	end->vitbM(-1);
-	end->vitbS(-1);
+    end->vitb(small);
+    end->vitbM(-1);
+    end->vitbS(-1);
 
 }
 

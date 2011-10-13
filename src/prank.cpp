@@ -515,6 +515,12 @@ void readArguments(int argc, char *argv[])
                 ANCHORS = true;
             }
 
+            // use anchors
+            else if (s=="-exonerate")
+            {
+                EXONERATE = true;
+            }
+
             // maximum anchor distance
             else if (s.substr(0,6)=="-maxd=")
             {

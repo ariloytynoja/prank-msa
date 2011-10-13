@@ -21,17 +21,17 @@ struct hit {
 class Exonerate_reads
 {
     static bool better (hit i,hit j) { return (i.score>j.score); }
+    static bool q_earlier (hit i,hit j) { return (i.q_start<j.q_start); }
 
     bool split_sugar_string(const std::string& row,hit *h);
     bool split_vulgar_string(const std::string& row,hit *h);
-    void write_exonerate_input(Node *root, Fasta_entry *read, map<string,string> *names, int r);
     void delete_files(int r);
 
 public:
     Exonerate_reads();
     bool test_executable();
 
-    void local_alignment(Node *root, Fasta_entry *read, std::multimap<std::string,std::string> *good_hits, std::map<std::string,hit> *hits, bool is_local);
+    void local_alignment(std::string* left,std::string* right, std::vector<hit> *hits, bool is_local);
 
 };
 

@@ -40,7 +40,8 @@ SOURCES += writefile.cpp \
     boolmatrix.cpp \
     ancestralsequence.cpp \
     ancestralnode.cpp \
-    check_version.cpp
+    check_version.cpp \
+    exonerate_reads.cpp
 OTHER_FILES += \  
     ../VERSION_HISTORY
 HEADERS += writefile.h \
@@ -75,8 +76,12 @@ HEADERS += writefile.h \
     boolmatrix.h \
     ancestralsequence.h \
     ancestralnode.h \
-    check_version.h
+    check_version.h \
+    exonerate_reads.h
 
+
+LIBS += -lboost_regex-mt
+INCLUDEPATH += /usr/include
 
 
 

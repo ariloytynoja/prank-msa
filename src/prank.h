@@ -237,19 +237,20 @@ bool SKIPINS = false;
 
 // use anchors
 bool ANCHORS = false;
+bool EXONERATE = false;
 
 // maximum anchor distance
 int initialAnchDist = 500;
 int maxAnchDist = 1000;
 
 // minimum anchor distance
-int minAnchDist = 100;
+int minAnchDist = 20;
 
 // anchor skip distance
-int anchSkipDist = 500;
+int anchSkipDist = 100;
 
 // anchor drop distance
-int anchDropDist = 50;
+int anchDropDist = 15;
 
 // don't infer gaps caused by missing data
 bool PATCHMISSING = true;

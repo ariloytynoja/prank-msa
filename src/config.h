@@ -137,6 +137,8 @@ extern int FBW;
 extern bool SKIPINS;
 
 extern bool ANCHORS;
+extern bool EXONERATE;
+
 extern int initialAnchDist;
 extern int maxAnchDist;
 extern int minAnchDist;

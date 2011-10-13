@@ -13,16 +13,16 @@ using namespace std;
 
 #define PORT 80
 
-Check_version::Check_version(float version)
+Check_version::Check_version(int version)
 {
 
-    cout<<"\nThis is PAGAN v."<<version<<".\nChecking if updates are available at http://http://code.google.com/p/pagan-msa.\n";
+    cout<<"\nThis is PRANK v."<<version<<".\nChecking if updates are available at http://http://code.google.com/p/prank-msa.\n";
 
     struct sockaddr_in *remote;
     char buf[BUFSIZ+1];
 
     int sock = create_tcp_socket();
-    char *ip = get_ip("pagan-msa.googlecode.com");
+    char *ip = get_ip("prank-msa.googlecode.com");
 
     remote = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in *));
     remote->sin_family = AF_INET;
@@ -44,7 +44,7 @@ Check_version::Check_version(float version)
         exit(1);
     }
 
-    char get[] = "GET /git/VERSION_HISTORY HTTP/1.0\r\nHost: pagan-msa.googlecode.com\r\nUser-Agent: HTMLGET 1.0\r\n\r\n";
+    char get[] = "GET /git/VERSION_HISTORY HTTP/1.0\r\nHost: prank-msa.googlecode.com\r\nUser-Agent: HTMLGET 1.0\r\n\r\n";
 
     //Send the query to the server
     int sent = 0;
@@ -103,7 +103,7 @@ Check_version::Check_version(float version)
     while( getline(output,s) )
     {
         istringstream ss(s);
-        double d;
+        int d;
         char v,p;
         while( ss >> v >> p >> d )
         {

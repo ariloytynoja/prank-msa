@@ -10,7 +10,8 @@
 #include <boost/regex.hpp>
 
 using namespace std;
-using namespace ppa;
+
+extern bool NOISE;
 
 Exonerate_reads::Exonerate_reads()
 {
@@ -69,23 +70,6 @@ bool Exonerate_reads::split_vulgar_string(const string& row,hit *h)
 
         h->score    = atoi( string(result[9]).c_str() );
 
-//        string match = result[10];
-
-//        std::string::const_iterator start, end;
-//        start = match.begin();
-//        end = match.end();
-
-//        const boost::regex triple_pattern("([MG])\\s+(\\d+)\\s+(\\d+)");
-//        boost::match_results<std::string::const_iterator> what;
-//        boost::match_flag_type flags = boost::match_default;
-//        while(regex_search(start, end, what, triple_pattern, flags))
-//        {
-//            cout<<what[0]<<endl;
-//            start = what[0].second;
-//            // update flags:
-//            flags |= boost::match_prev_avail;
-//            flags |= boost::match_not_bob;
-//        }
     }
 
 
@@ -93,61 +77,35 @@ bool Exonerate_reads::split_vulgar_string(const string& row,hit *h)
     return valid;
 }
 
-void Exonerate_reads::write_exonerate_input(Node *root, Fasta_entry *read, map<string,string> *names, int r)
-{
-    vector<Fasta_entry> aligned_sequences;
-    root->get_alignment(&aligned_sequences,true);
 
-    // create exonerate input
+void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, bool is_local)
+{
+
+    int r = rand();
+
+    string left;
+    for(int i=0;i<ls->length();i++)
+        if(ls->at(i)!='-')
+            left+=(ls->at(i));
+    string right;
+    for(int i=0;i<rs->length();i++)
+        if(rs->at(i)!='-')
+            right+=(rs->at(i));
+
     stringstream q_name;
     q_name <<"q"<<r<<".fas";
 
     ofstream q_output( q_name.str().c_str(), (ios::out));
-    q_output<<">"<<read->name<<endl<<read->sequence<<endl;
+    q_output<<">left"<<endl<<left<<endl;
     q_output.close();
 
     stringstream t_name;
     t_name <<"t"<<r<<".fas";
 
     ofstream t_output( t_name.str().c_str(), (ios::out));
-    vector<Fasta_entry>::iterator it = aligned_sequences.begin();
-    for(;it!=aligned_sequences.end();it++)
-    {
-        if(names->find(it->name) != names->end())
-        {
-            string seq = it->sequence;
-            for (string::iterator si = seq.begin();si != seq.end();)
-                if(*si == '-')
-                    seq.erase(si);
-                else
-                    si++;
-            t_output<<">"<<it->name<<endl<<seq<<endl;
-        }
-    }
+    t_output<<">right"<<endl<<right<<endl;
     t_output.close();
 
-    return;
-}
-
-void Exonerate_reads::local_alignment(Node *root, Fasta_entry *read, multimap<string,string> *tid_nodes, map<string,hit> *hits, bool is_local)
-{
-
-    int r = rand();
-
-//    set<string> names;
-//    multimap<string,string>::iterator it = tid_nodes->begin();
-//    for(;it!=tid_nodes->end();it++)
-//        names.insert(it->second);
-
-    map<string,string> names;
-    multimap<string,string>::iterator it = tid_nodes->begin();
-    for(;it!=tid_nodes->end();it++)
-    {
-        if(it->first==read->tid)
-            names.insert(pair<string,string>(it->second,it->first));
-    }
-
-    this->write_exonerate_input(root,read,&names,r);
 
     // exonerate command for local alignment
 
@@ -167,8 +125,6 @@ void Exonerate_reads::local_alignment(Node *root, Fasta_entry *read, multimap<st
     // read exonerate output, summing the multiple hit scores
 
     char line[256];
-    map<string,hit> all_hits;
-    vector<string> hit_names;
 
     while ( fgets( line, sizeof line, fpipe))
     {
@@ -177,125 +133,78 @@ void Exonerate_reads::local_alignment(Node *root, Fasta_entry *read, multimap<st
 
         if(valid)
         {
-            map<string,hit>::iterator iter = all_hits.find(h.node);
-            if( iter != all_hits.end() )
-            {
-                if(iter->second.t_strand == h.t_strand && iter->second.q_strand == h.q_strand)
-                {
-                    iter->second.score += h.score;
-
-                    if(iter->second.q_start > h.q_start)
-                        iter->second.q_start = h.q_start;
-                    if(iter->second.q_end < h.q_end)
-                        iter->second.q_end = h.q_end;
-                    if(iter->second.t_start > h.t_start)
-                        iter->second.t_start = h.t_start;
-                    if(iter->second.t_end < h.t_end)
-                        iter->second.t_end = h.t_end;
-//                    cout<<"i "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
-                }
-                else if(iter->second.score < h.score)
-                {
-                    iter->second = h;
-//                    cout<<"b "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
-                }
-            }
-            else
-            {
-//                cout<<"n "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
-
-                all_hits.insert( make_pair(h.node, h) );
-                hit_names.push_back(h.node);
-            }
+            hits->push_back(h);
         }
     }
     pclose(fpipe);
 
+    sort (hits->begin(), hits->end(), Exonerate_reads::q_earlier);
 
-    if(Settings::noise>1)
-        cout<<"\nExonerate_reads: "<<read->name<<" has "<<hit_names.size()<<" hits\n";
+    vector<hit>::iterator iter1 = hits->begin();
+    vector<hit>::iterator iter2 = hits->begin();
+    if( iter2 != hits->end() )
+        iter2++;
 
-    if(hit_names.size()>0)
+    while( iter2 != hits->end() )
     {
-        tid_nodes->clear();
-        hits->clear();
-
-        vector<hit> best_hits;
-        vector<string>::iterator iter = hit_names.begin();
-
-        for(;iter!=hit_names.end();iter++)
+        if(iter1->t_start > iter2->t_start)
         {
-             map<string,hit>::iterator iter2 = all_hits.find(*iter);
-             if( iter2 != all_hits.end() )
-             {
-               best_hits.push_back(iter2->second);
-             }
-        }
-
-        sort (best_hits.begin(), best_hits.end(), Exonerate_reads::better);
-
-
-        // keep hits that are above a relative threshold
-
-        if( ( is_local && Settings_handle::st.is("exonerate-local-keep-above") &&
-                Settings_handle::st.get("exonerate-local-keep-above").as<float>()>0 ) ||
-
-            ( !is_local && Settings_handle::st.is("exonerate-gapped-keep-above") &&
-                Settings_handle::st.get("exonerate-gapped-keep-above").as<float>()>0 ) )
-        {
-            int lim = best_hits.at(0).score;
-            if(is_local)
-                lim = int (lim * Settings_handle::st.get("exonerate-local-keep-above").as<float>() );
-            else
-                lim = int (lim * Settings_handle::st.get("exonerate-gapped-keep-above").as<float>() );
-
-
-            for(int i=0; i<(int)hit_names.size(); i++)
+            if(iter1->score > iter2->score)
             {
-                if(best_hits.at(i).score > lim)
+                hits->erase(iter2);
+                iter2 = iter1;
+                iter2++;
+            } else {
+                if(iter1 == hits->begin())
                 {
-                    string tid = names.find(best_hits.at(i).node)->second;
-                    tid_nodes->insert(pair<string,string>(tid,best_hits.at(i).node));
-                    hits->insert(pair<string,hit>(best_hits.at(i).node,best_hits.at(i)));
-
-                    if(Settings::noise>2)
-                        cout<<"adding "<<best_hits.at(i).node<<" "<<best_hits.at(i).score<<endl;
+                    hits->erase(iter1);
+                    iter1 = iter2;
+                    iter2++;
+                }
+                else
+                {
+                    hits->erase(iter1);
+                    iter1 = iter2;
+                    iter1--;
                 }
             }
         }
-
-
-        // keep a fixed number of hits
-
         else
         {
-            int lim = hit_names.size();
-            if( is_local && Settings_handle::st.is("exonerate-local-keep-best") &&
-                    Settings_handle::st.get("exonerate-local-keep-best").as<int>()>0 )
-                lim = Settings_handle::st.get("exonerate-local-keep-best").as<int>();
-
-            if( !is_local && Settings_handle::st.is("exonerate-gapped-keep-best") &&
-                    Settings_handle::st.get("exonerate-gapped-keep-best").as<int>()>0 )
-                lim = Settings_handle::st.get("exonerate-gapped-keep-best").as<int>();
-
-            for(int i=0; i<lim && i<(int)hit_names.size(); i++)
-            {
-                string tid = names.find(best_hits.at(i).node)->second;
-                tid_nodes->insert(pair<string,string>(tid,best_hits.at(i).node));
-                hits->insert(pair<string,hit>(best_hits.at(i).node,best_hits.at(i)));
-
-                if(Settings::noise>2)
-                    cout<<"adding "<<best_hits.at(i).node<<" "<<best_hits.at(i).score<<endl;
-            }
+            iter1++;
+            iter2++;
         }
     }
-    else if(!Settings_handle::st.is("keep-despite-exonerate-fails"))
+
+    iter1 = hits->begin();
+    iter2 = hits->begin();
+    if( iter2 != hits->end() )
+        iter2++;
+
+    while( iter2 != hits->end() )
     {
-        tid_nodes->clear();
-        read->node_to_align = "discarded_read";
+        if(iter1->t_end > iter2->t_start)
+        {
+            int overlap = iter1->t_end - iter2->t_start;
+            iter1->t_end-=overlap;
+            iter1->q_end-=overlap;
+            iter2->t_start+=overlap;
+            iter2->q_start+=overlap;
+        }
+        if(iter1->q_end > iter2->q_start)
+        {
+            int overlap = iter1->q_end - iter2->q_start;
+            iter1->t_end-=overlap;
+            iter1->q_end-=overlap;
+            iter2->t_start+=overlap;
+            iter2->q_start+=overlap;
+        }
+
+        iter1++;
+        iter2++;
     }
 
-    if(!Settings_handle::st.is("keep-exonerate-files"))
+    if(NOISE==0)
         this->delete_files(r);
 }
 

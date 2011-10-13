@@ -133,11 +133,11 @@ protected:
     double maxFullScore;
 
 
-	Site *beg;
-	Site *end;
-	Site* newsite;
+    Site *beg;
+    Site *end;
+    Site* newsite;
 
-	int nanch;
+    int nanch;
     IntMatrix* anchors;
 
     int totalSites;
@@ -146,15 +146,16 @@ protected:
     int k;
 public:
     double small;
-	Hirschberg();
+    Hirschberg();
     ~Hirschberg();
 
     void defineBegin();
     void defineSite(int i);
+    void defineESite(int l,int r);
     void defineEnd();
 
     void getMidSite(int s1,int e1,int s2,int e2);
-	void alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore* pms);
+    void alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore* pms);
     void divideSeq();
 
     double getMaxScore() { return maxFullScore; }

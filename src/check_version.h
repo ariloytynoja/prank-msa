@@ -15,7 +15,7 @@ class Check_version
     char *get_ip(const char *host);
 
 public:
-    Check_version(float version);
+    Check_version(int version);
 };
 
 #endif // CHECK_VERSION_H
