@@ -44,11 +44,13 @@ Node::~Node()
 //        }
 //    }
 
-    if (node_has_left_child){
+    if (node_has_left_child)
+    {
         delete child0;
         node_has_left_child = false;
     }
-    if (node_has_right_child){
+    if (node_has_right_child)
+    {
         delete child1;
         node_has_right_child = false;
     }
@@ -96,7 +98,8 @@ Node::Node(string t)
 
 
     float currPair = subDistances[0]+child0->maxLength+subDistances[1]+child1->maxLength;
-    if (currPair > maxSpan) {
+    if (currPair > maxSpan)
+    {
         maxSpan = currPair;
     }
 
@@ -123,7 +126,8 @@ Node::Node(string t,Node* p,int branch)
     node_has_right_child = false;
     this->set_name(tree);
 
-    if (tree.find(",",0)>0 && tree.find(",",0)<tree.length()) {
+    if (tree.find(",",0)>0 && tree.find(",",0)<tree.length())
+    {
         isLast = false;
 
         node_has_left_child = true;
@@ -152,13 +156,17 @@ Node::Node(string t,Node* p,int branch)
 
 
         float currPair = subDistances[0]+child0->maxLength+subDistances[1]+child1->maxLength;
-        if (currPair > maxSpan) {
+        if (currPair > maxSpan)
+        {
             maxSpan = currPair;
         }
 
-        if (subDistances[0]+child0->maxLength > subDistances[1]+child1->maxLength) {
+        if (subDistances[0]+child0->maxLength > subDistances[1]+child1->maxLength)
+        {
             maxLength = subDistances[0]+child0->maxLength;
-        } else {
+        }
+        else
+        {
             maxLength = subDistances[1]+child1->maxLength;
         }
     }
@@ -168,7 +176,8 @@ void Node::findMiddlePoint()
 {
     halfLength = maxSpan/2;
 
-    if (halfLength >= child0->maxLength && halfLength <= child0->maxLength+subDistances[0]+subDistances[1]) {
+    if (halfLength >= child0->maxLength && halfLength <= child0->maxLength+subDistances[0]+subDistances[1])
+    {
 
         float b0 = halfLength-child0->maxLength;
         float b1 = subDistances[0]+subDistances[1]-b0;
@@ -190,10 +199,13 @@ void Node::findMiddlePoint()
 
 void Node::findMiddle(int branch)
 {
-    if (!isLast) {
-        if (branch==0) {
+    if (!isLast)
+    {
+        if (branch==0)
+        {
 
-            if (halfLength >= child0->maxLength && halfLength <= child0->maxLength+subDistances[0]) {
+            if (halfLength >= child0->maxLength && halfLength <= child0->maxLength+subDistances[0])
+            {
 
                 float b0 = halfLength-child0->maxLength;
                 float b1 = subDistances[0]-b0;
@@ -211,7 +223,8 @@ void Node::findMiddle(int branch)
                 return;
             }
 
-            if (halfLength >= child1->maxLength && halfLength <= child1->maxLength+subDistances[1]) {
+            if (halfLength >= child1->maxLength && halfLength <= child1->maxLength+subDistances[1])
+            {
 
                 float b0 = halfLength-child1->maxLength;
                 float b1 = subDistances[1]-b0;
@@ -231,9 +244,12 @@ void Node::findMiddle(int branch)
             child0->findMiddle(1);
             child1->findMiddle(0);
 
-        } else {
+        }
+        else
+        {
 
-            if (halfLength >= child0->maxLength && halfLength <= child0->maxLength+subDistances[0]) {
+            if (halfLength >= child0->maxLength && halfLength <= child0->maxLength+subDistances[0])
+            {
 
                 float b0 = halfLength-child0->maxLength;
                 float b1 = subDistances[0]-b0;
@@ -252,7 +268,8 @@ void Node::findMiddle(int branch)
             }
 
 
-            if (halfLength >= child1->maxLength && halfLength <= child1->maxLength+subDistances[1]) {
+            if (halfLength >= child1->maxLength && halfLength <= child1->maxLength+subDistances[1])
+            {
 
                 float b0 = halfLength-child1->maxLength;
                 float b1 = subDistances[1]-b0;
@@ -275,16 +292,19 @@ void Node::findMiddle(int branch)
     }
 }
 
-void Node::divideTree(string tree,string* trees,float* distance) {
+void Node::divideTree(string tree,string* trees,float* distance)
+{
 
     trees[0] = "";
 
-    if ((tree.substr(tree.length()-1)).compare(";")==0) {
-      tree = tree.substr(0,tree.find_last_of(")")); // remove last ';' and anything after the last bracket
+    if ((tree.substr(tree.length()-1)).compare(";")==0)
+    {
+        tree = tree.substr(0,tree.find_last_of(")")); // remove last ';' and anything after the last bracket
     }
     tree = tree.substr(1,tree.length()-2);     // remove first & last '('
 
-    if (tree.at(0)!='(') { // only one taxon before midpoint comma
+    if (tree.at(0)!='(')   // only one taxon before midpoint comma
+    {
 
         string tmp = tree.substr(0,tree.find(",",0));
         trees[0] = tmp.substr(0,tmp.find(":",0));
@@ -294,38 +314,59 @@ void Node::divideTree(string tree,string* trees,float* distance) {
 
         bool trifurc = false;
         int open = 0;
-        for (unsigned int j = 0; j<tree.length(); j++) {
-            if (tree.at(j)=='(') { open++; }
-            else if (tree.at(j)==')') { open--; }
-            if (j>0 && open==0 && tree.substr(j).find(",",0)<=tree.length()) {
+        for (unsigned int j = 0; j<tree.length(); j++)
+        {
+            if (tree.at(j)=='(')
+            {
+                open++;
+            }
+            else if (tree.at(j)==')')
+            {
+                open--;
+            }
+            if (j>0 && open==0 && tree.substr(j).find(",",0)<=tree.length())
+            {
                 trifurc = true;
             }
         }
 
         // correction for trifurcating root
-        if (trifurc) {
+        if (trifurc)
+        {
             isUnrooted = true;
             trees[1] = "("+tree+")";
             distance[0] = distance[0]/2;
             distance[1] = distance[0];
-        } else {
+        }
+        else
+        {
             trees[1] = tree.substr(0,tree.find_last_of(":"));
             tmp = tree.substr(tree.find_last_of(":")+1);
             distance[1] = atof(tmp.c_str());
         }
 
-    } else {
+    }
+    else
+    {
 
         int open = 0;
 
-        for (unsigned int i=0; i<tree.length(); i++) {
+        for (unsigned int i=0; i<tree.length(); i++)
+        {
 
             // count parentheses that are "open"
-            if (tree.at(i)=='(') { open++; }
-            else if (tree.at(i)==')') { open--; }
+            if (tree.at(i)=='(')
+            {
+                open++;
+            }
+            else if (tree.at(i)==')')
+            {
+                open--;
+            }
             trees[0].append(tree.substr(i,1));
 
-            if (open<=0) {
+            if (open<=0)
+            {
                 string tmp = tree.substr(i+2,tree.find(",",i+2));
                 distance[0] = atof(tmp.c_str());
 
@@ -333,24 +374,35 @@ void Node::divideTree(string tree,string* trees,float* distance) {
 
                 bool trifurc = false;
                 open = 0;
-                for (unsigned int j = 0; j<tree.length(); j++) {
-                    if (tree.at(j)=='(') { open++; }
-                    else if (tree.at(j)==')') { open--; }
+                for (unsigned int j = 0; j<tree.length(); j++)
+                {
+                    if (tree.at(j)=='(')
+                    {
+                        open++;
+                    }
+                    else if (tree.at(j)==')')
+                    {
+                        open--;
+                    }
 
-                    if (open==0 && tree.find(",",j)<=tree.length()) {
+                    if (open==0 && tree.find(",",j)<=tree.length())
+                    {
                         trifurc = true;
                     }
                 }
 
                 // correction for trifurcating root
-                if (trifurc) {
+                if (trifurc)
+                {
 
                     isUnrooted = true;
                     trees[1] = "("+tree+")";
                     distance[0] = distance[0]/2;
                     distance[1] = distance[0];
 
-                } else {
+                }
+                else
+                {
 
                     trees[1] = tree.substr(0,tree.find_last_of(":"));
 
@@ -368,11 +420,11 @@ void Node::divideTree(string tree,string* trees,float* distance) {
 
 void Node::mark_sequences(vector<string> *names)
 {
-    if(is_leaf())
+    if (is_leaf())
     {
-        for(int i=0;i<(int)names->size();i++)
+        for (int i=0; i<(int)names->size(); i++)
         {
-            if(names->at(i)==tree)
+            if (names->at(i)==tree)
             {
                 this->has_sequence(true);
                 break;
@@ -390,7 +442,7 @@ void Node::prune_down()
 {
 //    cout<<"prune down in "<<this->get_name()<<endl;
 
-    if(this->is_leaf())
+    if (this->is_leaf())
         return;
 
     child0->set_distance_to_parent(subDistances[0]);
@@ -398,33 +450,35 @@ void Node::prune_down()
     child1->set_distance_to_parent(subDistances[1]);
     child1->prune_down();
 
-    if(!child0->has_sequence()){
+    if (!child0->has_sequence())
+    {
         this->delete_left_child();
         this->has_left_child(false);
     }
 
-    if(!child1->has_sequence()){
+    if (!child1->has_sequence())
+    {
         this->delete_right_child();
         this->has_right_child(false);
     }
 
-    if(this->has_left_child() && !child0->is_leaf())
+    if (this->has_left_child() && !child0->is_leaf())
     {
-        if(!child0->has_left_child() && child0->has_right_child())
+        if (!child0->has_left_child() && child0->has_right_child())
         {
             Node *new_child = child0->child1;
             new_child->set_distance_to_parent (child0->get_distance_to_parent()+
-                                        child0->child1->get_distance_to_parent());
+                                               child0->child1->get_distance_to_parent());
 
             child0->has_right_child(false);
             this->delete_left_child();
             this->add_left_child(new_child);
         }
-        else if(child0->has_left_child() && !child0->has_right_child())
+        else if (child0->has_left_child() && !child0->has_right_child())
         {
             Node *new_child = child0->child0;
             new_child->set_distance_to_parent (child0->get_distance_to_parent()+
-                                child0->child0->get_distance_to_parent());
+                                               child0->child0->get_distance_to_parent());
 
             child0->has_left_child(false);
             this->delete_left_child();
@@ -432,33 +486,33 @@ void Node::prune_down()
         }
     }
 
-    if(this->has_right_child() && !child1->is_leaf())
+    if (this->has_right_child() && !child1->is_leaf())
     {
-        if(!child1->has_left_child() && child1->has_right_child())
+        if (!child1->has_left_child() && child1->has_right_child())
         {
             Node *new_child = child1->child1;
             new_child->set_distance_to_parent (child1->get_distance_to_parent()+
-                                        child1->child1->get_distance_to_parent() );
+                                               child1->child1->get_distance_to_parent() );
 
             child1->has_right_child(false);
             this->delete_right_child();
             this->add_right_child(new_child);
         }
-        else if(child1->has_left_child() && !child1->has_right_child())
+        else if (child1->has_left_child() && !child1->has_right_child())
         {
             Node *new_child = child1->child0;
             new_child->set_distance_to_parent (child1->get_distance_to_parent()+
-                                            child1->child0->get_distance_to_parent());
+                                               child1->child0->get_distance_to_parent());
             child1->has_left_child(false);
             this->delete_right_child();
             this->add_right_child(new_child);
         }
     }
 
-    if(this->has_left_child() && child0->has_sequence())
+    if (this->has_left_child() && child0->has_sequence())
         this->has_sequence(true);
 
-    if(this->has_right_child() && child1->has_sequence())
+    if (this->has_right_child() && child1->has_sequence())
         this->has_sequence(true);
 
 //    cout<<"prune down out "<<this->get_name()<<endl;
@@ -468,7 +522,7 @@ void Node::prune_up()
 {
 //    cout<<"prune up in "<<this->get_name()<<endl;
 
-    if(!this->is_leaf() && !this->has_left_child() && this->has_right_child())
+    if (!this->is_leaf() && !this->has_left_child() && this->has_right_child())
     {
         Node* tmp_child = child1;
 
@@ -484,7 +538,7 @@ void Node::prune_up()
         delete tmp_child;
     }
 
-    if(!this->is_leaf() && this->has_left_child() && !this->has_right_child())
+    if (!this->is_leaf() && this->has_left_child() && !this->has_right_child())
     {
         Node* tmp_child = child0;
 

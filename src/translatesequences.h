@@ -28,7 +28,8 @@
 	@author Ari Loytynoja <ari@ebi.ac.uk>
 */
 
-class TranslateSequences{
+class TranslateSequences
+{
     std::map<std::string,std::string> dnaSeqs;
     std::map<std::string,std::string> codonToAa;
     std::map<std::string,std::string> aaToCodon;

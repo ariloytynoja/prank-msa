@@ -74,39 +74,49 @@ AncestralNode::AncestralNode(string s)
     rd = atof(rn.substr(rn.find(":")+1).c_str());
     rn = rn.substr(0,rn.find(":"));
 
-    if (ln.at(0)=='#' && ln.at(ln.length()-1)=='#') {
+    if (ln.at(0)=='#' && ln.at(ln.length()-1)=='#')
+    {
         lInternal = true;
-    } else {
+    }
+    else
+    {
         lInternal = false;
         lChild = new TerminalNode(ln,ld);
     }
-    if (rn.at(0)=='#' && rn.at(rn.length()-1)=='#') {
+    if (rn.at(0)=='#' && rn.at(rn.length()-1)=='#')
+    {
         rInternal = true;
-    } else {
+    }
+    else
+    {
         rInternal = false;
         rChild = new TerminalNode(rn,rd);
     }
 
     ld *= branchScalingFactor;
 
-    if(MAXBRANCH) {
-      if(ld>fixedBranchLength)
-        ld=fixedBranchLength;
+    if (MAXBRANCH)
+    {
+        if (ld>fixedBranchLength)
+            ld=fixedBranchLength;
     }
 
-    if(FIXEDBRANCH) {
-      ld=fixedBranchLength;
+    if (FIXEDBRANCH)
+    {
+        ld=fixedBranchLength;
     }
 
     rd *= branchScalingFactor;
 
-    if(MAXBRANCH) {
-      if(rd>fixedBranchLength)
-        rd=fixedBranchLength;
+    if (MAXBRANCH)
+    {
+        if (rd>fixedBranchLength)
+            rd=fixedBranchLength;
     }
 
-    if(FIXEDBRANCH) {
-      rd=fixedBranchLength;
+    if (FIXEDBRANCH)
+    {
+        rd=fixedBranchLength;
     }
 
     if (ld<minBrL)
@@ -123,7 +133,7 @@ void AncestralNode::partlyAlignSequences()
     lChild->partlyAlignSequences();
     rChild->partlyAlignSequences();
 
-    if(lChild->getGroupName() !="null" && lChild->getGroupName() == rChild->getGroupName())
+    if (lChild->getGroupName() !="null" && lChild->getGroupName() == rChild->getGroupName())
     {
         FOREVER = false;
         this->readThisNode();
@@ -163,13 +173,14 @@ void AncestralNode::alignThisNode()
 
     hmm->alignmentModel(this);
 
-	PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
+    PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
     int time1 = time(0);
 
-    if(HARDANCHORS) {
-      printChildAlignment(lChild,outfile+".left_ach");
-      printChildAlignment(rChild,outfile+".right_ach");
-      tmpNodeName = nodeName;
+    if (HARDANCHORS)
+    {
+        printChildAlignment(lChild,outfile+".left_ach");
+        printChildAlignment(rChild,outfile+".right_ach");
+        tmpNodeName = nodeName;
     }
 
     Hirschberg* hp = new Hirschberg();
@@ -178,24 +189,29 @@ void AncestralNode::alignThisNode()
         cout<<"Hirschberg: "<<hp->getMaxScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
 
     delete hp;
-	delete pms;
+    delete pms;
 
-    if (!lChild->isTerminal()) {
+    if (!lChild->isTerminal())
+    {
         AncestralSequence *a1 = static_cast<AncestralSequence*>(lChild->getSequence());
         a1->setRealIndex(true);
     }
-    if (!rChild->isTerminal()) {
+    if (!rChild->isTerminal())
+    {
         AncestralSequence *a2 = static_cast<AncestralSequence*>(rChild->getSequence());
         a2->setRealIndex(false);
     }
     time1 = time(0);
 
-    if (DOPOST) {
+    if (DOPOST)
+    {
 
-		PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
+        PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
 
-		if (NOISE>=0 && SCREEN) {
-            for (unsigned int i=0;i<message.length();i++) {
+        if (NOISE>=0 && SCREEN)
+        {
+            for (unsigned int i=0; i<message.length(); i++)
+            {
                 cout<<'\b';
             }
 
@@ -203,7 +219,9 @@ void AncestralNode::alignThisNode()
 
             cout<<message;
             cout.flush();
-        } else if (NOISE>0) {
+        }
+        else if (NOISE>0)
+        {
             cout<<currentNode+": computing full probability"<<endl;
         }
 
@@ -229,8 +247,8 @@ void AncestralNode::alignThisNode()
 
         time1 = time(0);
 
-		delete pms;
-	}
+        delete pms;
+    }
 
     CharacterProbability *cp = new CharacterProbability(lChild->getSequence(),rChild->getSequence());
 
@@ -244,20 +262,24 @@ void AncestralNode::alignThisNode()
     seq->setChildGaps(lChild->getSequence(),rChild->getSequence());
 
 
-    if(DOTS){
-      int l = getSequence()->length();
-      for(int i=0;i<l;i++) {
-        if(seq->isPermInsertion(i)){
-          if(seq->getLIndex(i)<0)
-            rChild->setPermanentInsertion(seq->getRIndex(i));
-          if(seq->getRIndex(i)<0)
-            lChild->setPermanentInsertion(seq->getLIndex(i));
+    if (DOTS)
+    {
+        int l = getSequence()->length();
+        for (int i=0; i<l; i++)
+        {
+            if (seq->isPermInsertion(i))
+            {
+                if (seq->getLIndex(i)<0)
+                    rChild->setPermanentInsertion(seq->getRIndex(i));
+                if (seq->getRIndex(i)<0)
+                    lChild->setPermanentInsertion(seq->getLIndex(i));
+            }
         }
-      }
     }
 
     // debugging: print each intermediate MA
-    if (PRINTNODES){
+    if (PRINTNODES)
+    {
 
         int n = getTerminalNodeNumber();
         int l = getSequence()->length();
@@ -267,7 +289,8 @@ void AncestralNode::alignThisNode()
         this->getTerminalNames(&nms);
 
         vector<string> sqs;
-        for (int i=0;i<n;i++) {
+        for (int i=0; i<n; i++)
+        {
             string s = "";
             sqs.push_back(s);
         }
@@ -278,13 +301,17 @@ void AncestralNode::alignThisNode()
         vector<string> col;
 
         char* alignment;
-        if (CODON){
+        if (CODON)
+        {
             alignment = new char[n*l*3];
-        } else {
+        }
+        else
+        {
             alignment = new char[n*l];
         }
 
-        for (int i=0;i<l;i++) {
+        for (int i=0; i<l; i++)
+        {
             col.clear();
             this->getCharactersAt(&col,i);
             vector<string>::iterator cb = col.begin();
@@ -292,15 +319,19 @@ void AncestralNode::alignThisNode()
 
             si = sqs.begin();
             int j=0;
-            for (;cb!=ce;cb++,si++,j++) {
+            for (; cb!=ce; cb++,si++,j++)
+            {
 
                 *si+=*cb;
 
-                if (CODON){
+                if (CODON)
+                {
                     alignment[j*l*3+i*3] = cb->at(0);
                     alignment[j*l*3+i*3+1] = cb->at(1);
                     alignment[j*l*3+i*3+2] = cb->at(2);
-                } else {
+                }
+                else
+                {
                     alignment[j*l+i] = cb->at(0);
                 }
             }
@@ -317,7 +348,8 @@ void AncestralNode::alignThisNode()
 
         l = getSequence()->length();
 
-        if (WRITEXML) {
+        if (WRITEXML)
+        {
             ofstream seqout((outfile+"_"+nodeName+".xml").c_str());
 
             si = nms.begin();
@@ -336,13 +368,15 @@ void AncestralNode::alignThisNode()
             // terminal nodes
 
             int ll = l;
-            if(CODON)
-              ll*=3;
+            if (CODON)
+                ll*=3;
 
-            for (int j=0;j<n;j++) {
+            for (int j=0; j<n; j++)
+            {
                 seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<(*si++)<<"\">"<<endl;
                 seqout<<"  <sequence>"<<endl<<"    ";
-                for (int i=0;i<ll;i++) {
+                for (int i=0; i<ll; i++)
+                {
                     seqout<<alignment[j*ll+i];
                 }
                 seqout<<endl;
@@ -354,14 +388,16 @@ void AncestralNode::alignThisNode()
 
             // internal nodes
             this->setSiteLength(l);
-            for (int i=0;i<l;i++) {
+            for (int i=0; i<l; i++)
+            {
                 this->setSiteIndex(i,i);
             }
             this->outputXml(&seqout,false);
             seqout<<"</nodes>"<<endl<<"<model>"<<endl;
 
             // model
-            for (int k=0;k<nState;k++) {
+            for (int k=0; k<nState; k++)
+            {
                 seqout<<"  <probability id=\""<<k+1<<"\" name=\""<<hmm->getStName(k)<<"\" ";
                 seqout<<"color=\""<<hmm->getDrawCl(k)<<"\" style=\""<<hmm->getDrawPt(k)<<"\" ";
                 seqout<<"offset=\""<<hmm->getDrawOf(k)<<"\" show=\"yes\"/>"<<endl;
@@ -387,185 +423,206 @@ void AncestralNode::alignThisNode()
 
 void AncestralNode::readAlignment()
 {
-  lChild->readAlignment();
-  rChild->readAlignment();
-  this->readThisNode();
+    lChild->readAlignment();
+    rChild->readAlignment();
+    this->readThisNode();
 }
 
 void AncestralNode::readThisNode()
 {
 //    cout<<"AncestralNode::readThisNode() "<<nodeName<<endl;
-  vector<int> path;
-  Sequence *seq1 = lChild->getSequence();
-  Sequence *seq2 = rChild->getSequence();
+    vector<int> path;
+    Sequence *seq1 = lChild->getSequence();
+    Sequence *seq2 = rChild->getSequence();
 
-   if(NOISE>1)
-    cout<<*(seq1->getGappedSeq())<<endl<<*(seq2->getGappedSeq())<<endl;
+    if (NOISE>1)
+        cout<<*(seq1->getGappedSeq())<<endl<<*(seq2->getGappedSeq())<<endl;
 
-  string* ancSeq = new string();
-  int i;
-  if(!CODON)
-  {
-      FOR(i,seq1->gappedLength()){
-        bool c1 = seq1->prealignedGapAt(i);
-        bool c2 = seq2->prealignedGapAt(i);
-        if(NOISE>1){
-          cout<<i<<"/"<<seq1->gappedLength()<<" ";
-          cout<<c1<<" "<<c2<<endl;
-        }
-        if(c1 && c2){
-          ancSeq->append("-");
-        }
-        else if(!c1 && c2){
-          path.push_back(0);
-          ancSeq->append("A");
-        }
-        else if(c1 && !c2){
-          path.push_back(1);
-          ancSeq->append("A");
-        }
-        else if(!c1 && !c2){
-          path.push_back(2);
-          ancSeq->append("A");
-        }
-      }
-  } else {
-     for(i=0;i<seq1->gappedLength();i+=3){
-        bool c1a = seq1->prealignedGapAt(i);
-        bool c1b = seq1->prealignedGapAt(i+1);
-        bool c1c = seq1->prealignedGapAt(i+2);
-        bool c2a = seq2->prealignedGapAt(i);
-        bool c2b = seq2->prealignedGapAt(i+1);
-        bool c2c = seq2->prealignedGapAt(i+2);
-
-        if( ( (c1a && c1b && c1c) || (!c1a && !c1b && !c1c) ) &&
-            ( (c2a && c2b && c2c) || (!c2a && !c2b && !c2c) ) )
+    string* ancSeq = new string();
+    int i;
+    if (!CODON)
+    {
+        FOR(i,seq1->gappedLength())
         {
-            //ok
+            bool c1 = seq1->prealignedGapAt(i);
+            bool c2 = seq2->prealignedGapAt(i);
+            if (NOISE>1)
+            {
+                cout<<i<<"/"<<seq1->gappedLength()<<" ";
+                cout<<c1<<" "<<c2<<endl;
+            }
+            if (c1 && c2)
+            {
+                ancSeq->append("-");
+            }
+            else if (!c1 && c2)
+            {
+                path.push_back(0);
+                ancSeq->append("A");
+            }
+            else if (c1 && !c2)
+            {
+                path.push_back(1);
+                ancSeq->append("A");
+            }
+            else if (!c1 && !c2)
+            {
+                path.push_back(2);
+                ancSeq->append("A");
+            }
         }
-        else
+    }
+    else
+    {
+        for (i=0; i<seq1->gappedLength(); i+=3)
         {
-            cout<<"ReadAlignment: Error reading the alignment. Gaps not following codon structure. Exiting.\n\n";
-            exit(-1);
+            bool c1a = seq1->prealignedGapAt(i);
+            bool c1b = seq1->prealignedGapAt(i+1);
+            bool c1c = seq1->prealignedGapAt(i+2);
+            bool c2a = seq2->prealignedGapAt(i);
+            bool c2b = seq2->prealignedGapAt(i+1);
+            bool c2c = seq2->prealignedGapAt(i+2);
+
+            if ( ( (c1a && c1b && c1c) || (!c1a && !c1b && !c1c) ) &&
+                    ( (c2a && c2b && c2c) || (!c2a && !c2b && !c2c) ) )
+            {
+                //ok
+            }
+            else
+            {
+                cout<<"ReadAlignment: Error reading the alignment. Gaps not following codon structure. Exiting.\n\n";
+                exit(-1);
+            }
+
+            if (NOISE>1)
+            {
+                cout<<i<<"/"<<seq1->gappedLength()<<" ";
+                cout<<c1a<<c1b<<c1c<<" "<<c2a<<c2b<<c2c<<endl;
+            }
+            if (c1a && c2a)
+            {
+                ancSeq->append("---");
+            }
+            else if (!c1a && c2a)
+            {
+                path.push_back(0);
+                ancSeq->append("AAA");
+            }
+            else if (c1a && !c2a)
+            {
+                path.push_back(1);
+                ancSeq->append("AAA");
+            }
+            else if (!c1a && !c2a)
+            {
+                path.push_back(2);
+                ancSeq->append("AAA");
+            }
         }
-
-        if(NOISE>1){
-          cout<<i<<"/"<<seq1->gappedLength()<<" ";
-          cout<<c1a<<c1b<<c1c<<" "<<c2a<<c2b<<c2c<<endl;
-        }
-        if(c1a && c2a){
-          ancSeq->append("---");
-        }
-        else if(!c1a && c2a){
-          path.push_back(0);
-          ancSeq->append("AAA");
-        }
-        else if(c1a && !c2a){
-          path.push_back(1);
-          ancSeq->append("AAA");
-        }
-        else if(!c1a && !c2a){
-          path.push_back(2);
-          ancSeq->append("AAA");
-        }
-      }
-  }
-
-  ////////
-
-  char prop[20];
-  sprintf(prop,"(%i/%i)",alignedNodes,totalNodes-1);
-
-  currentNode = nodeName+prop;
-  if (NOISE>0)
-    cout<<endl<<nodeName+prop+": reading "+lChild->getNodeName()+" and "+rChild->getNodeName()<<endl;
-
-
-  hmm->alignmentModel(this);
-
-  PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
-  int time1 = time(0);
-
-
-  ReadAlignment* ra = new ReadAlignment();
-  ra->readSeqs(lChild->getSequence(),rChild->getSequence(),pms,this,&path);
-  if (NOISE>0)
-    cout<<"ReadAlignment: "<<ra->getMaxScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
-
-  delete ra;
-  delete pms;
-
-
-  if (!lChild->isTerminal()) {
-    AncestralSequence *a1 = static_cast<AncestralSequence*>(lChild->getSequence());
-    a1->setRealIndex(true);
-  }
-  if (!rChild->isTerminal()) {
-    AncestralSequence *a2 = static_cast<AncestralSequence*>(rChild->getSequence());
-    a2->setRealIndex(false);
-  }
-  time1 = time(0);
-
-  if (DOPOST) {
-
-    PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
-
-    if (NOISE>=0 && SCREEN) {
-      for (unsigned int i=0;i<message.length();i++) {
-        cout<<'\b';
-      }
-
-      message = currentNode+": computing full probability               ";
-
-      cout<<message;
-      cout.flush();
-    } else if (NOISE>0) {
-      cout<<currentNode+": computing full probability"<<endl;
     }
 
-    FullProbability* fp = new FullProbability(lChild->getSequence(),rChild->getSequence(),pms);
+    ////////
 
-    if (FULLBAND)
-      fp->alignBand();
-    else
-      fp->alignSeqs();
+    char prop[20];
+    sprintf(prop,"(%i/%i)",alignedNodes,totalNodes-1);
 
+    currentNode = nodeName+prop;
     if (NOISE>0)
-      cout <<"FullProbability: "<< fp->getMaxFwdScore()<<" "<<fp->getMaxBwdScore()<<" "<<fp->getMaxFwdScore()-fp->getMaxBwdScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
+        cout<<endl<<nodeName+prop+": reading "+lChild->getNodeName()+" and "+rChild->getNodeName()<<endl;
 
-    time1 = time(0);
 
-    PostProbability* pp = new PostProbability(lChild->getSequence(),rChild->getSequence(),fp->getMaxFwdScore(),pms);
+    hmm->alignmentModel(this);
 
+    PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
+    int time1 = time(0);
+
+
+    ReadAlignment* ra = new ReadAlignment();
+    ra->readSeqs(lChild->getSequence(),rChild->getSequence(),pms,this,&path);
     if (NOISE>0)
-      cout<<"PostProbability: time "<<(time(0)-time1)<<"s"<<endl;
+        cout<<"ReadAlignment: "<<ra->getMaxScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
 
-    delete fp;
-    delete pp;
-
-    time1 = time(0);
-
+    delete ra;
     delete pms;
-  }
-
-  CharacterProbability *cp = new CharacterProbability(lChild->getSequence(),rChild->getSequence());
-
-  if (NOISE>0)
-    cout<<"CharacterProbability: "<< cp->getFwdScore()<<" "<<cp->getBwdScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
-
-  delete cp;
-
-  seq = new AncestralSequence();
-  seq->setChildGaps(lChild->getSequence(),rChild->getSequence());
-  seq->setGappedSeq(ancSeq);
 
 
-  alignedNodes++;
+    if (!lChild->isTerminal())
+    {
+        AncestralSequence *a1 = static_cast<AncestralSequence*>(lChild->getSequence());
+        a1->setRealIndex(true);
+    }
+    if (!rChild->isTerminal())
+    {
+        AncestralSequence *a2 = static_cast<AncestralSequence*>(rChild->getSequence());
+        a2->setRealIndex(false);
+    }
+    time1 = time(0);
 
-  lChild->getSequence()->cleanSpace();
-  rChild->getSequence()->cleanSpace();
+    if (DOPOST)
+    {
 
-  delete ancSeq;
+        PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
+
+        if (NOISE>=0 && SCREEN)
+        {
+            for (unsigned int i=0; i<message.length(); i++)
+            {
+                cout<<'\b';
+            }
+
+            message = currentNode+": computing full probability               ";
+
+            cout<<message;
+            cout.flush();
+        }
+        else if (NOISE>0)
+        {
+            cout<<currentNode+": computing full probability"<<endl;
+        }
+
+        FullProbability* fp = new FullProbability(lChild->getSequence(),rChild->getSequence(),pms);
+
+        if (FULLBAND)
+            fp->alignBand();
+        else
+            fp->alignSeqs();
+
+        if (NOISE>0)
+            cout <<"FullProbability: "<< fp->getMaxFwdScore()<<" "<<fp->getMaxBwdScore()<<" "<<fp->getMaxFwdScore()-fp->getMaxBwdScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
+
+        time1 = time(0);
+
+        PostProbability* pp = new PostProbability(lChild->getSequence(),rChild->getSequence(),fp->getMaxFwdScore(),pms);
+
+        if (NOISE>0)
+            cout<<"PostProbability: time "<<(time(0)-time1)<<"s"<<endl;
+
+        delete fp;
+        delete pp;
+
+        time1 = time(0);
+
+        delete pms;
+    }
+
+    CharacterProbability *cp = new CharacterProbability(lChild->getSequence(),rChild->getSequence());
+
+    if (NOISE>0)
+        cout<<"CharacterProbability: "<< cp->getFwdScore()<<" "<<cp->getBwdScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
+
+    delete cp;
+
+    seq = new AncestralSequence();
+    seq->setChildGaps(lChild->getSequence(),rChild->getSequence());
+    seq->setGappedSeq(ancSeq);
+
+
+    alignedNodes++;
+
+    lChild->getSequence()->cleanSpace();
+    rChild->getSequence()->cleanSpace();
+
+    delete ancSeq;
 }
 
 
@@ -573,17 +630,19 @@ void AncestralNode::readThisNode()
 
 void AncestralNode::setPermanentInsertion(int i)
 {
-  if(i<0 || (seq->getLIndex(i)>=0 && seq->getRIndex(i)>=0))
-    return;
+    if (i<0 || (seq->getLIndex(i)>=0 && seq->getRIndex(i)>=0))
+        return;
 
-  this->getSequence()->setPermInsertion(i);
+    this->getSequence()->setPermInsertion(i);
 
-  if(isLInternal()){
-    lChild->setPermanentInsertion(seq->getLIndex(i));
-  }
-  if(isRInternal()){
-    rChild->setPermanentInsertion(seq->getRIndex(i));
-  }
+    if (isLInternal())
+    {
+        lChild->setPermanentInsertion(seq->getLIndex(i));
+    }
+    if (isRInternal())
+    {
+        rChild->setPermanentInsertion(seq->getRIndex(i));
+    }
 }
 int AncestralNode::getTerminalNodeNumber()
 {
@@ -651,7 +710,8 @@ void AncestralNode::setAnnotation(map<string,FlMatrix*>* annotation)
 
 void AncestralNode::getThisAlignmentPostProbAt(double* p,int i)
 {
-    if (i>=0) {
+    if (i>=0)
+    {
         if (seq->postProbAt(i)>=0)
             (*p) = seq->postProbAt(i);
     }
@@ -659,11 +719,13 @@ void AncestralNode::getThisAlignmentPostProbAt(double* p,int i)
 
 void AncestralNode::getLowestAlignmentPostProbAt(double* p,int i)
 {
-    if (seq->getLIndex(i)>=0) {
+    if (seq->getLIndex(i)>=0)
+    {
         lChild->getLowestAlignmentPostProbAt(p,seq->getLIndex(i));
     }
 
-    if (seq->getRIndex(i)>=0) {
+    if (seq->getRIndex(i)>=0)
+    {
         rChild->getLowestAlignmentPostProbAt(p,seq->getRIndex(i));
     }
 
@@ -671,7 +733,7 @@ void AncestralNode::getLowestAlignmentPostProbAt(double* p,int i)
 
     this->getThisAlignmentPostProbAt(&tp,i);
 
-    if(tp<(*p))
+    if (tp<(*p))
         (*p)=tp;
 
 }
@@ -685,35 +747,53 @@ void AncestralNode::outputXml(std::ofstream* out,bool triple)
 
     int nState = hmm->getNStates();
 
-    for (int k=0;k<hmm->getNStates();k++) {
+    for (int k=0; k<hmm->getNStates(); k++)
+    {
         (*out)<<"  <probability id=\""<<k+1<<"\">"<<endl<<"    ";
 
-        for (int m=0;m<siteLength;m++) {
+        for (int m=0; m<siteLength; m++)
+        {
 
-            if (m>0){
+            if (m>0)
+            {
                 (*out)<<",";
             }
 
             int i = siteIndex[m];
 
-            if (CODON || triple) {
-                if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )  {
+            if (CODON || triple)
+            {
+                if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )
+                {
                     (*out)<<"-1,-1,-1";
-                } else {
-                    if (seq->stateProbAt(k,i)>=0) {
+                }
+                else
+                {
+                    if (seq->stateProbAt(k,i)>=0)
+                    {
                         int t = (int)(seq->stateProbAt(k,i)*100+0.5);
                         (*out)<<t<<","<<t<<","<<t;
-                    } else {
+                    }
+                    else
+                    {
                         (*out)<<"0,0,0";
                     }
                 }
-            } else {
-                if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )  {
+            }
+            else
+            {
+                if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )
+                {
                     (*out)<<"-1";
-                } else {
-                    if (seq->stateProbAt(k,i)>=0) {
+                }
+                else
+                {
+                    if (seq->stateProbAt(k,i)>=0)
+                    {
                         (*out)<<(int)(seq->stateProbAt(k,i)*100+0.5);
-                    } else {
+                    }
+                    else
+                    {
                         (*out)<<"0";
                     }
                 }
@@ -722,30 +802,42 @@ void AncestralNode::outputXml(std::ofstream* out,bool triple)
         (*out)<<endl<<"  </probability>"<<endl;
     }
 
-    if (DOPOST) {
+    if (DOPOST)
+    {
         (*out)<<"  <probability id=\""<<nState+1<<"\">"<<endl<<"    ";
 
         double a;
         double* ap = &a;
 
-        for (int m=0;m<siteLength;m++) {
-            if (m>0){
+        for (int m=0; m<siteLength; m++)
+        {
+            if (m>0)
+            {
                 (*out)<<",";
             }
             int i = siteIndex[m];
-            if (CODON || triple) {
-                if (i<0 || getSequence()->isInsertion(i))  {
+            if (CODON || triple)
+            {
+                if (i<0 || getSequence()->isInsertion(i))
+                {
                     (*out)<<"-1,-1,-1";
-                } else {
+                }
+                else
+                {
                     *ap = 0.0;
                     getThisAlignmentPostProbAt(ap,i);
                     *ap=(int)((*ap)*100+0.5);
                     (*out)<<*ap<<","<<*ap<<","<<*ap;
                 }
-            } else {
-                if (i<0 || getSequence()->isInsertion(i))  {
+            }
+            else
+            {
+                if (i<0 || getSequence()->isInsertion(i))
+                {
                     (*out)<<"-1";
-                } else {
+                }
+                else
+                {
                     *ap = 0.0;
                     getThisAlignmentPostProbAt(ap,i);
                     *ap=(int)((*ap)*100+0.5);
@@ -852,10 +944,12 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
 
     int *insSite = new int[siteLength];
     int h;
-    FOR(h,siteLength){
+    FOR(h,siteLength)
+    {
         insSite[h]=0;
         int i = siteIndex[h];
-        if (i>=0) {
+        if (i>=0)
+        {
             insSite[h] = this->getSequence()->isInsertion(i);
         }
     }
@@ -877,29 +971,42 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
     int j,k;
 
 
-    FOR(h,siteLength) {
+    FOR(h,siteLength)
+    {
         int i = siteIndex[h];
 
-        if (i<0) {
+        if (i<0)
+        {
             fprintf(ancPro,"- %i (-1) ;",h+1);
-            FOR(k,nState) {
-                FOR(j,sAlpha-1) {
+            FOR(k,nState)
+            {
+                FOR(j,sAlpha-1)
+                {
                     fprintf(ancPro," 0,");
                 }
                 fprintf(ancPro," 0;");
             }
-        } else {
+        }
+        else
+        {
 
-            if (this->getSequence()->isInsertion(i)) {
+            if (this->getSequence()->isInsertion(i))
+            {
                 fprintf(ancPro,"+ %i",h+1);
-            } else if (this->getSequence()->isGap(i) && parSite[h]) {
+            }
+            else if (this->getSequence()->isGap(i) && parSite[h])
+            {
                 fprintf(ancPro,"* %i",h+1);
-            } else {
+            }
+            else
+            {
                 fprintf(ancPro,"  %i",h+1);
             }
 
-            FOR(k,nState) {
-                if (this->getSequence()->stateProbAt(k,i)>maxProb) {
+            FOR(k,nState)
+            {
+                if (this->getSequence()->stateProbAt(k,i)>maxProb)
+                {
                     maxProb = this->getSequence()->stateProbAt(k,i);
                     maxState = k;
                 }
@@ -908,10 +1015,12 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
             fprintf(ancPro," (%i) ;",maxState+1);
 
 
-            FOR(k,nState) {
+            FOR(k,nState)
+            {
                 double sum = 0;
 
-                FOR(j,sAlpha) {
+                FOR(j,sAlpha)
+                {
                     double t = this->getSequence()->mlCharProbAt(j,i,k);
                     if (LOGVALUES)
                         sum += exp(t);
@@ -919,7 +1028,8 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
                         sum += t;
                 }
 
-                FOR(j,sAlpha-1) {
+                FOR(j,sAlpha-1)
+                {
                     double t = this->getSequence()->mlCharProbAt(j,i,k);
                     if (LOGVALUES)
                         fprintf(ancPro," %.3f,",exp(t)/sum);
@@ -942,27 +1052,40 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
 
 void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
 {
-    if (i<0) {
-        for (int j=0;j<getInternalNodeNumber();j++){
-            if (CODON){
+    if (i<0)
+    {
+        for (int j=0; j<getInternalNodeNumber(); j++)
+        {
+            if (CODON)
+            {
                 col->push_back("---");
-            } else {
+            }
+            else
+            {
                 col->push_back("-");
             }
         }
 
-    } else {
+    }
+    else
+    {
 
         lChild->getAncCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i));
         rChild->getAncCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
 
-        if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) ) { /*e090626*/
-            if (CODON){
+        if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) )   /*e090626*/
+        {
+            if (CODON)
+            {
                 col->push_back("---");
-            } else {
+            }
+            else
+            {
                 col->push_back("-");
             }
-        } else {
+        }
+        else
+        {
             string alpha = hmm->getAlphabet();
             int sAlpha = alpha.length();
 
@@ -971,51 +1094,72 @@ void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
             float maxProb = -HUGE_VAL;
             int j,k;
 
-            FOR(k,nState) {
-                if (this->getSequence()->stateProbAt(k,i)>maxProb) {
+            FOR(k,nState)
+            {
+                if (this->getSequence()->stateProbAt(k,i)>maxProb)
+                {
                     maxProb = this->getSequence()->stateProbAt(k,i);
                     maxState = k;
                 }
             }
 
-            if (LOGVALUES) {
+            if (LOGVALUES)
+            {
                 float ms = -HUGE_VAL;
 
                 int mi = -1;
-                FOR(j,sAlpha) {
-                    if (this->getSequence()->mlCharProbAt(j,i,maxState)>= ms){
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,i,maxState)>= ms)
+                    {
                         ms = this->getSequence()->mlCharProbAt(j,i,maxState);
                         mi = j;
                     }
                 }
 
-                if (mi>=0) {
-                    if (CODON){
+                if (mi>=0)
+                {
+                    if (CODON)
+                    {
                         col->push_back(alpha.substr(mi*3,3));
-                    } else {
+                    }
+                    else
+                    {
                         col->push_back(string(1,alpha.at(mi)));
                     }
-                } else {
+                }
+                else
+                {
                     cout<<"impossible index: site "<<i<<", "<<mi<<endl;
                 }
 
-            } else {
+            }
+            else
+            {
                 float ms = 0;
 
                 int mi = -1;
-                FOR(j,sAlpha) {
-                    if (this->getSequence()->mlCharProbAt(j,i,maxState) >= ms){
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,i,maxState) >= ms)
+                    {
                         ms = this->getSequence()->mlCharProbAt(j,i,maxState);
                         mi = j;
                     }
                 }
-                if (mi>=0) {
-                    if (CODON){
+                if (mi>=0)
+                {
+                    if (CODON)
+                    {
                         col->push_back(alpha.substr(mi*3,3));
-                    } else {
+                    }
+                    else
+                    {
                         col->push_back(string(1,alpha.at(mi)));
                     }
-                } else {
+                }
+                else
+                {
                     cout<<"impossible index: site "<<i<<", "<<mi<<endl;
                 }
             }
@@ -1025,48 +1169,76 @@ void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
 
 void AncestralNode::getCharactersAt(vector<string>* col,int i)
 {
-  if (seq->getLIndex(i)<0) {
-    if(DOTS && this->getSequence()->isPermInsertion(i)) {
-      for (int j=0;j<lChild->getTerminalNodeNumber();j++){
-        if (CODON){
-          col->push_back("...");
-        } else {
-          col->push_back(".");
+    if (seq->getLIndex(i)<0)
+    {
+        if (DOTS && this->getSequence()->isPermInsertion(i))
+        {
+            for (int j=0; j<lChild->getTerminalNodeNumber(); j++)
+            {
+                if (CODON)
+                {
+                    col->push_back("...");
+                }
+                else
+                {
+                    col->push_back(".");
+                }
+            }
         }
-      }
-    } else{
-      for (int j=0;j<lChild->getTerminalNodeNumber();j++){
-        if (CODON){
-          col->push_back("---");
-        } else {
-          col->push_back("-");
+        else
+        {
+            for (int j=0; j<lChild->getTerminalNodeNumber(); j++)
+            {
+                if (CODON)
+                {
+                    col->push_back("---");
+                }
+                else
+                {
+                    col->push_back("-");
+                }
+            }
         }
-      }
     }
-  } else {
-    lChild->getCharactersAt(col,seq->getLIndex(i));
-  }
-  if (seq->getRIndex(i)<0) {
-    if(DOTS && this->getSequence()->isPermInsertion(i)) {
-      for (int j=0;j<rChild->getTerminalNodeNumber();j++){
-        if (CODON){
-          col->push_back("...");
-        } else {
-          col->push_back(".");
-        }
-      }
-    } else{
-      for (int j=0;j<rChild->getTerminalNodeNumber();j++){
-        if (CODON){
-          col->push_back("---");
-        } else {
-          col->push_back("-");
-        }
-      }
+    else
+    {
+        lChild->getCharactersAt(col,seq->getLIndex(i));
     }
-  } else {
-    rChild->getCharactersAt(col,seq->getRIndex(i));
-  }
+    if (seq->getRIndex(i)<0)
+    {
+        if (DOTS && this->getSequence()->isPermInsertion(i))
+        {
+            for (int j=0; j<rChild->getTerminalNodeNumber(); j++)
+            {
+                if (CODON)
+                {
+                    col->push_back("...");
+                }
+                else
+                {
+                    col->push_back(".");
+                }
+            }
+        }
+        else
+        {
+            for (int j=0; j<rChild->getTerminalNodeNumber(); j++)
+            {
+                if (CODON)
+                {
+                    col->push_back("---");
+                }
+                else
+                {
+                    col->push_back("-");
+                }
+            }
+        }
+    }
+    else
+    {
+        rChild->getCharactersAt(col,seq->getRIndex(i));
+    }
 }
 
 
@@ -1087,14 +1259,20 @@ void AncestralNode::setSiteIndex(int site,int index)
 {
     siteIndex[site] = index;
 
-    if (index>=0) {
+    if (index>=0)
+    {
         lChild->setSiteIndex(site,getSequence()->getLIndex(index));
-    } else {
+    }
+    else
+    {
         lChild->setSiteIndex(site,-1);
     }
-    if (index>=0) {
+    if (index>=0)
+    {
         rChild->setSiteIndex(site,getSequence()->getRIndex(index));
-    } else {
+    }
+    else
+    {
         rChild->setSiteIndex(site,-1);
     }
 }
@@ -1103,59 +1281,68 @@ void AncestralNode::setSiteIndex(int site,int index)
 void AncestralNode::printChildAlignment(TreeNode *node,string filename)
 {
 
-  int n = node->getTerminalNodeNumber();
-  int l = node->getSequence()->length();
+    int n = node->getTerminalNodeNumber();
+    int l = node->getSequence()->length();
 
-  vector<string> nms;
-  node->getTerminalNames(&nms);
+    vector<string> nms;
+    node->getTerminalNames(&nms);
 
-  vector<string> sqs;
-  for (int i=0;i<n;i++) {
-    string s = "";
-    sqs.push_back(s);
-  }
-
-  vector<string>::iterator si = sqs.begin();
-  vector<string> col;
-
-  char* alignment;
-  if (CODON){
-    alignment = new char[n*l*3];
-  } else {
-    alignment = new char[n*l];
-  }
-
-  for (int i=0;i<l;i++) {
-    col.clear();
-    node->getCharactersAt(&col,i);
-    vector<string>::iterator cb = col.begin();
-    vector<string>::iterator ce = col.end();
-
-    si = sqs.begin();
-    int j=0;
-    for (;cb!=ce;cb++,si++,j++) {
-
-      *si+=*cb;
-
-      if (CODON){
-        alignment[j*l*3+i*3] = cb->at(0);
-        alignment[j*l*3+i*3+1] = cb->at(1);
-        alignment[j*l*3+i*3+2] = cb->at(2);
-      } else {
-        alignment[j*l+i] = cb->at(0);
-      }
+    vector<string> sqs;
+    for (int i=0; i<n; i++)
+    {
+        string s = "";
+        sqs.push_back(s);
     }
 
-  }
+    vector<string>::iterator si = sqs.begin();
+    vector<string> col;
 
-  if (CODON)
-    l*=3;
+    char* alignment;
+    if (CODON)
+    {
+        alignment = new char[n*l*3];
+    }
+    else
+    {
+        alignment = new char[n*l];
+    }
+
+    for (int i=0; i<l; i++)
+    {
+        col.clear();
+        node->getCharactersAt(&col,i);
+        vector<string>::iterator cb = col.begin();
+        vector<string>::iterator ce = col.end();
+
+        si = sqs.begin();
+        int j=0;
+        for (; cb!=ce; cb++,si++,j++)
+        {
+
+            *si+=*cb;
+
+            if (CODON)
+            {
+                alignment[j*l*3+i*3] = cb->at(0);
+                alignment[j*l*3+i*3+1] = cb->at(1);
+                alignment[j*l*3+i*3+2] = cb->at(2);
+            }
+            else
+            {
+                alignment[j*l+i] = cb->at(0);
+            }
+        }
+
+    }
+
+    if (CODON)
+        l*=3;
 
 
-  WriteFile* wfa = new WriteFile();
-  wfa->writeSeqs((filename).c_str(),&nms,&sqs,8);
-  delete wfa;
+    WriteFile* wfa = new WriteFile();
+    wfa->writeSeqs((filename).c_str(),&nms,&sqs,8);
+    delete wfa;
 
-  delete []alignment;
+    delete []alignment;
 
 }

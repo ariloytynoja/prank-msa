@@ -31,45 +31,52 @@
 #include "terminalsequence.h"
 #include "site.h"
 
-class CharacterProbability{
+class CharacterProbability
+{
     float fwdScore;
     float bwdScore;
 
-	int nState;
-	int sAlpha;
+    int nState;
+    int sAlpha;
 
-	int li;
-	int ri;
+    int li;
+    int ri;
 
-	double small,sum,sum1,sum2;
+    double small,sum,sum1,sum2;
 
-	int skipMatch;
+    int skipMatch;
 
-	AncestralSequence* a1;
-	AncestralSequence* a2;
-	TerminalSequence* t1;
-	TerminalSequence* t2;
+    AncestralSequence* a1;
+    AncestralSequence* a2;
+    TerminalSequence* t1;
+    TerminalSequence* t2;
 
-	void logScoresSS();
-	void logScoresSM();
-	void logScoresMS();
-	void logScoresMM();
-	void scoresSS();
-	void scoresSM();
-	void scoresMS();
-	void scoresMM();
+    void logScoresSS();
+    void logScoresSM();
+    void logScoresMS();
+    void logScoresMM();
+    void scoresSS();
+    void scoresSM();
+    void scoresMS();
+    void scoresMM();
 
-	Site *cSite;
-	Site *pSite;
-	Site *sSite;
+    Site *cSite;
+    Site *pSite;
+    Site *sSite;
 
     int j,k,l,m,n;
 public:
     CharacterProbability(Sequence* sq1,Sequence* sq2);
     ~CharacterProbability();
 
-    float getFwdScore() { return fwdScore; }
-    float getBwdScore() { return bwdScore; }
+    float getFwdScore()
+    {
+        return fwdScore;
+    }
+    float getBwdScore()
+    {
+        return bwdScore;
+    }
 };
 
 #endif

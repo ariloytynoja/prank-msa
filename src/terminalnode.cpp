@@ -45,16 +45,19 @@ TerminalNode::TerminalNode(string s,float l)
 
     l *= branchScalingFactor;
 
-    if(MAXBRANCH) {
-      if(l>fixedBranchLength)
+    if (MAXBRANCH)
+    {
+        if (l>fixedBranchLength)
+            l=fixedBranchLength;
+    }
+
+    if (FIXEDBRANCH)
+    {
         l=fixedBranchLength;
     }
 
-    if(FIXEDBRANCH) {
-      l=fixedBranchLength;
-    }
-
-    if (l<minBrL) {
+    if (l<minBrL)
+    {
         cout<<"Branch length <"<<minBrL<<". Set to "<<minBrL<<"."<<endl;
         l=minBrL;
     }
@@ -110,7 +113,7 @@ void TerminalNode::setCharString(vector<string>* sns,vector<string>* sqs)
 //     charString = sqs->at(index);
     seq = new TerminalSequence(&sqs->at(index));
     charString = *seq->getMLsequence();
-     if (NOISE>1)
+    if (NOISE>1)
         cout<<nodeName<<endl<<charString<<endl;
 }
 
@@ -120,20 +123,22 @@ void TerminalNode::setCharString(vector<string>* sns,vector<string>* sqs,int* co
     vector<string>::iterator ni = sns->begin();
     vector<string>::iterator si = sqs->begin();
 
-    for (;ni!=sns->end();si++,ni++){
+    for (; ni!=sns->end(); si++,ni++)
+    {
         string seqname = (*ni);
         string tmpGroup = "null";
-        if(PARTLYALIGNED)
+        if (PARTLYALIGNED)
         {
             size_t pos = seqname.find("_group_");
-            if(pos != string::npos)
+            if (pos != string::npos)
             {
                 tmpGroup = seqname.substr((int)pos);
                 seqname = seqname.substr(0,(int)pos);
             }
         }
 
-        if (seqname==nodeName) {
+        if (seqname==nodeName)
+        {
             if (NOISE>1)
                 cout<<(*ni)<<"\n"<<(*si)<<endl;
 
@@ -155,7 +160,8 @@ void TerminalNode::setAnnotation(map<string,FlMatrix*>* annotation)
 {
     map<string,FlMatrix*>::iterator smi;
     smi = annotation->find(nodeName);
-    if (smi!=annotation->end()){
+    if (smi!=annotation->end())
+    {
         seq->setAnnotation(smi->second);
     }
 
@@ -228,19 +234,30 @@ void TerminalNode::getAncCharactersAt(vector<string>* ,int ,bool )
 
 void TerminalNode::getCharactersAt(vector<string>* col,int i)
 {
-    if (i<0) {
-        if (CODON){
+    if (i<0)
+    {
+        if (CODON)
+        {
             col->push_back("---");
-        } else {
+        }
+        else
+        {
             col->push_back("-");
         }
-    } else if (i<getSequence()->length()){
-        if (CODON){
+    }
+    else if (i<getSequence()->length())
+    {
+        if (CODON)
+        {
             col->push_back(charString.substr(i*3,3));
-        } else {
+        }
+        else
+        {
             col->push_back(charString.substr(i,1));
         }
-    } else {
+    }
+    else
+    {
         cout<<nodeName<<": index out of scope ("<<i<<")"<<endl;
     }
 }

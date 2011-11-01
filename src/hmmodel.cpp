@@ -50,7 +50,8 @@ HMModel::HMModel()
 
 HMModel::~HMModel()
 {
-    if (as>0) {
+    if (as>0)
+    {
 
         delete cPi;
         delete nPi;
@@ -92,7 +93,8 @@ void HMModel::readModel(const char* filename)
 {
     ifstream in(filename);
 
-    if (!in) {
+    if (!in)
+    {
         cout<<"Could not read HMM-file "<<filename<<"!"<<endl;
         exit(-1);
     }
@@ -100,44 +102,50 @@ void HMModel::readModel(const char* filename)
     string row;
 
     if (NOISE>1)
-      cout<<"Reading a model"<<endl;
+        cout<<"Reading a model"<<endl;
 
     // Get state number & alphabet
     //
     sn = nextInt(nextNotComment(&in));
     alphabet = getString(nextNotComment(&in),"ARNDCQEGHILKMFPSTWYVUZ");
     as = alphabet.length();
-	fas=as;
+    fas=as;
 
     if (NOISE>1)
-      cout<<"Alphabet ("<<as<<"): "<<alphabet<<endl;
+        cout<<"Alphabet ("<<as<<"): "<<alphabet<<endl;
 
     // A hack for codonmodel
     //
-    if (as==183){
+    if (as==183)
+    {
         as=61;
         CODON=true;
     }
 
-	if(as==4) {
-		fullAlphabet = "ACGTURYMKSWHBVDN";
-		fas=fullAlphabet.length();
-	}
-	else if(as==20) {
-		fullAlphabet = "ARNDCQEGHILKMFPSTWYVX";
+    if (as==4)
+    {
+        fullAlphabet = "ACGTURYMKSWHBVDN";
+        fas=fullAlphabet.length();
+    }
+    else if (as==20)
+    {
+        fullAlphabet = "ARNDCQEGHILKMFPSTWYVX";
         fas = fullAlphabet.length();
     }
-    else if(as==21) {
-      fullAlphabet = "ARNDCQEGHILKMFPSTWYVZX";
-      fas = fullAlphabet.length();
+    else if (as==21)
+    {
+        fullAlphabet = "ARNDCQEGHILKMFPSTWYVZX";
+        fas = fullAlphabet.length();
     }
-    else if(as==61){
-		fullAlphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTTNNN";
-		fas = 62;
-	}
-	else {
-		cout<<"HMModel::readModel: untypical 'as'"<<endl;
-	}
+    else if (as==61)
+    {
+        fullAlphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTTNNN";
+        fas = 62;
+    }
+    else
+    {
+        cout<<"HMModel::readModel: untypical 'as'"<<endl;
+    }
 
     // Allocate space for P matrices
     // Read pi and Q
@@ -152,24 +160,29 @@ void HMModel::readModel(const char* filename)
     logcPr = new DbMatrix(sn,fas,fas,"logP_right");
 
     if (NOISE>1)
-      cout<<"Reading frequencies"<<endl;
+        cout<<"Reading frequencies"<<endl;
 
-    FOR(k,sn) {
+    FOR(k,sn)
+    {
         row = nextNotComment(&in);
-        FOR(j,as) {
+        FOR(j,as)
+        {
             cPi->s(nextDouble(row),k,j);
             logcPi->s(log( cPi->g(k,j) ),k,j);
         }
     }
 
     if (NOISE>1)
-      cout<<"Reading Q"<<endl;
+        cout<<"Reading Q"<<endl;
 
-    FOR(k,sn) {
-        FOR(i,as) {
+    FOR(k,sn)
+    {
+        FOR(i,as)
+        {
             row = nextNotComment(&in);
             double sum = 0;
-            FOR(j,as) {
+            FOR(j,as)
+            {
                 cQ->s(nextDouble(row),k,i,j);
                 sum += cQ->g(k,i,j);
             }
@@ -203,94 +216,111 @@ void HMModel::readModel(const char* filename)
     trp = new DbMatrix(3,sn,3,sn,"model transition probability");
 
     if (NOISE>1)
-      cout<<"Reading structure background frequencies"<<endl;
+        cout<<"Reading structure background frequencies"<<endl;
 
     row = nextNotComment(&in);
-    FOR(l,sn) {
+    FOR(l,sn)
+    {
         sbf->s(nextDouble(row),l);
     }
 
     if (NOISE>1)
-      cout<<"Reading structure transition probabilities"<<endl;
+        cout<<"Reading structure transition probabilities"<<endl;
 
-    FOR(k,sn) {
+    FOR(k,sn)
+    {
         row = nextNotComment(&in);
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             stp->s(nextDouble(row),k,l);
         }
     }
 
     if (NOISE>1)
-      cout<<"Reading structure indel rates"<<endl;
+        cout<<"Reading structure indel rates"<<endl;
 
     row = nextNotComment(&in);
-    FOR(l,sn) {
+    FOR(l,sn)
+    {
         sir->s(nextDouble(row),l);
     }
 
     if (NOISE>1)
-      cout<<"Reading structure indel extension probabilities"<<endl;
+        cout<<"Reading structure indel extension probabilities"<<endl;
 
     row = nextNotComment(&in);
-    FOR(l,sn) {
+    FOR(l,sn)
+    {
         gep->s(nextDouble(row),l);
     }
 
     if (NOISE>1)
-      cout<<"Reading structure match extension probabilities"<<endl;
+        cout<<"Reading structure match extension probabilities"<<endl;
 
     row = nextNotComment(&in);
-    FOR(l,sn) {
+    FOR(l,sn)
+    {
         mep->s(nextDouble(row),l);
     }
 
     if (NOISE>1)
-      cout<<"Reading codon sites"<<endl;
+        cout<<"Reading codon sites"<<endl;
 
     row = nextNotComment(&in);
-    FOR(l,sn) {
+    FOR(l,sn)
+    {
         codon->s(nextInt(row),l);
     }
 
     if (NOISE>1)
-      cout<<"Reading prankster settings"<<endl;
+        cout<<"Reading prankster settings"<<endl;
 
     row = nextNotComment(&in);
-    if (row!="") {
-        FOR(l,sn) {
+    if (row!="")
+    {
+        FOR(l,sn)
+        {
             drawPt->s(nextInt(row),l);
         }
 
         row = nextNotComment(&in);
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             drawCl->s(nextInt(row),l);
         }
 
         row = nextNotComment(&in);
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             drawOf->s(nextInt(row),l);
         }
 
         row = nextNotComment(&in);
         int est=0;
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             int b = row.find_first_not_of(" \t\n",est);
             est = row.find_first_of(" \t\n",b);
             stNames[l] = row.substr(b,est-b);
             est++;
         }
-    } else {
-        FOR(l,sn) {
+    }
+    else
+    {
+        FOR(l,sn)
+        {
             drawPt->s(2,l);
             drawOf->s(0,l);
         }
 
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             drawCl->s(l%7+1,l);
         }
 
         char *str = new char[10];
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             sprintf(str,"state%i",l);
             stNames[l] = str;
         }
@@ -298,7 +328,8 @@ void HMModel::readModel(const char* filename)
 
     }
 
-    FOR(l,sn) {
+    FOR(l,sn)
+    {
         stShow[l] = true;
     }
 
@@ -310,7 +341,8 @@ void HMModel::readModel(const char* filename)
 void HMModel::proteinModel()
 {
 
-    if (NOISE>0){
+    if (NOISE>0)
+    {
         cout<<"Protein substitution model: wag."<<endl;
     }
 
@@ -335,9 +367,11 @@ void HMModel::proteinModel()
     logcPr = new DbMatrix(sn,24,24,"logP_right");
 
     double tmp_pi[20] = {0.0866279, 0.043972, 0.0390894, 0.0570451, 0.0193078, 0.0367281, 0.0580589, 0.0832518, 0.0244313, 0.048466,
-                         0.086209, 0.0620286, 0.0195027, 0.0384319, 0.0457631, 0.0695179, 0.0610127, 0.0143859, 0.0352742, 0.0708956};
+                         0.086209, 0.0620286, 0.0195027, 0.0384319, 0.0457631, 0.0695179, 0.0610127, 0.0143859, 0.0352742, 0.0708956
+                        };
 
-    FOR(j,as) {
+    FOR(j,as)
+    {
         cPi->s(tmp_pi[j],0,j);
         logcPi->s(log( cPi->g(0,j) ),0,j);
     }
@@ -361,10 +395,13 @@ void HMModel::proteinModel()
                          0.183747304969, 0.024378648436, 0.079353827364, 0.0213842684566, 0.0099045924752, 0.0315100653768, 0.0477688308585, 0.0188010037494, 0.0115635053091, 0.07067118256, 0.028157755998, 0.086032427628, 0.029568433524, 0.0066065589057, 0.0363992375304, 0.304350756558, -1.1004826896859, 0.0015948784176, 0.0102700127816, 0.098419398788,
                          0.0098004742107, 0.05117989024, 0.00281118065298, 0.0074025714917, 0.013845044146, 0.0079236101097, 0.0090895272073, 0.0280544413194, 0.0064149020097, 0.010298201078, 0.057355623581, 0.008529242643, 0.0100576594062, 0.058786971516, 0.0063796049555, 0.0364094439818, 0.0067641119728, -0.44467569893618, 0.087670143938, 0.0259030544764,
                          0.0208543675065, 0.016776769076, 0.0424510884, 0.0185802165661, 0.0105002187974, 0.008363355651, 0.0113971362467, 0.0086252194872, 0.094633174672, 0.02036395922, 0.034364459162, 0.0082661793504, 0.0083556782799, 0.248050243532, 0.0098869347026, 0.0547101006747, 0.0177637255796, 0.035754572001, -0.6920103710931, 0.022312972188,
-                         0.173776433679, 0.011074304228, 0.0076711383924, 0.0086899653085, 0.019349118692, 0.0110654786961, 0.0341810742559, 0.0155886497946, 0.0028916398054, 0.3790671258, 0.15520551106, 0.0189456434124, 0.040145332815, 0.0249765843548, 0.0144102052697, 0.0161795265281, 0.084699660521, 0.0052561618971, 0.011101848966, -1.034275403476 };
+                         0.173776433679, 0.011074304228, 0.0076711383924, 0.0086899653085, 0.019349118692, 0.0110654786961, 0.0341810742559, 0.0155886497946, 0.0028916398054, 0.3790671258, 0.15520551106, 0.0189456434124, 0.040145332815, 0.0249765843548, 0.0144102052697, 0.0161795265281, 0.084699660521, 0.0052561618971, 0.011101848966, -1.034275403476
+                        };
 
-    FOR(j,as) {
-        FOR(i,as) {
+    FOR(j,as)
+    {
+        FOR(i,as)
+        {
             cQ->s(tmp_q[j*as+i],0,j,i);
         }
     }
@@ -418,17 +455,18 @@ void HMModel::proteinModel()
 void HMModel::codonModel()
 {
 
-    if (NOISE>0){
+    if (NOISE>0)
+    {
         cout<<"Empirical codon substitution model."<<endl;
     }
 
     // state number & alphabet
     //
     sn = 1;
-	alphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTT";
-	fullAlphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTTNNN";
-	as = 61;
-	fas = 62;
+    alphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTT";
+    fullAlphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTTNNN";
+    as = 61;
+    fas = 62;
 
     // pi and Q
     // Allocate space for P matrices
@@ -444,7 +482,8 @@ void HMModel::codonModel()
 
     double tmp_pi[61] = {0.024709, 0.026990, 0.037138, 0.018760, 0.013945, 0.024015, 0.009522, 0.014230, 0.010544, 0.015952, 0.008214, 0.008979, 0.007064, 0.029436, 0.020724, 0.019431, 0.015416, 0.013015, 0.026398, 0.008551, 0.011465, 0.012756, 0.006648, 0.009507, 0.005177, 0.012128, 0.007718, 0.007807, 0.005328, 0.017807, 0.031660, 0.011119, 0.028694, 0.027083, 0.035815, 0.023890, 0.013035, 0.027437, 0.008784, 0.019503, 0.015756, 0.021140, 0.009781, 0.015576, 0.007598, 0.019661, 0.026815, 0.015815, 0.022021, 0.013288, 0.009289, 0.015669, 0.007124, 0.012150, 0.019672, 0.015708, 0.014291, 0.007146, 0.026531, 0.012766, 0.015811};
 
-    FOR(j,as) {
+    FOR(j,as)
+    {
         cPi->s(tmp_pi[j],0,j);
         logcPi->s(log( cPi->g(0,j) ),0,j);
     }
@@ -509,10 +548,13 @@ void HMModel::codonModel()
                           0.009698, 0.002434, 0.004231, 0.002181, 0.007355, 0.003706, 0.001486, 0.003563, 0.003005, 0.001332, 0.000938, 0.000850, 0.036737, 0.022514, 0.050124, 0.039565, 0.011123, 0.001684, 0.005324, 0.003985, 0.002657, 0.000688, 0.001101, 0.001412, 0.000924, 0.001225, 0.001344, 0.001364, 0.134940, 0.110170, 0.166768, 0.232319, 0.003665, 0.001742, 0.003248, 0.000893, 0.006771, 0.003626, 0.002881, 0.004588, 0.000807, 0.000941, 0.000485, 0.000684, 0.013885, 0.007741, 0.011459, 0.018003, 0.002946, 0.007198, 0.007047, 0.001422, 0.001547, 0.003293, 0.002265, 0.005311, 0.002229, -1.350170, 0.022013, 0.315940, 0.030797,
                           0.000913, 0.002054, 0.001345, 0.000711, 0.002252, 0.006692, 0.002769, 0.001385, 0.000329, 0.002140, 0.000747, 0.000745, 0.003139, 0.026339, 0.017464, 0.005509, 0.000670, 0.010085, 0.002403, 0.002351, 0.000292, 0.002068, 0.000435, 0.000435, 0.000351, 0.001420, 0.000803, 0.000370, 0.004178, 0.040259, 0.025578, 0.006897, 0.000722, 0.001248, 0.000668, 0.000585, 0.001174, 0.009094, 0.001413, 0.001731, 0.000866, 0.002782, 0.000702, 0.000377, 0.002367, 0.014317, 0.011161, 0.004303, 0.083316, 0.023953, 0.001174, 0.008709, 0.001468, 0.002953, 0.003776, 0.011470, 0.001361, 0.005929, -0.674727, 0.014580, 0.289399,
                           0.005134, 0.001612, 0.009549, 0.003780, 0.007256, 0.004386, 0.003892, 0.003650, 0.002703, 0.002099, 0.002294, 0.001057, 0.014394, 0.026127, 0.070423, 0.029953, 0.004552, 0.001303, 0.007416, 0.001937, 0.001483, 0.001460, 0.001658, 0.000831, 0.001244, 0.002063, 0.001943, 0.001452, 0.062751, 0.158996, 0.352069, 0.156779, 0.002326, 0.001100, 0.004314, 0.002122, 0.004262, 0.003845, 0.004216, 0.005074, 0.000813, 0.000716, 0.000864, 0.000555, 0.008558, 0.014517, 0.030840, 0.013473, 0.004420, 0.002884, 0.004626, 0.002053, 0.002568, 0.001777, 0.000441, 0.009051, 0.001523, 0.176854, 0.030303, -1.304410, 0.024070,
-                          0.002251, 0.002443, 0.002279, 0.003053, 0.002903, 0.003136, 0.001739, 0.002095, 0.000480, 0.002546, 0.000343, 0.001933, 0.004630, 0.012038, 0.017844, 0.022139, 0.001431, 0.004439, 0.001592, 0.006699, 0.000860, 0.000519, 0.001155, 0.001232, 0.000324, 0.000767, 0.000553, 0.000376, 0.005670, 0.012297, 0.028200, 0.023794, 0.000966, 0.000694, 0.001388, 0.002479, 0.001660, 0.003343, 0.001790, 0.004686, 0.001831, 0.001327, 0.000932, 0.000642, 0.002593, 0.005737, 0.010501, 0.013995, 0.035159, 0.072228, 0.001266, 0.002683, 0.002048, 0.007672, 0.001252, 0.013918, 0.001164, 0.013919, 0.485610, 0.019433, -0.882676 };
+                          0.002251, 0.002443, 0.002279, 0.003053, 0.002903, 0.003136, 0.001739, 0.002095, 0.000480, 0.002546, 0.000343, 0.001933, 0.004630, 0.012038, 0.017844, 0.022139, 0.001431, 0.004439, 0.001592, 0.006699, 0.000860, 0.000519, 0.001155, 0.001232, 0.000324, 0.000767, 0.000553, 0.000376, 0.005670, 0.012297, 0.028200, 0.023794, 0.000966, 0.000694, 0.001388, 0.002479, 0.001660, 0.003343, 0.001790, 0.004686, 0.001831, 0.001327, 0.000932, 0.000642, 0.002593, 0.005737, 0.010501, 0.013995, 0.035159, 0.072228, 0.001266, 0.002683, 0.002048, 0.007672, 0.001252, 0.013918, 0.001164, 0.013919, 0.485610, 0.019433, -0.882676
+                         };
 
-    FOR(j,as) {
-        FOR(i,as) {
+    FOR(j,as)
+    {
+        FOR(i,as)
+        {
             cQ->s(tmp_q[j*as+i],0,j,i);
         }
     }
@@ -565,7 +607,8 @@ void HMModel::codonModel()
 
 void HMModel::dnaModel(float* pi,bool isRna)
 {
-    if (NOISE>0){
+    if (NOISE>0)
+    {
         cout<<"DNA substitution model: base frequencies "<<pi[0]<<", "<<pi[1]<<", "<<pi[2]<<" and "<<pi[3]<<"; kappa "<<kappa<<" and rho "<<rho<<"."<<endl;
     }
     // state number & alphabet
@@ -576,29 +619,30 @@ void HMModel::dnaModel(float* pi,bool isRna)
     else
         alphabet = "ACGT";
 
-	fullAlphabet = "ACGTURYMKSWHBVDN";
+    fullAlphabet = "ACGTURYMKSWHBVDN";
 
-	as = alphabet.length();
-	fas = fullAlphabet.length();
+    as = alphabet.length();
+    fas = fullAlphabet.length();
 
     // pi and Q
     // Allocate space for P matrices
     //
-	cPi = new DbMatrix(sn,16,"pi_dna");
+    cPi = new DbMatrix(sn,16,"pi_dna");
     cQ  = new DbMatrix(sn,4,4,"Q_dna");
-	cPl = new DbMatrix(sn,16,16,"P_left_dna");
-	cPr = new DbMatrix(sn,16,16,"P_right_dna");
-	cPl->initialise(0);
-	cPr->initialise(0);
+    cPl = new DbMatrix(sn,16,16,"P_left_dna");
+    cPr = new DbMatrix(sn,16,16,"P_right_dna");
+    cPl->initialise(0);
+    cPr->initialise(0);
 
 
-	logcPi = new DbMatrix(sn,16,"logpi");
-	logcPl = new DbMatrix(sn,16,16,"logP_left");
-	logcPr = new DbMatrix(sn,16,16,"logP_right");
-	logcPl->initialise(-HUGE_VAL);
-	logcPr->initialise(-HUGE_VAL);
+    logcPi = new DbMatrix(sn,16,"logpi");
+    logcPl = new DbMatrix(sn,16,16,"logP_left");
+    logcPr = new DbMatrix(sn,16,16,"logP_right");
+    logcPl->initialise(-HUGE_VAL);
+    logcPr->initialise(-HUGE_VAL);
 
-    FOR(j,as) {
+    FOR(j,as)
+    {
         cPi->s(pi[j],0,j);
         logcPi->s(log( cPi->g(0,j) ),0,j);
     }
@@ -701,63 +745,76 @@ void HMModel::alignmentModel(AncestralNode *tn)
 
     double tbd = ld+rd;
 
-    if(REALBRANCHES && !MAXBRANCH && ((as==4 && tbd>dnaMaxPairwiseLength) || (as!=4 && tbd>protMaxPairwiseLength)) ){
-        if(NOISE>0) {
-        cout<<endl<<"Warning: alignment of highly diverged sequences may produce rubbish!"<<endl<<
-          "Consider not setting '-realbranches' or using it with '-maxbraches=xx' (e.g. with xx=0.15)."<<endl<<endl;
+    if (REALBRANCHES && !MAXBRANCH && ((as==4 && tbd>dnaMaxPairwiseLength) || (as!=4 && tbd>protMaxPairwiseLength)) )
+    {
+        if (NOISE>0)
+        {
+            cout<<endl<<"Warning: alignment of highly diverged sequences may produce rubbish!"<<endl<<
+                "Consider not setting '-realbranches' or using it with '-maxbraches=xx' (e.g. with xx=0.15)."<<endl<<endl;
         }
     }
 
-    if(as!=4 && !REALBRANCHES && tbd>protMaxPairwiseLength){
+    if (as!=4 && !REALBRANCHES && tbd>protMaxPairwiseLength)
+    {
 
-      ld = protMaxPairwiseLength*ld/(tbd);
-      rd = protMaxPairwiseLength*rd/(tbd);
+        ld = protMaxPairwiseLength*ld/(tbd);
+        rd = protMaxPairwiseLength*rd/(tbd);
 
-      if(ADJUSTMODEL)
-      {
-          tbd=protMaxPairwiseLength;
-      }
+        if (ADJUSTMODEL)
+        {
+            tbd=protMaxPairwiseLength;
+        }
 
-      if(NOISE>0) {
-        cout<<endl<<"Note: branch lengths were considered too long and pairwise distance of "<<
-              protMaxPairwiseLength<<" is used."<<endl<<
-          "If *really* wanted, this can disabled with option '-realbranches' or adjusted with"<<
-          endl<<"option -maxpairdist=# (x=small stringent, x=large relaxed)."
-          <<endl<<endl;
-      }
-    } else if(as==4 && !REALBRANCHES && tbd>dnaMaxPairwiseLength){
-      ld = dnaMaxPairwiseLength*ld/(tbd);
-      rd = dnaMaxPairwiseLength*rd/(tbd);
+        if (NOISE>0)
+        {
+            cout<<endl<<"Note: branch lengths were considered too long and pairwise distance of "<<
+                protMaxPairwiseLength<<" is used."<<endl<<
+                "If *really* wanted, this can disabled with option '-realbranches' or adjusted with"<<
+                endl<<"option -maxpairdist=# (x=small stringent, x=large relaxed)."
+                <<endl<<endl;
+        }
+    }
+    else if (as==4 && !REALBRANCHES && tbd>dnaMaxPairwiseLength)
+    {
+        ld = dnaMaxPairwiseLength*ld/(tbd);
+        rd = dnaMaxPairwiseLength*rd/(tbd);
 
-      if(ADJUSTMODEL)
-      {
-          tbd=dnaMaxPairwiseLength;
-      }
+        if (ADJUSTMODEL)
+        {
+            tbd=dnaMaxPairwiseLength;
+        }
 
-      if(NOISE>0) {
-        cout<<endl<<"Note: branch lengths were considered too long and pairwise distance of "<<
-              dnaMaxPairwiseLength<<" is used."<<endl<<
-          "If *really* wanted, this can disabled with option '-realbranches' or adjusted with"<<
-          endl<<"option -maxpairdist=# (x=small stringent, x=large relaxed)."
-          <<endl<<endl;
-      }
+        if (NOISE>0)
+        {
+            cout<<endl<<"Note: branch lengths were considered too long and pairwise distance of "<<
+                dnaMaxPairwiseLength<<" is used."<<endl<<
+                "If *really* wanted, this can disabled with option '-realbranches' or adjusted with"<<
+                endl<<"option -maxpairdist=# (x=small stringent, x=large relaxed)."
+                <<endl<<endl;
+        }
     }
 
     trp->initialise(0);
     double t;
 
-    FOR(k,sn) {
-        FOR(l,sn) {
+    FOR(k,sn)
+    {
+        FOR(l,sn)
+        {
 
-            if (codon->g(k)>0 && codon->g(l)>0) {
+            if (codon->g(k)>0 && codon->g(l)>0)
+            {
 
-                if ((codon->g(k)==1 && codon->g(l)==2 && l==k+1) || (codon->g(k)==2 && codon->g(l)==3 && l==k+1)) { // codon1 to codon2 & codon2 to codon3
+                if ((codon->g(k)==1 && codon->g(l)==2 && l==k+1) || (codon->g(k)==2 && codon->g(l)==3 && l==k+1))   // codon1 to codon2 & codon2 to codon3
+                {
 
                     trp->s( 1, 0, k, 0, l);
                     trp->s( 1, 1, k, 1, l);
                     trp->s( 1, 2, k, 2, l);
 
-                } else if (codon->g(k)==3 && codon->g(l)==1 && k==l+2) { // codon3 to codon1 in same state
+                }
+                else if (codon->g(k)==3 && codon->g(l)==1 && k==l+2)   // codon3 to codon1 in same state
+                {
 
                     // from X
                     t = gep->g(k) + (1-gep->g(k)) * stp->g(k,l) * (1-exp(-1.0*sir->g(l)*tbd));
@@ -782,7 +839,9 @@ void HMModel::alignmentModel(AncestralNode *tn)
                     t = mep->g(k) + (1-mep->g(k)) * stp->g(k,l) * (1-2*(1-exp(-1.0*sir->g(l)*tbd)));
                     trp->s( t, 2, k, 2, l );
 
-                } else if (codon->g(k)==3 && codon->g(l)==1 && k!=l+2) { // codon3 to codon1 in different state
+                }
+                else if (codon->g(k)==3 && codon->g(l)==1 && k!=l+2)   // codon3 to codon1 in different state
+                {
 
                     // from X
                     t = (1-gep->g(k)) * stp->g(k,l) * (1-exp(-1.0*sir->g(l)*tbd));
@@ -811,7 +870,8 @@ void HMModel::alignmentModel(AncestralNode *tn)
                 continue;
             }
 
-            if (codon->g(l)<0) {
+            if (codon->g(l)<0)
+            {
 
                 // from X
                 t = (1-gep->g(k)) * stp->g(k,l) * 0.5;
@@ -836,7 +896,8 @@ void HMModel::alignmentModel(AncestralNode *tn)
                 continue;
             }
 
-            if (k==l) {
+            if (k==l)
+            {
 
                 // from X
                 t = gep->g(k) + (1-gep->g(k)) * stp->g(k,l) * (1-exp(-1.0*sir->g(l)*tbd));
@@ -862,7 +923,9 @@ void HMModel::alignmentModel(AncestralNode *tn)
                 t = mep->g(k) + (1-mep->g(k)) * stp->g(k,l) * (1-2*(1-exp(-1.0*sir->g(l)*tbd)));
                 trp->s( t, 2, k, 2, l );
 
-            } else {
+            }
+            else
+            {
 
                 // from X
                 t = (1-gep->g(k)) * stp->g(k,l) * (1-exp(-1.0*sir->g(l)*tbd));
@@ -893,7 +956,8 @@ void HMModel::alignmentModel(AncestralNode *tn)
         lsbf->s(log(sbf->g(k)),k);
     }
 
-    for (int k=0;k<sn;k++) {
+    for (int k=0; k<sn; k++)
+    {
         t = 1-exp(-1.0*sir->g(k)*tbd);
         pba->s(log(t),k,0);           // start at right deletion
         pba->s(log(t),k,1);           // start at left deletion
@@ -904,13 +968,18 @@ void HMModel::alignmentModel(AncestralNode *tn)
         pea->s(log(1-mep->g(k)),k,2);  // end from match
     }
 
-    if (NOISE>1) {
+    if (NOISE>1)
+    {
         cout<<"State transition probabilities: left & right branches "<<ld<<" & "<<rd<<endl;
-        FOR(j,sn) {
+        FOR(j,sn)
+        {
             cout<<"state "<<j<<endl;
-            FOR(i,3) {
-                FOR(l,sn) {
-                    FOR(m,3) {
+            FOR(i,3)
+            {
+                FOR(l,sn)
+                {
+                    FOR(m,3)
+                    {
                         cout<<" "<<trp->g(i,j,m,l);
                     }
                     cout<<"  ";
@@ -924,13 +993,18 @@ void HMModel::alignmentModel(AncestralNode *tn)
     trp->clog(i,j,m,l);
 
 
-    if (NOISE>1) {
+    if (NOISE>1)
+    {
         cout<<"State transition probabilities: left & right branches "<<ld<<" & "<<rd<<endl;
-        FOR(j,sn) {
+        FOR(j,sn)
+        {
             cout<<"state "<<j<<endl;
-            FOR(i,3) {
-                FOR(l,sn) {
-                    FOR(m,3) {
+            FOR(i,3)
+            {
+                FOR(l,sn)
+                {
+                    FOR(m,3)
+                    {
                         cout<<" "<<trp->g(i,j,m,l);
                     }
                     cout<<"  ";
@@ -950,12 +1024,15 @@ void HMModel::alignmentModel(AncestralNode *tn)
     double* twu = new double[as*as];
     double* twv = new double[as*as];
 
-    FOR(l,sn) {
-        FOR(i,as) {
+    FOR(l,sn)
+    {
+        FOR(i,as)
+        {
 
             twr[i] = wRoot->g(l,i);
 
-            FOR(j,as) {
+            FOR(j,as)
+            {
                 twu[i*as+j] = wU->g(l,i,j);
                 twv[i*as+j] = wV->g(l,i,j);
             }
@@ -964,8 +1041,10 @@ void HMModel::alignmentModel(AncestralNode *tn)
         e->computePMatrix(as,tml,twu,twv,twr,ld);
         e->computePMatrix(as,tmr,twu,twv,twr,rd);
 
-        FOR(i,as) {
-            FOR(j,as) {
+        FOR(i,as)
+        {
+            FOR(j,as)
+            {
                 cPl->s(tml[i*as+j],l,i,j);
                 cPr->s(tmr[i*as+j],l,i,j);
 
@@ -976,7 +1055,8 @@ void HMModel::alignmentModel(AncestralNode *tn)
     }
 
 
-    if(as==4) {
+    if (as==4)
+    {
 
         FlMatrix *dnaFreqs = new FlMatrix(4,fas);
         dnaFreqs->initialise(0);
@@ -987,118 +1067,137 @@ void HMModel::alignmentModel(AncestralNode *tn)
         dnaFreqs->s( 1, 3, 3 ); // T
         dnaFreqs->s( 1, 3, 4 ); // U
 
-        if(NXis1) {
-              dnaFreqs->s( 1.0, 0, 5 ); // R
-              dnaFreqs->s( 1.0, 2, 5 ); // R
+        if (NXis1)
+        {
+            dnaFreqs->s( 1.0, 0, 5 ); // R
+            dnaFreqs->s( 1.0, 2, 5 ); // R
 
-              dnaFreqs->s( 1.0, 1, 6 ); // Y
-              dnaFreqs->s( 1.0, 3, 6 ); // Y
+            dnaFreqs->s( 1.0, 1, 6 ); // Y
+            dnaFreqs->s( 1.0, 3, 6 ); // Y
 
-              dnaFreqs->s( 1.0, 0, 7 ); // M
-              dnaFreqs->s( 1.0, 1, 7 ); // M
+            dnaFreqs->s( 1.0, 0, 7 ); // M
+            dnaFreqs->s( 1.0, 1, 7 ); // M
 
-              dnaFreqs->s( 1.0, 2, 8 ); // K
-              dnaFreqs->s( 1.0, 3, 8 ); // K
+            dnaFreqs->s( 1.0, 2, 8 ); // K
+            dnaFreqs->s( 1.0, 3, 8 ); // K
 
-              dnaFreqs->s( 1.0, 1, 9 ); // S
-              dnaFreqs->s( 1.0, 2, 9 ); // S
+            dnaFreqs->s( 1.0, 1, 9 ); // S
+            dnaFreqs->s( 1.0, 2, 9 ); // S
 
-              dnaFreqs->s( 1.0, 0, 10 ); // W
-              dnaFreqs->s( 1.0, 3, 10 ); // W
+            dnaFreqs->s( 1.0, 0, 10 ); // W
+            dnaFreqs->s( 1.0, 3, 10 ); // W
 
-              dnaFreqs->s( 1.0, 0, 11 ); // H
-              dnaFreqs->s( 1.0, 1, 11 ); // H
-              dnaFreqs->s( 1.0, 3, 11 ); // H
+            dnaFreqs->s( 1.0, 0, 11 ); // H
+            dnaFreqs->s( 1.0, 1, 11 ); // H
+            dnaFreqs->s( 1.0, 3, 11 ); // H
 
-              dnaFreqs->s( 1.0, 1, 12 ); // B
-              dnaFreqs->s( 1.0, 2, 12 ); // B
-              dnaFreqs->s( 1.0, 3, 12 ); // B
+            dnaFreqs->s( 1.0, 1, 12 ); // B
+            dnaFreqs->s( 1.0, 2, 12 ); // B
+            dnaFreqs->s( 1.0, 3, 12 ); // B
 
-              dnaFreqs->s( 1.0, 0, 13 ); // V
-              dnaFreqs->s( 1.0, 1, 13 ); // V
-              dnaFreqs->s( 1.0, 2, 13 ); // V
+            dnaFreqs->s( 1.0, 0, 13 ); // V
+            dnaFreqs->s( 1.0, 1, 13 ); // V
+            dnaFreqs->s( 1.0, 2, 13 ); // V
 
-              dnaFreqs->s( 1.0, 0, 14 ); // D
-              dnaFreqs->s( 1.0, 2, 14 ); // D
-              dnaFreqs->s( 1.0, 3, 14 ); // D
+            dnaFreqs->s( 1.0, 0, 14 ); // D
+            dnaFreqs->s( 1.0, 2, 14 ); // D
+            dnaFreqs->s( 1.0, 3, 14 ); // D
 
-              dnaFreqs->s( 1.0, 0, 15 ); // N
-              dnaFreqs->s( 1.0, 1, 15 ); // N
-              dnaFreqs->s( 1.0, 2, 15 ); // N
-              dnaFreqs->s( 1.0, 3, 15 ); // N
-        } else {
-              dnaFreqs->s( 0.5, 0, 5 ); // R
-              dnaFreqs->s( 0.5, 2, 5 ); // R
+            dnaFreqs->s( 1.0, 0, 15 ); // N
+            dnaFreqs->s( 1.0, 1, 15 ); // N
+            dnaFreqs->s( 1.0, 2, 15 ); // N
+            dnaFreqs->s( 1.0, 3, 15 ); // N
+        }
+        else
+        {
+            dnaFreqs->s( 0.5, 0, 5 ); // R
+            dnaFreqs->s( 0.5, 2, 5 ); // R
 
-              dnaFreqs->s( 0.5, 1, 6 ); // Y
-              dnaFreqs->s( 0.5, 3, 6 ); // Y
+            dnaFreqs->s( 0.5, 1, 6 ); // Y
+            dnaFreqs->s( 0.5, 3, 6 ); // Y
 
-              dnaFreqs->s( 0.5, 0, 7 ); // M
-              dnaFreqs->s( 0.5, 1, 7 ); // M
+            dnaFreqs->s( 0.5, 0, 7 ); // M
+            dnaFreqs->s( 0.5, 1, 7 ); // M
 
-              dnaFreqs->s( 0.5, 2, 8 ); // K
-              dnaFreqs->s( 0.5, 3, 8 ); // K
+            dnaFreqs->s( 0.5, 2, 8 ); // K
+            dnaFreqs->s( 0.5, 3, 8 ); // K
 
-              dnaFreqs->s( 0.5, 1, 9 ); // S
-              dnaFreqs->s( 0.5, 2, 9 ); // S
+            dnaFreqs->s( 0.5, 1, 9 ); // S
+            dnaFreqs->s( 0.5, 2, 9 ); // S
 
-              dnaFreqs->s( 0.5, 0, 10 ); // W
-              dnaFreqs->s( 0.5, 3, 10 ); // W
+            dnaFreqs->s( 0.5, 0, 10 ); // W
+            dnaFreqs->s( 0.5, 3, 10 ); // W
 
-              dnaFreqs->s( 0.33, 0, 11 ); // H
-              dnaFreqs->s( 0.33, 1, 11 ); // H
-              dnaFreqs->s( 0.34, 3, 11 ); // H
+            dnaFreqs->s( 0.33, 0, 11 ); // H
+            dnaFreqs->s( 0.33, 1, 11 ); // H
+            dnaFreqs->s( 0.34, 3, 11 ); // H
 
-              dnaFreqs->s( 0.33, 1, 12 ); // B
-              dnaFreqs->s( 0.33, 2, 12 ); // B
-              dnaFreqs->s( 0.34, 3, 12 ); // B
+            dnaFreqs->s( 0.33, 1, 12 ); // B
+            dnaFreqs->s( 0.33, 2, 12 ); // B
+            dnaFreqs->s( 0.34, 3, 12 ); // B
 
-              dnaFreqs->s( 0.33, 0, 13 ); // V
-              dnaFreqs->s( 0.33, 1, 13 ); // V
-              dnaFreqs->s( 0.34, 2, 13 ); // V
+            dnaFreqs->s( 0.33, 0, 13 ); // V
+            dnaFreqs->s( 0.33, 1, 13 ); // V
+            dnaFreqs->s( 0.34, 2, 13 ); // V
 
-              dnaFreqs->s( 0.33, 0, 14 ); // D
-              dnaFreqs->s( 0.33, 2, 14 ); // D
-              dnaFreqs->s( 0.34, 3, 14 ); // D
+            dnaFreqs->s( 0.33, 0, 14 ); // D
+            dnaFreqs->s( 0.33, 2, 14 ); // D
+            dnaFreqs->s( 0.34, 3, 14 ); // D
 
-              dnaFreqs->s( 0.25, 0, 15 ); // N
-              dnaFreqs->s( 0.25, 1, 15 ); // N
-              dnaFreqs->s( 0.25, 2, 15 ); // N
-              dnaFreqs->s( 0.25, 3, 15 ); // N
+            dnaFreqs->s( 0.25, 0, 15 ); // N
+            dnaFreqs->s( 0.25, 1, 15 ); // N
+            dnaFreqs->s( 0.25, 2, 15 ); // N
+            dnaFreqs->s( 0.25, 3, 15 ); // N
         }
         int n,m;
 
-        FOR(l,sn) {
-            for(i=as;i<fas;i++) {
+        FOR(l,sn)
+        {
+            for (i=as; i<fas; i++)
+            {
 
                 double t = 0;
                 int ct = 0;
-                FOR(n,as) {
+                FOR(n,as)
+                {
                     t += dnaFreqs->g(n,i)*cPi->g(l,n);
-                    if(dnaFreqs->g(n,i)>0)
+                    if (dnaFreqs->g(n,i)>0)
                         ct++;
                 }
                 t/=ct;
                 cPi->s(t,l,i);
                 logcPi->s(log(t),l,i);
             }
-            FOR(i,fas) {
-                FOR(j,fas) {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
 
-                    if(i<as && j<as)
+                    if (i<as && j<as)
                         continue;
 
                     double tl = 0;
                     double tr = 0;
                     double tmp;
-                    FOR(n,as) {
-                        FOR(m,as) {
-                            if(NXis1) {
+                    FOR(n,as)
+                    {
+                        FOR(m,as)
+                        {
+                            if (NXis1)
+                            {
                                 tmp = cPl->g(l,n,m)*dnaFreqs->g(m,j)*dnaFreqs->g(n,i);
-                                if(tmp>tl) { tl = tmp; }
+                                if (tmp>tl)
+                                {
+                                    tl = tmp;
+                                }
                                 tmp += cPr->g(l,n,m)*dnaFreqs->g(m,j)*dnaFreqs->g(n,i);
-                                if(tmp>tr) { tr = tmp; }
-                            } else {
+                                if (tmp>tr)
+                                {
+                                    tr = tmp;
+                                }
+                            }
+                            else
+                            {
                                 tl += cPl->g(l,n,m)*dnaFreqs->g(m,j)*dnaFreqs->g(n,i);
                                 tr += cPr->g(l,n,m)*dnaFreqs->g(m,j)*dnaFreqs->g(n,i);
                             }
@@ -1119,22 +1218,24 @@ void HMModel::alignmentModel(AncestralNode *tn)
     }
 
 
-    else if(as==20) {
+    else if (as==20)
+    {
 //        fullAlphabet = "ARNDCQEGHILKMFPSTWYVXBZJ";
 //        B [21] = [ND] [2,3]
 //        Z [22] = [EQ] [5,6]
 //        J [23] = [IL] [9,10]
 
-/**/
+        /**/
         FlMatrix *aaFreqs = new FlMatrix(20,fas);
         aaFreqs->initialise(0);
         FOR(i,as)
-            aaFreqs->s( 1, i, i ); // self
+        aaFreqs->s( 1, i, i ); // self
 
 
-        if(NXis1) {
+        if (NXis1)
+        {
             FOR(i,as)
-                aaFreqs->s( 1.0, i, 20 ); // X
+            aaFreqs->s( 1.0, i, 20 ); // X
 
             aaFreqs->s( 1.0, 2, 21 ); // B
             aaFreqs->s( 1.0, 3, 21 ); // B
@@ -1145,10 +1246,12 @@ void HMModel::alignmentModel(AncestralNode *tn)
             aaFreqs->s( 1.0, 9, 23 ); // J
             aaFreqs->s( 1.0,10, 23 ); // J
 
-        } else {
+        }
+        else
+        {
 
             FOR(i,as)
-                aaFreqs->s( 1.0/20, i, 20 ); // X
+            aaFreqs->s( 1.0/20, i, 20 ); // X
 
             aaFreqs->s( 0.5, 2, 21 ); // B
             aaFreqs->s( 0.5, 3, 21 ); // B
@@ -1162,37 +1265,53 @@ void HMModel::alignmentModel(AncestralNode *tn)
         }
         int n,m;
 
-        FOR(l,sn) {
-            for(i=as;i<fas;i++) {
+        FOR(l,sn)
+        {
+            for (i=as; i<fas; i++)
+            {
 
                 double t = 0;
                 int ct = 0;
-                FOR(n,as) {
+                FOR(n,as)
+                {
                     t += aaFreqs->g(n,i)*cPi->g(l,n);
-                    if(aaFreqs->g(n,i)>0)
+                    if (aaFreqs->g(n,i)>0)
                         ct++;
                 }
                 t/=ct;
                 cPi->s(t,l,i);
                 logcPi->s(log(t),l,i);
             }
-            FOR(i,fas) {
-                FOR(j,fas) {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
 
-                    if(i<as && j<as)
+                    if (i<as && j<as)
                         continue;
 
                     double tl = 0;
                     double tr = 0;
                     double tmp;
-                    FOR(n,as) {
-                        FOR(m,as) {
-                            if(NXis1) {
+                    FOR(n,as)
+                    {
+                        FOR(m,as)
+                        {
+                            if (NXis1)
+                            {
                                 tmp = cPl->g(l,n,m)*aaFreqs->g(m,j)*aaFreqs->g(n,i);
-                                if(tmp>tl) { tl = tmp; }
+                                if (tmp>tl)
+                                {
+                                    tl = tmp;
+                                }
                                 tmp += cPr->g(l,n,m)*aaFreqs->g(m,j)*aaFreqs->g(n,i);
-                                if(tmp>tr) { tr = tmp; }
-                            } else {
+                                if (tmp>tr)
+                                {
+                                    tr = tmp;
+                                }
+                            }
+                            else
+                            {
                                 tl += cPl->g(l,n,m)*aaFreqs->g(m,j)*aaFreqs->g(n,i);
                                 tr += cPr->g(l,n,m)*aaFreqs->g(m,j)*aaFreqs->g(n,i);
                             }
@@ -1212,166 +1331,191 @@ void HMModel::alignmentModel(AncestralNode *tn)
         delete aaFreqs;
     }
 
-    else if(as==21) {
-      int n;
-      FOR(l,sn) {
+    else if (as==21)
+    {
+        int n;
+        FOR(l,sn)
+        {
 
-        cPi->s(1.0,l,21);
-        logcPi->s(0.0,l,21);
+            cPi->s(1.0,l,21);
+            logcPi->s(0.0,l,21);
 
-        double maxtl = -1;
-        double maxtr = -1;
+            double maxtl = -1;
+            double maxtr = -1;
 
-        FOR(n,20) {
+            FOR(n,20)
+            {
 
-          double t = cPl->g(l,n,n);
-          cPl->s(t,l,n,21);
-          cPl->s(t,l,21,n);
+                double t = cPl->g(l,n,n);
+                cPl->s(t,l,n,21);
+                cPl->s(t,l,21,n);
 
-          if(t>maxtl)
-              maxtl = t;
+                if (t>maxtl)
+                    maxtl = t;
 
-          t = log(t);
-          logcPl->s(t,l,n,21);
-          logcPl->s(t,l,21,n);
+                t = log(t);
+                logcPl->s(t,l,n,21);
+                logcPl->s(t,l,21,n);
 
-          t = cPr->g(l,n,n);
-          cPr->s(t,l,n,21);
-          cPr->s(t,l,21,n);
+                t = cPr->g(l,n,n);
+                cPr->s(t,l,n,21);
+                cPr->s(t,l,21,n);
 
-          if(t>maxtr)
-              maxtr = t;
+                if (t>maxtr)
+                    maxtr = t;
 
-          t = log(t);
-          logcPr->s(t,l,n,21);
-          logcPr->s(t,l,21,n);
-
-        }
-        cPl->s(maxtl,l,21,21);
-        cPr->s(maxtr,l,21,21);
-
-        logcPl->s(log(maxtl),l,21,21);
-        logcPr->s(log(maxtr),l,21,21);
-      }
-    }
-
-    else if(as==61) {
-		int n;
-		FOR(l,sn) {
-
-          if(NXis1) {
-            cPi->s(1.0,l,61);
-            logcPi->s(0.0,l,61);
-
-            FOR(n,as) {
-
-              double t = cPl->g(l,n,n);
-
-              cPl->s(t,l,n,61);
-              cPl->s(t,l,61,n);
-
-              t = log(t);
-
-              logcPl->s(t,l,n,61);
-              logcPl->s(t,l,61,n);
-
-              t = cPr->g(l,n,n);
-
-              cPr->s(t,l,n,61);
-              cPr->s(t,l,61,n);
-
-              t = log(t);
-
-              logcPr->s(t,l,n,61);
-              logcPr->s(t,l,61,n);
+                t = log(t);
+                logcPr->s(t,l,n,21);
+                logcPr->s(t,l,21,n);
 
             }
-            cPl->s(1.0,l,61,61);
-            logcPl->s(0.0,l,61,61);
+            cPl->s(maxtl,l,21,21);
+            cPr->s(maxtr,l,21,21);
 
-            cPr->s(1.0,l,61,61);
-            logcPr->s(0.0,l,61,61);
-          } else {
-            cPi->s(1.0/61,l,61);
-            logcPi->s(log(1.0/61),l,61);
+            logcPl->s(log(maxtl),l,21,21);
+            logcPr->s(log(maxtr),l,21,21);
+        }
+    }
 
-			FOR(n,as) {
+    else if (as==61)
+    {
+        int n;
+        FOR(l,sn)
+        {
 
-				double t = 1.0/(61*61);
+            if (NXis1)
+            {
+                cPi->s(1.0,l,61);
+                logcPi->s(0.0,l,61);
 
-				cPl->s(t,l,n,61);
-				cPr->s(t,l,n,61);
-				cPl->s(t,l,61,n);
-				cPr->s(t,l,61,n);
+                FOR(n,as)
+                {
 
-				t = log(t);
+                    double t = cPl->g(l,n,n);
 
-				logcPl->s(t,l,n,61);
-				logcPr->s(t,l,n,61);
-				logcPl->s(t,l,61,n);
-				logcPr->s(t,l,61,n);
-			}
-            double t = 1.0/(61*61);
+                    cPl->s(t,l,n,61);
+                    cPl->s(t,l,61,n);
 
-            cPl->s(t,l,61,61);
-            cPr->s(t,l,61,61);
+                    t = log(t);
 
-            t = log(t);
-            logcPl->s(t,l,61,61);
-            logcPr->s(t,l,61,61);
-          }
-      }
-	}
-	else {
-		cout<<"HMModel::alignmentModel: impossible 'as'"<<cout;
-		exit(-1);
-	}
+                    logcPl->s(t,l,n,61);
+                    logcPl->s(t,l,61,n);
 
-    for(i=as;i<fas;i++) {
-		nPi->s(cPi->g(0,i),i);
-		lognPi->s(logcPi->g(0,i),i);
+                    t = cPr->g(l,n,n);
+
+                    cPr->s(t,l,n,61);
+                    cPr->s(t,l,61,n);
+
+                    t = log(t);
+
+                    logcPr->s(t,l,n,61);
+                    logcPr->s(t,l,61,n);
+
+                }
+                cPl->s(1.0,l,61,61);
+                logcPl->s(0.0,l,61,61);
+
+                cPr->s(1.0,l,61,61);
+                logcPr->s(0.0,l,61,61);
+            }
+            else
+            {
+                cPi->s(1.0/61,l,61);
+                logcPi->s(log(1.0/61),l,61);
+
+                FOR(n,as)
+                {
+
+                    double t = 1.0/(61*61);
+
+                    cPl->s(t,l,n,61);
+                    cPr->s(t,l,n,61);
+                    cPl->s(t,l,61,n);
+                    cPr->s(t,l,61,n);
+
+                    t = log(t);
+
+                    logcPl->s(t,l,n,61);
+                    logcPr->s(t,l,n,61);
+                    logcPl->s(t,l,61,n);
+                    logcPr->s(t,l,61,n);
+                }
+                double t = 1.0/(61*61);
+
+                cPl->s(t,l,61,61);
+                cPr->s(t,l,61,61);
+
+                t = log(t);
+                logcPl->s(t,l,61,61);
+                logcPr->s(t,l,61,61);
+            }
+        }
+    }
+    else
+    {
+        cout<<"HMModel::alignmentModel: impossible 'as'"<<cout;
+        exit(-1);
+    }
+
+    for (i=as; i<fas; i++)
+    {
+        nPi->s(cPi->g(0,i),i);
+        lognPi->s(logcPi->g(0,i),i);
     }
 
 /////////
 
-    if (NOISE>1) {
+    if (NOISE>1)
+    {
         cout<<"character frequencies: "<<fullAlphabet<<endl;
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             cout<<"state "<<l<<endl;
-            FOR(i,fas) {
+            FOR(i,fas)
+            {
                 cout<<cPi->g(l,i)<<" ";
             }
         }
         cout<<endl;
         cout<<"substitution probabilities: "<<fullAlphabet<<endl;
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             cout<<"state "<<l<<"; left branch"<<endl;
-            FOR(i,fas) {
-                FOR(j,fas) {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
                     cout<<" "<<cPl->g(l,i,j);
                 }
                 cout<<endl;
             }
             cout<<"state "<<l<<"; right branch"<<endl;
-            FOR(i,fas) {
-                FOR(j,fas) {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
                     cout<<" "<<cPr->g(l,i,j);
                 }
                 cout<<endl;
             }
         }
         cout<<"substitution probabilities: "<<fullAlphabet<<endl;
-        FOR(l,sn) {
+        FOR(l,sn)
+        {
             cout<<"state "<<l<<"; left branch"<<endl;
-            FOR(i,fas) {
-                FOR(j,fas) {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
                     cout<<" "<<log(cPl->g(l,i,j));
                 }
                 cout<<endl;
             }
             cout<<"state "<<l<<"; right branch"<<endl;
-            FOR(i,fas) {
-                FOR(j,fas) {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
                     cout<<" "<<log(cPr->g(l,i,j));
                 }
                 cout<<endl;
@@ -1401,11 +1545,13 @@ void HMModel::pairwiseModel(IntMatrix* scores,float dist)
     double* twu = new double[as*as];
     double* twv = new double[as*as];
 
-    FOR(i,as) {
+    FOR(i,as)
+    {
 
         twr[i] = wRoot->g(0,i);
 
-        FOR(j,as) {
+        FOR(j,as)
+        {
             twu[i*as+j] = wU->g(0,i,j);
             twv[i*as+j] = wV->g(0,i,j);
         }
@@ -1413,28 +1559,33 @@ void HMModel::pairwiseModel(IntMatrix* scores,float dist)
 
     e->computePMatrix(as,tm,twu,twv,twr,dist);
 
-    FOR(i,as) {
-        FOR(j,as) {
-          scores->s((int)(log( tm[i*as+j]/(charBgFreq(0,i)*charBgFreq(0,j)) )*1000),i,j);
+    FOR(i,as)
+    {
+        FOR(j,as)
+        {
+            scores->s((int)(log( tm[i*as+j]/(charBgFreq(0,i)*charBgFreq(0,j)) )*1000),i,j);
         }
     }
 
     double sumA = 0;
 
-    FOR(j,as) {
+    FOR(j,as)
+    {
         double sum = 0;
-        FOR(i,as) {
+        FOR(i,as)
+        {
             sum += nPi->g(j)*tm[i*as+j];
             sumA += nPi->g(i)*nPi->g(j)*tm[i*as+j];
         }
-		scores->s((int)(log(sum)*1000),as,j);
-		scores->s((int)(log(sum)*1000),j,as);
+        scores->s((int)(log(sum)*1000),as,j);
+        scores->s((int)(log(sum)*1000),j,as);
     }
     scores->s((int)(log(sumA)*1000),as,as);
 
-    if (NOISE>1) {
-      cout<<"Pairwise substitution scoring matrix"<<endl;
-      scores->print();
+    if (NOISE>1)
+    {
+        cout<<"Pairwise substitution scoring matrix"<<endl;
+        scores->print();
     }
 
     delete[] tm;
@@ -1452,9 +1603,11 @@ void HMModel::buildModel()
     // Hack to speed up computation:
     // index of next non-zero transition
     //
-    RFOR(i,sn-1) {
+    RFOR(i,sn-1)
+    {
         int nz = -1;
-        RFOR(j,sn-1) {
+        RFOR(j,sn-1)
+        {
             tiX->s(nz,i,j+1);
             if (stp->g(i,j)>0)
                 nz=j;
@@ -1462,9 +1615,11 @@ void HMModel::buildModel()
         tiX->s(nz,i,0);
     }
 
-    RFOR(i,sn-1) {
+    RFOR(i,sn-1)
+    {
         int nz = -1;
-        RFOR(j,sn-1) {
+        RFOR(j,sn-1)
+        {
             tiY->s(nz,j+1,i);
             if (stp->g(j,i)>0)
                 nz=j;
@@ -1476,7 +1631,8 @@ void HMModel::buildModel()
     //
     nPi = new DbMatrix(fas,"pi_null-model");
     lognPi = new DbMatrix(fas,"log_pi_null-model");
-    FOR(i,as) {
+    FOR(i,as)
+    {
         nPi->s(cPi->g(0,i),i); // same as structure state 0
         lognPi->s(log( cPi->g(0,i) ),i); // same as structure state 0
     }
@@ -1500,32 +1656,39 @@ void HMModel::buildModel()
     double* twv = new double[as*as];
     int npi0 = 0;
 
-    FOR(l,sn) {
-        FOR(i,as) {
+    FOR(l,sn)
+    {
+        FOR(i,as)
+        {
 
             tpi[i] = cPi->g(l,i);
 
-            FOR(j,as) {
+            FOR(j,as)
+            {
                 tcq[i*as+j] = cQ->g(l,i,j);
             }
         }
 
-        if (e->getpi_sqrt (tpi, tsq, as, &npi0) != 0) {
+        if (e->getpi_sqrt (tpi, tsq, as, &npi0) != 0)
+        {
             cout << "\nError in eigen square roots!!\n\n";
             exit (-1);
         }
 
 
-        if (e->eigenQREV (tcq, tpi, tsq, as, npi0, twr, twu, twv) != 0) {
+        if (e->eigenQREV (tcq, tpi, tsq, as, npi0, twr, twu, twv) != 0)
+        {
             cout << "\nError in eigen QREV!!\n\n";
             exit (-1);
         }
 
-        FOR(i,as) {
+        FOR(i,as)
+        {
 
             wRoot->s(twr[i],l,i);
 
-            FOR(j,as) {
+            FOR(j,as)
+            {
                 wU->s(twu[i*as+j],l,i,j);
                 wV->s(twv[i*as+j],l,i,j);
             }
@@ -1541,25 +1704,31 @@ void HMModel::buildModel()
 
     delete e;
 
-    if (NOISE>1) {
+    if (NOISE>1)
+    {
         // Print out the model
         cout<<"Definition of the HMM"<<endl;
         cout<<"number of structure states "<<sn<<", alphabet "<<alphabet<<endl;
 
         cout<<"character equilibrium frequencies (pi)"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<"state "<<k<<":"<<endl;
-            FOR(j,as) {
+            FOR(j,as)
+            {
                 cout<<" "<<cPi->g(k,j);
             }
             cout<<endl;
         }
 
         cout<<"original substitution matrix"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<"state "<<k<<":"<<endl;
-            FOR(i,as) {
-                FOR(j,as) {
+            FOR(i,as)
+            {
+                FOR(j,as)
+                {
                     cout<<" "<<cQ->g(k,i,j);
                 }
                 cout<<endl;
@@ -1567,23 +1736,29 @@ void HMModel::buildModel()
         }
 
         cout<<"eigen values & vectors"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<"state "<<k<<":"<<endl;
-            FOR(j,as) {
+            FOR(j,as)
+            {
                 cout<<" "<<wRoot->g(k,j);
             }
             cout<<endl<<endl;
 
-            FOR(i,as) {
-                FOR(j,as) {
+            FOR(i,as)
+            {
+                FOR(j,as)
+                {
                     cout<<" "<<wU->g(k,i,j);
                 }
                 cout<<endl;
             }
             cout<<endl;
 
-            FOR(i,as) {
-                FOR(j,as) {
+            FOR(i,as)
+            {
+                FOR(j,as)
+                {
                     cout<<" "<<wV->g(k,i,j);
                 }
                 cout<<endl;
@@ -1592,33 +1767,39 @@ void HMModel::buildModel()
         }
 
         cout<<"structure background frequencies"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<" "<<sbf->g(k);
         }
         cout<<endl;
 
         cout<<"structure transition probabilities"<<endl;
-        FOR(k,sn) {
-            FOR(l,sn) {
+        FOR(k,sn)
+        {
+            FOR(l,sn)
+            {
                 cout<<" "<<stp->g(k,l);
             }
             cout<<endl;
         }
 
         cout<<"indel rates"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<" "<<sir->g(k);
         }
         cout<<endl;
 
         cout<<"gap extension probabilities"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<" "<<gep->g(k);
         }
         cout<<endl;
 
         cout<<"match extension probabilities"<<endl;
-        FOR(k,sn) {
+        FOR(k,sn)
+        {
             cout<<" "<<mep->g(k);
         }
         cout<<endl;
@@ -1655,7 +1836,8 @@ std::string HMModel::nextNotComment(ifstream *in)
 
     string row = "";
     getline(*in,row);
-    while (row[0]=='#'){
+    while (row[0]=='#')
+    {
         getline(*in,row);
     }
 

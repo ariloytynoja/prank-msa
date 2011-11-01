@@ -29,23 +29,27 @@ ReadAnnotation::ReadAnnotation(string annofile,map<string,FlMatrix*>* annotation
 
     int nState = hmm->getNStates();
 
-    if (!in) {
+    if (!in)
+    {
         cout<<"Could not read annotation file "<<annofile<<"!"<<endl;
         exit(-1);
     }
 
     string row = nextNotComment(&in);
-    while (row.length()>0) {
+    while (row.length()>0)
+    {
         string name;
         if (row.at(0)=='>')
             name = row.substr(1);
-        else {
+        else
+        {
             cout<<"Annotation file "<<annofile<<": erroneous name '"<<row<<"'"<<endl;
             exit(-1);
         }
         row = nextNotComment(&in);
         int nstate = nextInt(row);
-        if (nstate != nState){
+        if (nstate != nState)
+        {
             cout<<"Annotation "<<annofile<<": erroneous nstate '"<<nstate<<"'"<<endl;
             exit(-1);
         }
@@ -57,7 +61,8 @@ ReadAnnotation::ReadAnnotation(string annofile,map<string,FlMatrix*>* annotation
             anno->initialise(1);
         row = nextNotComment(&in);
         int i;
-        FOR(i,nsite){
+        FOR(i,nsite)
+        {
 // 			cout<<i<<" "<<row<<endl;
             FOR(k,nstate)
             if (LOGVALUES)
@@ -97,7 +102,8 @@ std::string ReadAnnotation::nextNotComment(ifstream *in)
 
     string row = "";
     getline(*in,row);
-    while (row[0]=='#'){
+    while (row[0]=='#')
+    {
         getline(*in,row);
     }
     return row;

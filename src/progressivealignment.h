@@ -30,7 +30,8 @@
 #include "treenode.h"
 #include "translatesequences.h"
 
-class ProgressiveAlignment{
+class ProgressiveAlignment
+{
     TranslateSequences *trseq;
 public:
     ProgressiveAlignment(std::string treefile,std::string seqfile,std::string dnafile,int aMethod=0);
@@ -44,43 +45,46 @@ private:
 
     void makeSettings(bool isDna)
     {
-        if(isDna) {
-          if(gapRate<0)
-            gapRate = dnaGapRate;
+        if (isDna)
+        {
+            if (gapRate<0)
+                gapRate = dnaGapRate;
 
-          if(gapExt<0)
-            gapExt = dnaGapExt;
+            if (gapExt<0)
+                gapExt = dnaGapExt;
 
-          if(pwDist<0)
-            pwDist = pwDnaDist;
+            if (pwDist<0)
+                pwDist = pwDnaDist;
 
-          if(pwGapRate<0)
-            pwGapRate = dnaGapRate;
+            if (pwGapRate<0)
+                pwGapRate = dnaGapRate;
 
-          if(pwGapExt<0)
-            pwGapExt = dnaGapExt;
+            if (pwGapExt<0)
+                pwGapExt = dnaGapExt;
 
-          if(branchScalingFactor<0)
-            branchScalingFactor = dnaBranchScalingFactor;
+            if (branchScalingFactor<0)
+                branchScalingFactor = dnaBranchScalingFactor;
 
-        } else {
-          if(gapRate<0)
-            gapRate = protGapRate;
+        }
+        else
+        {
+            if (gapRate<0)
+                gapRate = protGapRate;
 
-          if(gapExt<0)
-            gapExt = protGapExt;
+            if (gapExt<0)
+                gapExt = protGapExt;
 
-          if(pwDist<0)
-            pwDist = pwProtDist;
+            if (pwDist<0)
+                pwDist = pwProtDist;
 
-          if(pwGapRate<0)
-            pwGapRate = pwProtGapRate;
+            if (pwGapRate<0)
+                pwGapRate = pwProtGapRate;
 
-          if(pwGapExt<0)
-            pwGapExt = pwProtGapExt;
+            if (pwGapExt<0)
+                pwGapExt = pwProtGapExt;
 
-          if(branchScalingFactor<0)
-            branchScalingFactor = protBranchScalingFactor;
+            if (branchScalingFactor<0)
+                branchScalingFactor = protBranchScalingFactor;
 
         }
 

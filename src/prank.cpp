@@ -35,11 +35,11 @@ int main(int argc, char *argv[])
     version = 101018;
 
     readArguments(argc, argv);
-	int time1 = time(0);
+    int time1 = time(0);
 
     ProgressiveAlignment* pa = new ProgressiveAlignment(treefile,seqfile,dnafile);
     if (NOISE>=0)
-		cout<<endl<<"Alignment done. Total time "<<(time(0)-time1)<<"s"<<endl;
+        cout<<endl<<"Alignment done. Total time "<<(time(0)-time1)<<"s"<<endl;
 
     delete pa;
     delete hmm;
@@ -55,7 +55,7 @@ void readArguments(int argc, char *argv[])
 
 
     // first see if 'noise' is defined.
-    for (int i=1;i<argc;i++)
+    for (int i=1; i<argc; i++)
     {
 
         string s = string(argv[i]);
@@ -83,7 +83,8 @@ void readArguments(int argc, char *argv[])
     // otheriwise run in the normal manner
     else
     {
-        for (int i=1;i<argc;i++) {
+        for (int i=1; i<argc; i++)
+        {
 
             string s = string(argv[i]);
 
@@ -100,13 +101,15 @@ void readArguments(int argc, char *argv[])
             }
 
             // print help
-            else if (s=="-help") {
+            else if (s=="-help")
+            {
                 printHelp(true);
                 exit(0);
             }
 
             // check version
-            else if (s=="-version") {
+            else if (s=="-version")
+            {
                 Check_version ch(version);
                 exit(0);
             }
@@ -221,15 +224,15 @@ void readArguments(int argc, char *argv[])
             }
 
             // don't print tree
-            else if (s=="-notree")
+            else if (s=="-showtree")
             {
-                PRINTTREE = false;
+                PRINTTREE = true;
             }
 
             // don't write xml
-            else if (s=="-noxml")
+            else if (s=="-showxml")
             {
-                WRITEXML = false;
+                WRITEXML = true;
             }
 
             // print dots for insertions
@@ -320,9 +323,9 @@ void readArguments(int argc, char *argv[])
             }
 
             // no posterior probabiliity calculation
-            else if (s=="-nopost")
+            else if (s=="-support")
             {
-                DOPOST = false;
+                DOPOST = true;
             }
 
             // penalise terminal gaps
@@ -331,7 +334,7 @@ void readArguments(int argc, char *argv[])
                 NOTGAP = false;
             }
 
-            else if(s=="-nomissing")
+            else if (s=="-nomissing")
             {
                 TERMF = true;
             }
@@ -378,14 +381,14 @@ void readArguments(int argc, char *argv[])
             // translate DNA to protein, then backtranslate
             else if (s=="-translate")
             {
-              TRANSLATE = true;
+                TRANSLATE = true;
             }
 
             // translate mtDNA to protein, then backtranslate
             else if (s=="-mttranslate")
             {
-              TRANSLATE = true;
-              MTTABLE = true;
+                TRANSLATE = true;
+                MTTABLE = true;
             }
 
             // consider N or X identical to any
@@ -472,7 +475,7 @@ void readArguments(int argc, char *argv[])
             // correct guidetree distances
             else if (s=="-correctp")
             {
-              CORRECTP = true;
+                CORRECTP = true;
             }
 
             /********* technical: hirschberg, full probability **********/
@@ -516,9 +519,9 @@ void readArguments(int argc, char *argv[])
             }
 
             // use anchors
-            else if (s=="-exonerate")
+            else if (s=="-noanchors" || s.substr(0,5)=="-noa")
             {
-                EXONERATE = true;
+                EXONERATE = false;
             }
 
             // maximum anchor distance
@@ -622,38 +625,40 @@ void readArguments(int argc, char *argv[])
         }
     }
 
-    if (seqfile=="") {
+    if (seqfile=="")
+    {
         printHelp(false);
         exit(0);
     }
 
     // define a seed for random numbers
-    if(seed>0)
+    if (seed>0)
         srand(seed);
     else
         srand(time(0));
 
     // partly aligned switches between F/non-F
     // and has to remember the settings
-    if(FOREVER && PARTLYALIGNED)
+    if (FOREVER && PARTLYALIGNED)
         FOREVER_FOR_PA = true;
     else
         FOREVER_FOR_PA = false;
 
     // remind that +F is not the default option
-    if (!FOREVER && !PREALIGNED && !CONVERT && !BACKTRANSLATE){
-      DOTS=false;
+    if (!FOREVER && !PREALIGNED && !CONVERT && !BACKTRANSLATE)
+    {
+        DOTS=false;
 
-      cout<<endl<<"Note: option '+F' is by default not selected.";
-      if(argc==2 && seqfile!="")
-        cout<<" You can select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
-      else
-        cout<<" You can select it by adding flag \"+F\"."<<endl;
+        cout<<endl<<"Note: option '+F' is by default not selected.";
+        if (argc==2 && seqfile!="")
+            cout<<" You can select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
+        else
+            cout<<" You can select it by adding flag \"+F\"."<<endl;
     }
 
     // options don't work together
     if (PREALIGNED)
-      FOREVER=false;
+        FOREVER=false;
 
     if (format!=8 && format!=11 && format!=12 && format!=17 && format!=18)
         format = 8;
@@ -669,12 +674,11 @@ void printHelp(bool complete)
     cout<<"\n input/output parameters:"<<endl;
     cout<<"  -d=sequence_file (in FASTA format)"<<endl;
     cout<<"  -t=tree_file [default: no tree, generate approximate NJ tree]"<<endl;
-    if(complete)
+    if (complete)
         cout<<"  -tree=\"tree_string\" [tree in newick format; in double quotes]"<<endl;
-    cout<<"  -m=model_file [default: HKY2/WAG]"<<endl;
     cout<<"  -o=output_file [default: 'output']"<<endl;
     cout<<"  -f=output_format ['fasta' (default), 'phylipi', 'phylips', 'paml', 'nexus']"<<endl;
-    if(complete)
+    if (complete)
     {
         cout<<"  -f=output_format_number [default: 8] (deprecated; use format names)"<<endl;
         cout<<"     8. Pearson/Fasta"<<endl;
@@ -682,44 +686,45 @@ void printHelp(bool complete)
         cout<<"    12. Phylip interleaved"<<endl;
         cout<<"    17. PAUP/NEXUS"<<endl;
         cout<<"    18. PAML"<<endl;
-        cout<<"  -noxml [do not output xml-files]"<<endl;
-        cout<<"  -notree [do not output dnd-files]"<<endl;
     }
+    cout<<"  -showxml [output xml-files]"<<endl;
+    cout<<"  -showtree [output dnd-files]"<<endl;
     cout<<"  -shortnames [truncate names at first space]"<<endl;
+    cout<<"  -noanchors [no Exonerate anchoring ()]"<<endl;
+    cout<<"  -support [compute posterior support]"<<endl;
     cout<<"  -quiet"<<endl;
     cout<<"\n model parameters:"<<endl;
     cout<<"  +F [force insertions to be always skipped]"<<endl;
     cout<<"  -F [equivalent]"<<endl;
-    if(complete)
+    if (complete)
         cout<<"  -dots [show insertion gaps as dots]"<<endl;
+    cout<<"  -m=model_file [default: HKY2/WAG]"<<endl;
     cout<<"  -gaprate=# [gap opening rate; default: dna "<<dnaGapRate<<" / prot "<<protGapRate<<"]"<<endl;
     cout<<"  -gapext=# [gap extension probability; default: dna "<<dnaGapExt<<" / prot "<<protGapExt<<"]"<<endl;
-    if(complete)
+    if (complete)
     {
         cout<<"  -dnafreqs=#,#,#,# [ACGT; default: empirical]"<<endl;
         cout<<"  -kappa=# [ts/tv rate ratio; default:"<<kappa<<"]"<<endl;
         cout<<"  -rho=# [pur/pyr rate ratio; default:"<<rho<<"]"<<endl;
-   }
+    }
     cout<<"  -codon [for coding DNA: use empirical codon model]"<<endl;
     cout<<"  -DNA / -protein [no autodetection: use dna or protein model]"<<endl;
     cout<<"  -termgap [penalise terminal gaps normally]"<<endl;
     cout<<"  -nomissing [no missing data, use -F for terminal gaps ]"<<endl;
-    cout<<"  -e [pre-aligned sequences; do not remove gaps]"<<endl;
     cout<<"\n other parameters:"<<endl;
-    cout<<"  -nopost [do not compute posterior support; default: compute]"<<endl;
-    if(complete)
+    cout<<"  -e [pre-aligned sequences; do not remove gaps]"<<endl;
+    if (complete)
         cout<<"  -pwdist=# [expected pairwise distance for computing guidetree; default: dna "<<pwDnaDist<<" / prot "<<pwProtDist<<"]"<<endl;
     cout<<"  -once [run only once; default: twice if no guidetree given]"<<endl;
     cout<<"  -twice [run always twice]"<<endl;
     cout<<"  -prunetree [prune guide tree branches with no sequence data]"<<endl;
 
-    if(complete)
+    if (complete)
         cout<<"  -skipins [skip insertions in posterior support]"<<endl;
     cout<<"  -uselogs [slower but should work for a greater number of sequences]"<<endl;
-    if(complete)
+    if (complete)
     {
         cout<<"  -writeanc [output ancestral sequences]"<<endl;
-//        cout<<"  -writeancseq [output ancestral sequences; another format]"<<endl;
         cout<<"  -printnodes [output each node; mostly for debugging]"<<endl;
         cout<<"  -matresize=# [matrix resizing multiplier]"<<endl;
         cout<<"  -matinitsize=# [matrix initial size multiplier]"<<endl;
@@ -746,20 +751,20 @@ void printHelp(bool complete)
 int parseFormat(string Format)
 {
     string format = "";
-    for(unsigned int i = 0; i < Format.size(); i++)
+    for (unsigned int i = 0; i < Format.size(); i++)
     {
         format += tolower(Format[i]);
     }
 
-    if(format == "fasta" || format == "8")
+    if (format == "fasta" || format == "8")
         return 8;
-    else if(format == "phylipi" || format == "phylip" || format == "12")
+    else if (format == "phylipi" || format == "phylip" || format == "12")
         return 12;
-    else if(format == "phylips" || format == "11")
+    else if (format == "phylips" || format == "11")
         return 11;
-    else if(format == "nexus" || format == "paup" || format == "17")
+    else if (format == "nexus" || format == "paup" || format == "17")
         return 17;
-    else if(format == "paml")
+    else if (format == "paml")
         return 18;
     else
     {

@@ -26,51 +26,133 @@
 
 class TerminalSequence : public Sequence
 {
-	IntMatrix* seqvec;    // shortcut for unambiguous terminal seqs: profile is useless!
-	FlMatrix* priorProb;
+    IntMatrix* seqvec;    // shortcut for unambiguous terminal seqs: profile is useless!
+    FlMatrix* priorProb;
 
-    bool isGap(int ){ return false; }
-    bool isXGap(int ){ return false; }
-    bool isYGap(int ){ return false; }
+    bool isGap(int )
+    {
+        return false;
+    }
+    bool isXGap(int )
+    {
+        return false;
+    }
+    bool isYGap(int )
+    {
+        return false;
+    }
 
 public:
 
-	TerminalSequence(std::string* s);
+    TerminalSequence(std::string* s);
     ~TerminalSequence();
 
-	int charAt(int i) { return seqvec->g(i); }                // index unambiguous character at site i
+    int charAt(int i)
+    {
+        return seqvec->g(i);    // index unambiguous character at site i
+    }
 
-    bool isChildGap(int ){ return false; }
-    bool hasNeighborGaps(int ) { return false; }
-    bool isInsertion(int ){ return false; }
-    bool isPermInsertion(int ){ return false; }
-    void setPermInsertion(int ){}
+    bool isChildGap(int )
+    {
+        return false;
+    }
+    bool hasNeighborGaps(int )
+    {
+        return false;
+    }
+    bool isInsertion(int )
+    {
+        return false;
+    }
+    bool isPermInsertion(int )
+    {
+        return false;
+    }
+    void setPermInsertion(int ) {}
 
-    bool fwdGapStarts(int ){ return false;  }
-    bool fwdGapContinues(int ){ return false; }
-    bool fwdGapEnds(int ){ return false; }
+    bool fwdGapStarts(int )
+    {
+        return false;
+    }
+    bool fwdGapContinues(int )
+    {
+        return false;
+    }
+    bool fwdGapEnds(int )
+    {
+        return false;
+    }
 
-    bool fwdGapStartsNext(int ){ return false; }
-    bool fwdGapContinuesNext(int ){ return false; }
-    bool fwdGapEndsNext(int ){ return false; }
+    bool fwdGapStartsNext(int )
+    {
+        return false;
+    }
+    bool fwdGapContinuesNext(int )
+    {
+        return false;
+    }
+    bool fwdGapEndsNext(int )
+    {
+        return false;
+    }
 
-    bool bwdGapStarts(int ){ return false; }
-    bool bwdGapContinues(int ){ return false; }
-    bool bwdGapEnds(int ){ return false; }
-	//
-    bool fwdChildGapStarts(int ){ return false; }
-    bool fwdChildGapContinues(int ){ return false; }
-    bool fwdChildGapEnds(int ){ return false; }
+    bool bwdGapStarts(int )
+    {
+        return false;
+    }
+    bool bwdGapContinues(int )
+    {
+        return false;
+    }
+    bool bwdGapEnds(int )
+    {
+        return false;
+    }
+    //
+    bool fwdChildGapStarts(int )
+    {
+        return false;
+    }
+    bool fwdChildGapContinues(int )
+    {
+        return false;
+    }
+    bool fwdChildGapEnds(int )
+    {
+        return false;
+    }
 
-    bool fwdChildGapStartsNext(int ){ return false; }
-    bool fwdChildGapContinuesNext(int ){ return false; }
-    bool fwdChildGapEndsNext(int ){ return false; }
+    bool fwdChildGapStartsNext(int )
+    {
+        return false;
+    }
+    bool fwdChildGapContinuesNext(int )
+    {
+        return false;
+    }
+    bool fwdChildGapEndsNext(int )
+    {
+        return false;
+    }
 
-    bool bwdChildGapStarts(int ){ return false; }
-    bool bwdChildGapContinues(int ){ return false; }
-    bool bwdChildGapEnds(int ){ return false; }
+    bool bwdChildGapStarts(int )
+    {
+        return false;
+    }
+    bool bwdChildGapContinues(int )
+    {
+        return false;
+    }
+    bool bwdChildGapEnds(int )
+    {
+        return false;
+    }
 
-	void setAnnotation(FlMatrix* annotation) { priorProb = annotation; hasPrior = true; }
+    void setAnnotation(FlMatrix* annotation)
+    {
+        priorProb = annotation;
+        hasPrior = true;
+    }
 };
 
 #endif

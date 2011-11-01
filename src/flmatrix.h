@@ -34,18 +34,19 @@
 #include <cassert>
 #include <cmath>
 
-class FlMatrix{
+class FlMatrix
+{
 private:
     int x;
     int y;
     int z;
     int w;
-	bool xar;
-	bool yar;
-	bool zar;
-	bool war;
+    bool xar;
+    bool yar;
+    bool zar;
+    bool war;
 
-	std::string name;
+    std::string name;
     float* data;
     int i,j,k,l;
 public:
@@ -59,25 +60,98 @@ public:
     void allocate();
     void initialise(float v = 0);
 
-    float g(int xa, int ya=0, int za = 0, int wa = 0) { /**/ if(!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;/**/ assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z); assert(wa>=0); assert(wa<w); return data[xa + ya*x + za*x*y + wa*x*y*z]; }
-/*    void s(float v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] = v; }*/
-	void s(float v, int xa, int ya=0, int za = 0, int wa = 0);
-	void a(float v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] += v; }
-    void d(float v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] /= v; }
-    void m(float v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] *= v; }
-    void alog(float v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] = sumLogs(data[xa + ya*x + za*x*y + wa*x*y*z], v); }
-    void clog(int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z); assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] = log(data[xa + ya*x + za*x*y + wa*x*y*z]); }
-    void printName() { std::cout<<"Name "<<name<<": x = "<<x<<", y = "<<y<<", z = "<<z<<", w = "<<w<<std::endl; }
+    float g(int xa, int ya=0, int za = 0, int wa = 0)
+    { /**/
+        if (!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;/**/
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        return data[xa + ya*x + za*x*y + wa*x*y*z];
+    }
+    /*    void s(float v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] = v; }*/
+    void s(float v, int xa, int ya=0, int za = 0, int wa = 0);
+    void a(float v, int xa, int ya=0, int za = 0, int wa = 0)
+    {
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        data[xa + ya*x + za*x*y + wa*x*y*z] += v;
+    }
+    void d(float v, int xa, int ya=0, int za = 0, int wa = 0)
+    {
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        data[xa + ya*x + za*x*y + wa*x*y*z] /= v;
+    }
+    void m(float v, int xa, int ya=0, int za = 0, int wa = 0)
+    {
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        data[xa + ya*x + za*x*y + wa*x*y*z] *= v;
+    }
+    void alog(float v, int xa, int ya=0, int za = 0, int wa = 0)
+    {
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        data[xa + ya*x + za*x*y + wa*x*y*z] = sumLogs(data[xa + ya*x + za*x*y + wa*x*y*z], v);
+    }
+    void clog(int xa, int ya=0, int za = 0, int wa = 0)
+    {
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        data[xa + ya*x + za*x*y + wa*x*y*z] = log(data[xa + ya*x + za*x*y + wa*x*y*z]);
+    }
+    void printName()
+    {
+        std::cout<<"Name "<<name<<": x = "<<x<<", y = "<<y<<", z = "<<z<<", w = "<<w<<std::endl;
+    }
     void print();
     void print(int m);
     double sumLogs(double a, double b);
 
-    int X() { return x; }
+    int X()
+    {
+        return x;
+    }
 
-	void resize(int i);
-	void copyData(float *tmp,int new_x,int new_y,int new_z,int new_w);
+    void resize(int i);
+    void copyData(float *tmp,int new_x,int new_y,int new_z,int new_w);
 
-	void allowResize(bool xr, bool yr=false, bool zr=false, bool wr=false);
+    void allowResize(bool xr, bool yr=false, bool zr=false, bool wr=false);
 };
 
 #endif

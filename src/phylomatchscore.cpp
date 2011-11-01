@@ -33,10 +33,11 @@ PhyloMatchScore::~PhyloMatchScore()
     delete bM;
     delete idX;
     delete idY;
-	if (s1->isTerminal() && s2->isTerminal()) {
-		delete match;
-		delete gap;
-	}
+    if (s1->isTerminal() && s2->isTerminal())
+    {
+        delete match;
+        delete gap;
+    }
 }
 
 PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
@@ -65,8 +66,10 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
     small = -HUGE_VAL;
 
 
-    if (LOGVALUES) {
-        if (s1->isTerminal() && s2->isTerminal()) {
+    if (LOGVALUES)
+    {
+        if (s1->isTerminal() && s2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(s1);
             t2 = static_cast<TerminalSequence*>(s2);
             fwdp = &PhyloMatchScore::logFwdSS;
@@ -75,7 +78,8 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullBwdp = &PhyloMatchScore::logBwdSS;
             computeSSMatrix();
         }
-        else if (s1->isTerminal() && !s2->isTerminal()) {
+        else if (s1->isTerminal() && !s2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(s1);
             a2 = static_cast<AncestralSequence*>(s2);
             fwdp = &PhyloMatchScore::logFwdSM;
@@ -83,7 +87,8 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullFwdp = &PhyloMatchScore::logFullFwdSM;
             fullBwdp = &PhyloMatchScore::logFullBwdSM;
         }
-        else if (!s1->isTerminal() && s2->isTerminal()) {
+        else if (!s1->isTerminal() && s2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(s1);
             t2 = static_cast<TerminalSequence*>(s2);
             fwdp = &PhyloMatchScore::logFwdMS;
@@ -91,7 +96,8 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullFwdp = &PhyloMatchScore::logFullFwdMS;
             fullBwdp = &PhyloMatchScore::logFullBwdMS;
         }
-        else if (!s1->isTerminal() && !s2->isTerminal()) {
+        else if (!s1->isTerminal() && !s2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(s1);
             a2 = static_cast<AncestralSequence*>(s2);
             fwdp = &PhyloMatchScore::logFwdMM;
@@ -99,8 +105,11 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullFwdp = &PhyloMatchScore::logFullFwdMM;
             fullBwdp = &PhyloMatchScore::logFullBwdMM;
         }
-    } else {
-        if (s1->isTerminal() && s2->isTerminal()) {
+    }
+    else
+    {
+        if (s1->isTerminal() && s2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(s1);
             t2 = static_cast<TerminalSequence*>(s2);
             fwdp = &PhyloMatchScore::fwdSS;
@@ -109,7 +118,8 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullBwdp = &PhyloMatchScore::bwdSS;
             computeSSMatrix();
         }
-        else if (s1->isTerminal() && !s2->isTerminal()) {
+        else if (s1->isTerminal() && !s2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(s1);
             a2 = static_cast<AncestralSequence*>(s2);
             fwdp = &PhyloMatchScore::fwdSM;
@@ -117,7 +127,8 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullFwdp = &PhyloMatchScore::fullFwdSM;
             fullBwdp = &PhyloMatchScore::fullBwdSM;
         }
-        else if (!s1->isTerminal() && s2->isTerminal()) {
+        else if (!s1->isTerminal() && s2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(s1);
             t2 = static_cast<TerminalSequence*>(s2);
             fwdp = &PhyloMatchScore::fwdMS;
@@ -125,7 +136,8 @@ PhyloMatchScore::PhyloMatchScore(Sequence* seq1,Sequence* seq2)
             fullFwdp = &PhyloMatchScore::fullFwdMS;
             fullBwdp = &PhyloMatchScore::fullBwdMS;
         }
-        else if (!s1->isTerminal() && !s2->isTerminal()) {
+        else if (!s1->isTerminal() && !s2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(s1);
             a2 = static_cast<AncestralSequence*>(s2);
             fwdp = &PhyloMatchScore::fwdMM;
@@ -160,7 +172,8 @@ void PhyloMatchScore::computeFullBwd(int j,int i)
 
 void PhyloMatchScore::fwdMM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(0,k);
         idX->s(0,k);
@@ -168,28 +181,35 @@ void PhyloMatchScore::fwdMM(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,j-1,k);
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,i-1,k);
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAt(m,j-1,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAt(m,j-1,k);
                     }
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAt(m,i-1,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAt(m,i-1,k);
                     }
@@ -215,12 +235,15 @@ void PhyloMatchScore::fwdMM(int j,int i)
 void PhyloMatchScore::fwdSS(int j,int i)
 {
 
-    FOR(k,nState) {
-        if (j>0 && i>0) {
+    FOR(k,nState)
+    {
+        if (j>0 && i>0)
+        {
             fM->s( match->g( t1->charAt(j-1), t2->charAt(i-1), k ), k );
             flM->s( match->g( t1->charAt(j-1), t2->charAt(i-1), k ), k );
         }
-        else {
+        else
+        {
             fM->s( 0, k );
             flM->s( 0, k );
         }
@@ -236,7 +259,8 @@ void PhyloMatchScore::fwdSS(int j,int i)
 
     return;
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(0,k);
         idX->s(0,k);
@@ -244,27 +268,33 @@ void PhyloMatchScore::fwdSS(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j-1));
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i-1));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j-1)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j-1));
                 }
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i-1)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i-1));
                 }
@@ -289,7 +319,8 @@ void PhyloMatchScore::fwdSS(int j,int i)
 
 void PhyloMatchScore::fwdSM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(0,k);
         idX->s(0,k);
@@ -297,19 +328,24 @@ void PhyloMatchScore::fwdSM(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,i-1,k);
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAt(m,i-1,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAt(m,i-1,k);
                     }
@@ -317,13 +353,16 @@ void PhyloMatchScore::fwdSM(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j-1));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j-1)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j-1));
                 }
@@ -349,7 +388,8 @@ void PhyloMatchScore::fwdSM(int j,int i)
 
 void PhyloMatchScore::fwdMS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(0,k);
         idX->s(0,k);
@@ -357,19 +397,24 @@ void PhyloMatchScore::fwdMS(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,j-1,k);
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAt(m,j-1,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAt(m,j-1,k);
                     }
@@ -377,13 +422,16 @@ void PhyloMatchScore::fwdMS(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i-1));
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i-1)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i-1));
                 }
@@ -409,7 +457,8 @@ void PhyloMatchScore::fwdMS(int j,int i)
 
 void PhyloMatchScore::bwdMM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(0,k);
         idX->s(0,k);
@@ -417,28 +466,35 @@ void PhyloMatchScore::bwdMM(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sl1 && i<sl2) {
+                if (j<sl1 && i<sl2)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,j,k);
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,i,k);
                 }
 
                 // x-gap
-                if (j<sl1) {
-                    if (n==0) {
+                if (j<sl1)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAt(m,j,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAt(m,j,k);
                     }
                 }
 
                 // y-gap
-                if (i<sl2) {
-                    if (n==0) {
+                if (i<sl2)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAt(m,i,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAt(m,i,k);
                     }
@@ -463,12 +519,15 @@ void PhyloMatchScore::bwdMM(int j,int i)
 
 void PhyloMatchScore::bwdSS(int j,int i)
 {
-    FOR(k,nState) {
-        if (j<sl1 && i<sl2) {
+    FOR(k,nState)
+    {
+        if (j<sl1 && i<sl2)
+        {
             bM->s( match->g( t1->charAt(j), t2->charAt(i), k ), k );
             flM->s( match->g( t1->charAt(j), t2->charAt(i), k ), k );
         }
-        else {
+        else
+        {
             bM->s( 0, k );
             flM->s( 0, k );
         }
@@ -485,7 +544,8 @@ void PhyloMatchScore::bwdSS(int j,int i)
     return;
 
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(0,k);
         idX->s(0,k);
@@ -493,27 +553,33 @@ void PhyloMatchScore::bwdSS(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
             // match
-            if (j<sl1 && i<sl2) {
+            if (j<sl1 && i<sl2)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j));
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i));
             }
 
             // x-gap
-            if (j<sl1) {
-                if (n==0) {
+            if (j<sl1)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j));
                 }
             }
 
             // y-gap
-            if (i<sl2) {
-                if (n==0) {
+            if (i<sl2)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i));
                 }
@@ -537,7 +603,8 @@ void PhyloMatchScore::bwdSS(int j,int i)
 
 void PhyloMatchScore::bwdSM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(0,k);
         idX->s(0,k);
@@ -545,19 +612,24 @@ void PhyloMatchScore::bwdSM(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sl1 && i<sl2) {
+                if (j<sl1 && i<sl2)
+                {
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,i,k);
                 }
 
                 // y-gap
-                if (i<sl2) {
-                    if (n==0) {
+                if (i<sl2)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAt(m,i,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAt(m,i,k);
                     }
@@ -565,13 +637,16 @@ void PhyloMatchScore::bwdSM(int j,int i)
             }
 
             // match
-            if (j<sl1 && i<sl2) {
+            if (j<sl1 && i<sl2)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j));
             }
 
             // x-gap
-            if (j<sl1) {
-                if (n==0) {
+            if (j<sl1)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j));
                 }
@@ -595,7 +670,8 @@ void PhyloMatchScore::bwdSM(int j,int i)
 
 void PhyloMatchScore::bwdMS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(0,k);
         idX->s(0,k);
@@ -603,19 +679,24 @@ void PhyloMatchScore::bwdMS(int j,int i)
 
         nullM1=nullM2=0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sl1 && i<sl2) {
+                if (j<sl1 && i<sl2)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,j,k);
                 }
 
                 // x-gap
-                if (j<sl1) {
-                    if (n==0) {
+                if (j<sl1)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAt(m,j,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAt(m,j,k);
                     }
@@ -623,13 +704,16 @@ void PhyloMatchScore::bwdMS(int j,int i)
             }
 
             // match
-            if (j<sl1 && i<sl2) {
+            if (j<sl1 && i<sl2)
+            {
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i));
             }
 
             // y-gap
-            if (i<sl2) {
-                if (n==0) {
+            if (i<sl2)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i));
                 }
@@ -655,7 +739,8 @@ void PhyloMatchScore::bwdMS(int j,int i)
 void PhyloMatchScore::fullFwdMM(int j,int i)
 {
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -664,28 +749,35 @@ void PhyloMatchScore::fullFwdMM(int j,int i)
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAtF(m,j-1,k);
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAtF(m,i-1,k);
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAtF(m,j-1,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAtF(m,j-1,k); // added ",k"
                     }
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAtF(m,i-1,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAtF(m,i-1,k); // added ",k"
                     }
@@ -700,17 +792,23 @@ void PhyloMatchScore::fullFwdMM(int j,int i)
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
     }
@@ -720,7 +818,8 @@ void PhyloMatchScore::fullFwdMM(int j,int i)
 
 void PhyloMatchScore::fullFwdSS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -729,27 +828,33 @@ void PhyloMatchScore::fullFwdSS(int j,int i)
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j-1));
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i-1));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j-1)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j-1));
                 }
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i-1)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i-1));
                 }
@@ -763,17 +868,23 @@ void PhyloMatchScore::fullFwdSS(int j,int i)
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
     }
@@ -784,7 +895,8 @@ void PhyloMatchScore::fullFwdSS(int j,int i)
 void PhyloMatchScore::fullFwdSM(int j,int i)
 {
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -793,19 +905,24 @@ void PhyloMatchScore::fullFwdSM(int j,int i)
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAtF(m,i-1,k);
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAtF(m,i-1,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAtF(m,i-1,k); // added ",k"
                     }
@@ -813,13 +930,16 @@ void PhyloMatchScore::fullFwdSM(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j-1));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j-1)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j-1));
                 }
@@ -833,17 +953,23 @@ void PhyloMatchScore::fullFwdSM(int j,int i)
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
     }
@@ -854,7 +980,8 @@ void PhyloMatchScore::fullFwdSM(int j,int i)
 void PhyloMatchScore::fullFwdMS(int j,int i)
 {
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -863,19 +990,24 @@ void PhyloMatchScore::fullFwdMS(int j,int i)
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAtF(m,j-1,k);
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAtF(m,j-1,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAtF(m,j-1,k); // added ",k"
                     }
@@ -883,13 +1015,16 @@ void PhyloMatchScore::fullFwdMS(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i-1));
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i-1)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i-1));
                 }
@@ -903,17 +1038,23 @@ void PhyloMatchScore::fullFwdMS(int j,int i)
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
     }
@@ -921,9 +1062,11 @@ void PhyloMatchScore::fullFwdMS(int j,int i)
     return;
 }
 
-void PhyloMatchScore::fullBwdMM(int j,int i) {
+void PhyloMatchScore::fullBwdMM(int j,int i)
+{
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -932,28 +1075,35 @@ void PhyloMatchScore::fullBwdMM(int j,int i) {
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sfl1 && i<sfl2) {
+                if (j<sfl1 && i<sfl2)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAtF(m,j,k);
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAtF(m,i,k);
                 }
 
                 // x-gap
-                if (j<sfl1) {
-                    if (n==0) {
+                if (j<sfl1)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAtF(m,j,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAtF(m,j,k); // added ",k"
                     }
                 }
 
                 // y-gap
-                if (i<sfl2) {
-                    if (n==0) {
+                if (i<sfl2)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAtF(m,i,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAtF(m,i,k); // added ",k"
                     }
@@ -969,17 +1119,23 @@ void PhyloMatchScore::fullBwdMM(int j,int i) {
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
 
@@ -988,9 +1144,11 @@ void PhyloMatchScore::fullBwdMM(int j,int i) {
     return;
 }
 
-void PhyloMatchScore::fullBwdSS(int j,int i) {
+void PhyloMatchScore::fullBwdSS(int j,int i)
+{
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -999,27 +1157,33 @@ void PhyloMatchScore::fullBwdSS(int j,int i) {
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
             // match
-            if (j<sfl1 && i<sfl2) {
+            if (j<sfl1 && i<sfl2)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j));
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i));
             }
 
             // x-gap
-            if (j<sfl1) {
-                if (n==0) {
+            if (j<sfl1)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j));
                 }
             }
 
             // y-gap
-            if (i<sfl2) {
-                if (n==0) {
+            if (i<sfl2)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i));
                 }
@@ -1034,17 +1198,23 @@ void PhyloMatchScore::fullBwdSS(int j,int i) {
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
 
@@ -1053,9 +1223,11 @@ void PhyloMatchScore::fullBwdSS(int j,int i) {
     return;
 }
 
-void PhyloMatchScore::fullBwdSM(int j,int i) {
+void PhyloMatchScore::fullBwdSM(int j,int i)
+{
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -1064,19 +1236,24 @@ void PhyloMatchScore::fullBwdSM(int j,int i) {
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sfl1 && i<sfl2) {
+                if (j<sfl1 && i<sfl2)
+                {
                     matchBr2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAtF(m,i,k);
                 }
 
                 // y-gap
-                if (i<sfl2) {
-                    if (n==0) {
+                if (i<sfl2)
+                {
+                    if (n==0)
+                    {
                         idY->a(hmm->charBgFreq(k,m)*a2->mlCharProbAtF(m,i,k),k);
                         nullM2 += hmm->nullBgFreq(m)*a2->mlCharProbAtF(m,i,k); // added ",k"
                     }
@@ -1084,13 +1261,16 @@ void PhyloMatchScore::fullBwdSM(int j,int i) {
             }
 
             // match
-            if (j<sfl1 && i<sfl2) {
+            if (j<sfl1 && i<sfl2)
+            {
                 matchBr1 += hmm->charSbProbL(k,n,t1->charAt(j));
             }
 
             // x-gap
-            if (j<sfl1) {
-                if (n==0) {
+            if (j<sfl1)
+            {
+                if (n==0)
+                {
                     idX->a(hmm->charBgFreq(k,t1->charAt(j)),k);
                     nullM1 += hmm->nullBgFreq(t1->charAt(j));
                 }
@@ -1105,17 +1285,23 @@ void PhyloMatchScore::fullBwdSM(int j,int i) {
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
 
@@ -1124,9 +1310,11 @@ void PhyloMatchScore::fullBwdSM(int j,int i) {
     return;
 }
 
-void PhyloMatchScore::fullBwdMS(int j,int i) {
+void PhyloMatchScore::fullBwdMS(int j,int i)
+{
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(0,k);
 
@@ -1135,19 +1323,24 @@ void PhyloMatchScore::fullBwdMS(int j,int i) {
 
         nullM1 = nullM2 = 0.0;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=0.0;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sfl1 && i<sfl2) {
+                if (j<sfl1 && i<sfl2)
+                {
                     matchBr1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAtF(m,j,k);
                 }
 
                 // x-gap
-                if (j<sfl1) {
-                    if (n==0) {
+                if (j<sfl1)
+                {
+                    if (n==0)
+                    {
                         idX->a(hmm->charBgFreq(k,m)*a1->mlCharProbAtF(m,j,k),k);
                         nullM1 += hmm->nullBgFreq(m)*a1->mlCharProbAtF(m,j,k); // added ",k"
                     }
@@ -1155,13 +1348,16 @@ void PhyloMatchScore::fullBwdMS(int j,int i) {
             }
 
             // match
-            if (j<sfl1 && i<sfl2) {
+            if (j<sfl1 && i<sfl2)
+            {
                 matchBr2 += hmm->charSbProbR(k,n,t2->charAt(i));
             }
 
             // y-gap
-            if (i<sfl2) {
-                if (n==0) {
+            if (i<sfl2)
+            {
+                if (n==0)
+                {
                     idY->a(hmm->charBgFreq(k,t2->charAt(i)),k);
                     nullM2 += hmm->nullBgFreq(t2->charAt(i));
                 }
@@ -1176,17 +1372,23 @@ void PhyloMatchScore::fullBwdMS(int j,int i) {
         else
             flM->s( -HUGE_VAL, k );
 
-        if (idX->g(k)!=0) {
+        if (idX->g(k)!=0)
+        {
             idX->s( idX->g( k )/nullM1, k );
             idX->clog( k );
-        } else {
+        }
+        else
+        {
             idX->s( -HUGE_VAL, k );
         }
 
-        if (idY->g(k)!=0) {
+        if (idY->g(k)!=0)
+        {
             idY->s( idY->g( k )/nullM2, k );
             idY->clog( k );
-        } else {
+        }
+        else
+        {
             idY->s( -HUGE_VAL, k );
         }
 
@@ -1198,7 +1400,8 @@ void PhyloMatchScore::fullBwdMS(int j,int i) {
 
 void PhyloMatchScore::logFwdMM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(small,k);
         idX->s(small,k);
@@ -1206,28 +1409,35 @@ void PhyloMatchScore::logFwdMM(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,j-1,k));
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,i-1,k));
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAt(m,j-1,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAt(m,j-1,k));
                     }
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAt(m,i-1,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAt(m,i-1,k));
                     }
@@ -1248,12 +1458,15 @@ void PhyloMatchScore::logFwdMM(int j,int i)
 
 void PhyloMatchScore::logFwdSS(int j,int i)
 {
-    FOR(k,nState) {
-        if (j>0 && i>0) {
+    FOR(k,nState)
+    {
+        if (j>0 && i>0)
+        {
             fM->s( match->g( t1->charAt(j-1), t2->charAt(i-1), k ), k );
             flM->s( fM->g( k ), k );
         }
-        else {
+        else
+        {
             fM->s( small, k );
             flM->s( small, k );
         }
@@ -1269,7 +1482,8 @@ void PhyloMatchScore::logFwdSS(int j,int i)
 
     return;
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(small,k);
         idX->s(small,k);
@@ -1277,27 +1491,33 @@ void PhyloMatchScore::logFwdSS(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j-1)));
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i-1)));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j-1)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j-1)));
                 }
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i-1)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i-1)));
                 }
@@ -1317,7 +1537,8 @@ void PhyloMatchScore::logFwdSS(int j,int i)
 
 void PhyloMatchScore::logFwdSM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(small,k);
         idX->s(small,k);
@@ -1325,19 +1546,24 @@ void PhyloMatchScore::logFwdSM(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,i-1,k));
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAt(m,i-1,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAt(m,i-1,k));
                     }
@@ -1345,13 +1571,16 @@ void PhyloMatchScore::logFwdSM(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j-1)));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j-1)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j-1)));
                 }
@@ -1372,7 +1601,8 @@ void PhyloMatchScore::logFwdSM(int j,int i)
 
 void PhyloMatchScore::logFwdMS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         fM->s(small,k);
         idX->s(small,k);
@@ -1380,19 +1610,24 @@ void PhyloMatchScore::logFwdMS(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,j-1,k));
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAt(m,j-1,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAt(m,j-1,k));
                     }
@@ -1400,13 +1635,16 @@ void PhyloMatchScore::logFwdMS(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i-1)));
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i-1)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i-1)));
                 }
@@ -1427,7 +1665,8 @@ void PhyloMatchScore::logFwdMS(int j,int i)
 
 void PhyloMatchScore::logBwdMM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(small,k);
         idX->s(small,k);
@@ -1435,28 +1674,35 @@ void PhyloMatchScore::logBwdMM(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sl1 && i<sl2) {
+                if (j<sl1 && i<sl2)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,j,k));
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,i,k));
                 }
 
                 // x-gap
-                if (j<sl1) {
-                    if (n==0) {
+                if (j<sl1)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAt(m,j,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAt(m,j,k));
                     }
                 }
 
                 // y-gap
-                if (i<sl2) {
-                    if (n==0) {
+                if (i<sl2)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAt(m,i,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAt(m,i,k));
                     }
@@ -1477,12 +1723,15 @@ void PhyloMatchScore::logBwdMM(int j,int i)
 
 void PhyloMatchScore::logBwdSS(int j,int i)
 {
-    FOR(k,nState) {
-        if (j<sl1 && i<sl2) {
+    FOR(k,nState)
+    {
+        if (j<sl1 && i<sl2)
+        {
             bM->s( match->g( t1->charAt(j), t2->charAt(i), k ), k );
             flM->s( bM->g( k ), k );
         }
-        else {
+        else
+        {
             bM->s( small, k );
             flM->s( small, k );
         }
@@ -1498,7 +1747,8 @@ void PhyloMatchScore::logBwdSS(int j,int i)
 
     return;
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(small,k);
         idX->s(small,k);
@@ -1506,27 +1756,33 @@ void PhyloMatchScore::logBwdSS(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
             // match
-            if (j<sl1 && i<sl2) {
+            if (j<sl1 && i<sl2)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j)));
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i)));
             }
 
             // x-gap
-            if (j<sl1) {
-                if (n==0) {
+            if (j<sl1)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j)));
                 }
             }
 
             // y-gap
-            if (i<sl2) {
-                if (n==0) {
+            if (i<sl2)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i)));
                 }
@@ -1545,7 +1801,8 @@ void PhyloMatchScore::logBwdSS(int j,int i)
 }
 void PhyloMatchScore::logBwdSM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(small,k);
 
@@ -1554,19 +1811,24 @@ void PhyloMatchScore::logBwdSM(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sl1 && i<sl2) {
+                if (j<sl1 && i<sl2)
+                {
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,i,k));
                 }
 
                 // y-gap
-                if (i<sl2) {
-                    if (n==0) {
+                if (i<sl2)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAt(m,i,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAt(m,i,k));
                     }
@@ -1574,13 +1836,16 @@ void PhyloMatchScore::logBwdSM(int j,int i)
             }
 
             // match
-            if (j<sl1 && i<sl2) {
+            if (j<sl1 && i<sl2)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j)));
             }
 
             // x-gap
-            if (j<sl1) {
-                if (n==0) {
+            if (j<sl1)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j)));
                 }
@@ -1599,7 +1864,8 @@ void PhyloMatchScore::logBwdSM(int j,int i)
 }
 void PhyloMatchScore::logBwdMS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         bM->s(small,k);
 
@@ -1608,19 +1874,24 @@ void PhyloMatchScore::logBwdMS(int j,int i)
 
         nullM1=nullM2=small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sl1 && i<sl2) {
+                if (j<sl1 && i<sl2)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,j,k));
                 }
 
                 // x-gap
-                if (j<sl1) {
-                    if (n==0) {
+                if (j<sl1)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAt(m,j,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAt(m,j,k));
                     }
@@ -1628,13 +1899,16 @@ void PhyloMatchScore::logBwdMS(int j,int i)
             }
 
             // match
-            if (j<sl1 && i<sl2) {
+            if (j<sl1 && i<sl2)
+            {
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i)));
             }
 
             // y-gap
-            if (i<sl2) {
-                if (n==0) {
+            if (i<sl2)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i)));
                 }
@@ -1654,7 +1928,8 @@ void PhyloMatchScore::logBwdMS(int j,int i)
 
 void PhyloMatchScore::logFullFwdMM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1663,28 +1938,35 @@ void PhyloMatchScore::logFullFwdMM(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAtF(m,j-1,k));
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAtF(m,i-1,k));
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAtF(m,j-1,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAtF(m,j-1,k));
                     }
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAtF(m,i-1,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAtF(m,i-1,k));
                     }
@@ -1704,7 +1986,8 @@ void PhyloMatchScore::logFullFwdMM(int j,int i)
 
 void PhyloMatchScore::logFullFwdSS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1713,27 +1996,33 @@ void PhyloMatchScore::logFullFwdSS(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j-1)));
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i-1)));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j-1)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j-1)));
                 }
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i-1)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i-1)));
                 }
@@ -1752,7 +2041,8 @@ void PhyloMatchScore::logFullFwdSS(int j,int i)
 
 void PhyloMatchScore::logFullFwdSM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1761,20 +2051,25 @@ void PhyloMatchScore::logFullFwdSM(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAtF(m,i-1,k));
                 }
 
                 // y-gap
-                if (i>0) {
-                    if (n==0) {
+                if (i>0)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAtF(m,i-1,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAtF(m,i-1,k));
                     }
@@ -1782,13 +2077,16 @@ void PhyloMatchScore::logFullFwdSM(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j-1)));
             }
 
             // x-gap
-            if (j>0) {
-                if (n==0) {
+            if (j>0)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j-1)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j-1)));
                 }
@@ -1807,7 +2105,8 @@ void PhyloMatchScore::logFullFwdSM(int j,int i)
 
 void PhyloMatchScore::logFullFwdMS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1816,20 +2115,25 @@ void PhyloMatchScore::logFullFwdMS(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j>0 && i>0) {
+                if (j>0 && i>0)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAtF(m,j-1,k));
                 }
 
                 // x-gap
-                if (j>0) {
-                    if (n==0) {
+                if (j>0)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAtF(m,j-1,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAtF(m,j-1,k));
                     }
@@ -1837,13 +2141,16 @@ void PhyloMatchScore::logFullFwdMS(int j,int i)
             }
 
             // match
-            if (j>0 && i>0) {
+            if (j>0 && i>0)
+            {
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i-1)));
             }
 
             // y-gap
-            if (i>0) {
-                if (n==0) {
+            if (i>0)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i-1)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i-1)));
                 }
@@ -1863,7 +2170,8 @@ void PhyloMatchScore::logFullFwdMS(int j,int i)
 
 void PhyloMatchScore::logFullBwdMM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1872,28 +2180,35 @@ void PhyloMatchScore::logFullBwdMM(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sfl1 && i<sfl2) {
+                if (j<sfl1 && i<sfl2)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAtF(m,j,k));
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAtF(m,i,k));
                 }
 
                 // x-gap
-                if (j<sfl1) {
-                    if (n==0) {
+                if (j<sfl1)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAtF(m,j,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAtF(m,j,k));
                     }
                 }
 
                 // y-gap
-                if (i<sfl2) {
-                    if (n==0) {
+                if (i<sfl2)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAtF(m,i,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAtF(m,i,k));
                     }
@@ -1914,7 +2229,8 @@ void PhyloMatchScore::logFullBwdMM(int j,int i)
 
 void PhyloMatchScore::logFullBwdSS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1923,27 +2239,33 @@ void PhyloMatchScore::logFullBwdSS(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
             // match
-            if (j<sfl1 && i<sfl2) {
+            if (j<sfl1 && i<sfl2)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j)));
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i)));
             }
 
             // x-gap
-            if (j<sfl1) {
-                if (n==0) {
+            if (j<sfl1)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j)));
                 }
             }
 
             // y-gap
-            if (i<sfl2) {
-                if (n==0) {
+            if (i<sfl2)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i)));
                 }
@@ -1964,7 +2286,8 @@ void PhyloMatchScore::logFullBwdSS(int j,int i)
 
 void PhyloMatchScore::logFullBwdSM(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -1973,20 +2296,25 @@ void PhyloMatchScore::logFullBwdSM(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sfl1 && i<sfl2) {
+                if (j<sfl1 && i<sfl2)
+                {
                     matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAtF(m,i,k));
                 }
 
                 // y-gap
-                if (i<sfl2) {
-                    if (n==0) {
+                if (i<sfl2)
+                {
+                    if (n==0)
+                    {
                         idY->alog( hmm->logCharBgFreq(k,m)+a2->mlCharProbAtF(m,i,k), k );
                         nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(m)+a2->mlCharProbAtF(m,i,k));
                     }
@@ -1994,13 +2322,16 @@ void PhyloMatchScore::logFullBwdSM(int j,int i)
             }
 
             // match
-            if (j<sfl1 && i<sfl2) {
+            if (j<sfl1 && i<sfl2)
+            {
                 matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,t1->charAt(j)));
             }
 
             // x-gap
-            if (j<sfl1) {
-                if (n==0) {
+            if (j<sfl1)
+            {
+                if (n==0)
+                {
                     idX->alog( hmm->logCharBgFreq(k,t1->charAt(j)), k );
                     nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(t1->charAt(j)));
                 }
@@ -2020,7 +2351,8 @@ void PhyloMatchScore::logFullBwdSM(int j,int i)
 
 void PhyloMatchScore::logFullBwdMS(int j,int i)
 {
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
 
         flM->s(small,k);
 
@@ -2029,19 +2361,24 @@ void PhyloMatchScore::logFullBwdMS(int j,int i)
 
         nullM1 = nullM2 = small;
 
-        FOR(n,sAlpha) {
+        FOR(n,sAlpha)
+        {
 
             matchBr1=matchBr2=small;
 
-            FOR(m,sAlpha) {
+            FOR(m,sAlpha)
+            {
                 // match
-                if (j<sfl1 && i<sfl2) {
+                if (j<sfl1 && i<sfl2)
+                {
                     matchBr1 = sumLogs(matchBr1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAtF(m,j,k));
                 }
 
                 // x-gap
-                if (j<sfl1) {
-                    if (n==0) {
+                if (j<sfl1)
+                {
+                    if (n==0)
+                    {
                         idX->alog( hmm->logCharBgFreq(k,m)+a1->mlCharProbAtF(m,j,k), k );
                         nullM1 = sumLogs(nullM1,hmm->logNullBgFreq(m)+a1->mlCharProbAtF(m,j,k));
                     }
@@ -2049,13 +2386,16 @@ void PhyloMatchScore::logFullBwdMS(int j,int i)
             }
 
             // match
-            if (j<sfl1 && i<sfl2) {
+            if (j<sfl1 && i<sfl2)
+            {
                 matchBr2 = sumLogs(matchBr2,hmm->logCharSbProbR(k,n,t2->charAt(i)));
             }
 
             // y-gap
-            if (i<sfl2) {
-                if (n==0) {
+            if (i<sfl2)
+            {
+                if (n==0)
+                {
                     idY->alog( hmm->logCharBgFreq(k,t2->charAt(i)), k );
                     nullM2 = sumLogs(nullM2,hmm->logNullBgFreq(t2->charAt(i)));
                 }
@@ -2081,30 +2421,37 @@ void PhyloMatchScore::computeSSMatrix()
 
     match = new DbMatrix(fas,fas,nState);
     gap = new DbMatrix(fas,nState);
-    if (LOGVALUES) {
+    if (LOGVALUES)
+    {
         match->initialise(small);
         gap->initialise(small);
     }
-    else {
+    else
+    {
         match->initialise(0);
         gap->initialise(0);
     }
 
     int i,j;
 
-	if (LOGVALUES) {
-		FOR(k,nState) {
-			FOR(i,fas) {
-				FOR(j,fas) {
+    if (LOGVALUES)
+    {
+        FOR(k,nState)
+        {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
 
-					nullM1 = hmm->logNullBgFreq(j);
-					nullM2 = hmm->logNullBgFreq(i);
+                    nullM1 = hmm->logNullBgFreq(j);
+                    nullM2 = hmm->logNullBgFreq(i);
 
-					t = small;
+                    t = small;
 
-					FOR(n,sAlpha) {
-						matchBr1 = hmm->logCharSbProbL(k,n,j);
-						matchBr2 = hmm->logCharSbProbR(k,n,i);
+                    FOR(n,sAlpha)
+                    {
+                        matchBr1 = hmm->logCharSbProbL(k,n,j);
+                        matchBr2 = hmm->logCharSbProbR(k,n,i);
 
                         t = sumLogs(t, hmm->logCharBgFreq(k,n)+matchBr1+matchBr2-(nullM1+nullM2));
 
@@ -2113,28 +2460,33 @@ void PhyloMatchScore::computeSSMatrix()
                     match->s( t, i, j, k );
                 }
 
-				gap->s( hmm->logCharBgFreq(k,i)-hmm->logNullBgFreq(i), i, k );
+                gap->s( hmm->logCharBgFreq(k,i)-hmm->logNullBgFreq(i), i, k );
 
             }
         }
     }
-    else {
+    else
+    {
 
-        FOR(k,nState) {
-            FOR(i,fas) {
-                FOR(j,fas) {
+        FOR(k,nState)
+        {
+            FOR(i,fas)
+            {
+                FOR(j,fas)
+                {
 
-					nullM1 = hmm->nullBgFreq(j);
-					nullM2 = hmm->nullBgFreq(i);
+                    nullM1 = hmm->nullBgFreq(j);
+                    nullM2 = hmm->nullBgFreq(i);
 
-					t = 0.0;
+                    t = 0.0;
 
-                    FOR(n,sAlpha) {
+                    FOR(n,sAlpha)
+                    {
 
-						matchBr1 = hmm->charSbProbL(k,n,j);
-						matchBr2 = hmm->charSbProbR(k,n,i);
+                        matchBr1 = hmm->charSbProbL(k,n,j);
+                        matchBr2 = hmm->charSbProbR(k,n,i);
 
-						t += hmm->charBgFreq(k,n)*matchBr1*matchBr2/(nullM1*nullM2);
+                        t += hmm->charBgFreq(k,n)*matchBr1*matchBr2/(nullM1*nullM2);
 
                     }
 
@@ -2142,15 +2494,16 @@ void PhyloMatchScore::computeSSMatrix()
 
                 }
 
-				gap->s( hmm->charBgFreq(k,i)/hmm->nullBgFreq(i), i, k );
+                gap->s( hmm->charBgFreq(k,i)/hmm->nullBgFreq(i), i, k );
                 gap->clog( i, k );
 
             }
         }
     }
 
-    if (0){
-      cout<<fas<<endl;
+    if (0)
+    {
+        cout<<fas<<endl;
         cout<<"match"<<endl;
         match->print();
         cout<<endl;

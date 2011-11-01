@@ -25,14 +25,17 @@
 
 class AncestralNode : public TreeNode
 {
-	AncestralSequence* seq;
+    AncestralSequence* seq;
 
 public:
     AncestralNode(std::string s);
 
     ~AncestralNode();
 
-    AncestralSequence* getSequence() { return seq; }
+    AncestralSequence* getSequence()
+    {
+        return seq;
+    }
 
     int getTerminalNodeNumber();
     int getInternalNodeNumber();

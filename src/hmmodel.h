@@ -37,7 +37,8 @@
 
 extern bool LOGVALUES;
 
-class HMModel{
+class HMModel
+{
     int as,fas;           // size of alphabet / full alphabet
     std::string alphabet, fullAlphabet; // alphabet as string
     int sn;           // number of structure states
@@ -93,54 +94,159 @@ public:
     void pairwiseModel(IntMatrix* scores,float dist);
 
     // general functions
-	int getNStates() { return sn; }
-	int getASize() { return as; }
-	int getFullASize() { return fas; }
-	std::string getAlphabet() { return alphabet; }
-	std::string getFullAlphabet() { return fullAlphabet; }
+    int getNStates()
+    {
+        return sn;
+    }
+    int getASize()
+    {
+        return as;
+    }
+    int getFullASize()
+    {
+        return fas;
+    }
+    std::string getAlphabet()
+    {
+        return alphabet;
+    }
+    std::string getFullAlphabet()
+    {
+        return fullAlphabet;
+    }
 
-    int getCodon(int i) { return codon->g(i); }
+    int getCodon(int i)
+    {
+        return codon->g(i);
+    }
 
     // function for sequence alignment
-    double charBgFreq(int k,int j) { return cPi->g(k,j); }
-    double nullBgFreq(int j) { return nPi->g(j); }
-    double charSbProbL(int k,int i,int j) { return cPl->g(k,i,j); }
-    double charSbProbR(int k,int i,int j) { return cPr->g(k,i,j); }
+    double charBgFreq(int k,int j)
+    {
+        return cPi->g(k,j);
+    }
+    double nullBgFreq(int j)
+    {
+        return nPi->g(j);
+    }
+    double charSbProbL(int k,int i,int j)
+    {
+        return cPl->g(k,i,j);
+    }
+    double charSbProbR(int k,int i,int j)
+    {
+        return cPr->g(k,i,j);
+    }
 
-    double logCharBgFreq(int k,int j) { return logcPi->g(k,j); }
-    double logNullBgFreq(int j) { return lognPi->g(j); }
-    double logCharSbProbL(int k,int i,int j) { return logcPl->g(k,i,j); }
-    double logCharSbProbR(int k,int i,int j) { return logcPr->g(k,i,j); }
+    double logCharBgFreq(int k,int j)
+    {
+        return logcPi->g(k,j);
+    }
+    double logNullBgFreq(int j)
+    {
+        return lognPi->g(j);
+    }
+    double logCharSbProbL(int k,int i,int j)
+    {
+        return logcPl->g(k,i,j);
+    }
+    double logCharSbProbR(int k,int i,int j)
+    {
+        return logcPr->g(k,i,j);
+    }
 
-    double structBgFreq(int k) { return lsbf->g(k); }
+    double structBgFreq(int k)
+    {
+        return lsbf->g(k);
+    }
 
-    double probWX(int k) { return pba->g(k,0); }
-    double probWY(int k) { return pba->g(k,1); }
-    double probWM(int k) { return pba->g(k,2); }
-    double probXW(int k) { return pea->g(k,0); }
-    double probYW(int k) { return pea->g(k,1); }
-    double probMW(int k) { return pea->g(k,2); }
+    double probWX(int k)
+    {
+        return pba->g(k,0);
+    }
+    double probWY(int k)
+    {
+        return pba->g(k,1);
+    }
+    double probWM(int k)
+    {
+        return pba->g(k,2);
+    }
+    double probXW(int k)
+    {
+        return pea->g(k,0);
+    }
+    double probYW(int k)
+    {
+        return pea->g(k,1);
+    }
+    double probMW(int k)
+    {
+        return pea->g(k,2);
+    }
 
-    double probXX(int k,int l) { return trp->g(0,k,0,l); }
-    double probXY(int k,int l) { return trp->g(0,k,1,l); }
-    double probXM(int k,int l) { return trp->g(0,k,2,l); }
+    double probXX(int k,int l)
+    {
+        return trp->g(0,k,0,l);
+    }
+    double probXY(int k,int l)
+    {
+        return trp->g(0,k,1,l);
+    }
+    double probXM(int k,int l)
+    {
+        return trp->g(0,k,2,l);
+    }
 
-    double probYX(int k,int l) { return trp->g(1,k,0,l); }
-    double probYY(int k,int l) { return trp->g(1,k,1,l); }
-    double probYM(int k,int l) { return trp->g(1,k,2,l); }
+    double probYX(int k,int l)
+    {
+        return trp->g(1,k,0,l);
+    }
+    double probYY(int k,int l)
+    {
+        return trp->g(1,k,1,l);
+    }
+    double probYM(int k,int l)
+    {
+        return trp->g(1,k,2,l);
+    }
 
-    double probMX(int k,int l) { return trp->g(2,k,0,l); }
-    double probMY(int k,int l) { return trp->g(2,k,1,l); }
-    double probMM(int k,int l) { return trp->g(2,k,2,l); }
+    double probMX(int k,int l)
+    {
+        return trp->g(2,k,0,l);
+    }
+    double probMY(int k,int l)
+    {
+        return trp->g(2,k,1,l);
+    }
+    double probMM(int k,int l)
+    {
+        return trp->g(2,k,2,l);
+    }
 
-    int transIndX(int k,int i) { return tiX->g(k,i); }
-    int transIndY(int k,int i) { return tiY->g(i,k); }
+    int transIndX(int k,int i)
+    {
+        return tiX->g(k,i);
+    }
+    int transIndY(int k,int i)
+    {
+        return tiY->g(i,k);
+    }
 
     std::string getDrawPt(int i);
     std::string getDrawCl(int i);
-    int getDrawOf(int i) { return drawOf->g(i); }
-    std::string getStName(int i) { return stNames[i]; }
-    bool getStShow(int i) { return stShow[i]; }
+    int getDrawOf(int i)
+    {
+        return drawOf->g(i);
+    }
+    std::string getStName(int i)
+    {
+        return stNames[i];
+    }
+    bool getStShow(int i)
+    {
+        return stShow[i];
+    }
 
     // functions for reading model file
     std::string nextNotComment(std::ifstream* in);

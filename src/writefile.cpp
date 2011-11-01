@@ -45,7 +45,7 @@ WriteFile::~WriteFile()
 
 void WriteFile::writeSeqs(const char* outputfile, std::vector<std::string>* names, std::vector<std::string> *seqs, int outform, bool isDna,AncestralNode *root, bool translate)
 {
-    if(outform == 17)
+    if (outform == 17)
         this->writeNexus(outputfile,names,seqs,isDna,root,translate);
     else
         this->writeSeqs(outputfile,names,seqs,outform);
@@ -53,15 +53,15 @@ void WriteFile::writeSeqs(const char* outputfile, std::vector<std::string>* name
 
 void WriteFile::writeSeqs(const char* outputfile, std::vector<std::string>* names, std::vector<std::string> *seqs, int outform )
 {
-    if(outform == 8)
+    if (outform == 8)
         this->writeFasta(outputfile,names,seqs);
-    else if(outform == 12)
+    else if (outform == 12)
         this->writeInterleaved(outputfile,names,seqs);
-    else if(outform == 11)
+    else if (outform == 11)
         this->writeSequential(outputfile,names,seqs,true);
-    else if(outform == 17)
+    else if (outform == 17)
         this->writeSimpleNexus(outputfile,names,seqs);
-    else if(outform == 18)
+    else if (outform == 18)
         this->writeSequential(outputfile,names,seqs,false);
     else
         this->writeFasta(outputfile,names,seqs);
@@ -74,7 +74,8 @@ void WriteFile::writeFasta(const char* outputfile, vector<string> * names, vecto
     ofstream output( outputfile );
 
     // Checking the existence of specified file, and possibility to open it in write mode
-    if (! output) { 
+    if (! output)
+    {
         cout<<"Failed to open output file "<<outputfile<<". Exiting.\n\n";
         exit(-1);
     }
@@ -117,7 +118,8 @@ void WriteFile::writeInterleaved(const char* outputfile,std::vector<std::string>
     ofstream output( outputfile );
 
     // Checking the existence of specified file, and possibility to open it in write mode
-    if (! output) {
+    if (! output)
+    {
         cout<<"Failed to open output file "<<outputfile<<". Exiting.\n\n";
         exit(-1);
     }
@@ -130,15 +132,15 @@ void WriteFile::writeInterleaved(const char* outputfile,std::vector<std::string>
     output<<seqs->size()<<" "<<length<<endl;
 
 
-    for(int offset = 0;offset<length;offset+=chars_by_line)
+    for (int offset = 0; offset<length; offset+=chars_by_line)
     {
         vector<string>::iterator si = seqs->begin();
         vector<string>::iterator ni = names->begin();
 
-        for(;ni!=names->end();ni++,si++)
+        for (; ni!=names->end(); ni++,si++)
         {
             string tmp = ni->substr(0,10)+"          ";
-            if(offset > 0)
+            if (offset > 0)
             {
                 tmp = "           ";
             }
@@ -154,7 +156,8 @@ void WriteFile::writeSequential(const char* outputfile,std::vector<std::string> 
     ofstream output( outputfile );
 
     // Checking the existence of specified file, and possibility to open it in write mode
-    if (! output) {
+    if (! output)
+    {
         cout<<"Failed to open output file "<<outputfile<<". Exiting.\n\n";
         exit(-1);
     }
@@ -169,7 +172,7 @@ void WriteFile::writeSequential(const char* outputfile,std::vector<std::string> 
     // Main loop : for all sequences in vector container
     for (; ni != names->end(); ni++,si++)
     {
-        if(truncate)
+        if (truncate)
             output << (*ni+"          ").substr(0,10)<<" "<< endl;
         else
             output << *ni<< endl;
@@ -201,13 +204,14 @@ void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *name
     ofstream output( outputfile );
 
     // Checking the existence of specified file, and possibility to open it in write mode
-    if (! output) {
+    if (! output)
+    {
         cout<<"Failed to open output file "<<outputfile<<". Exiting.\n\n";
         exit(-1);
     }
 
     string datatype = "protein";
-    if(isDna)
+    if (isDna)
         datatype = "dna";
 
     int length = seqs->begin()->length();
@@ -215,14 +219,14 @@ void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *name
     output<<"#NEXUS\nbegin data;\ndimensions ntax="<<seqs->size()<<" nchar="<<length<<";\nformat datatype="<<datatype<<" interleave=yes gap=-;\nmatrix\n"<<endl;
 
 
-    for(int offset = 0;offset<length;offset+=chars_by_line)
+    for (int offset = 0; offset<length; offset+=chars_by_line)
     {
         output<<endl;
 
         vector<string>::iterator si = seqs->begin();
         vector<string>::iterator ni = names->begin();
 
-        for(;ni!=names->end();ni++,si++)
+        for (; ni!=names->end(); ni++,si++)
         {
             string tmp = ni->substr(0,20)+"'                    ";
             output << "'"<<tmp.substr(0,21)<<"     ";
@@ -231,10 +235,10 @@ void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *name
         }
     }
     output<<";\nend;\nbegin trees;\n translate\n";
-    for(int i=0;i<(int)names->size();i++)
+    for (int i=0; i<(int)names->size(); i++)
     {
         output<<"  "<<i+1<<" '"<<names->at(i).substr(0,20)<<"'";
-        if(i<(int)names->size()-1)
+        if (i<(int)names->size()-1)
             output<<",\n";
         else
             output<<"\n";
@@ -246,24 +250,25 @@ void WriteFile::writeNexus(const char* outputfile,std::vector<std::string> *name
 
     output<<" ;\n tree * PRANK =\n"<<tree<<";\nend;\n";
 
-    if(DOPOST)
+    if (DOPOST)
     {
         output << "begin assumptions;\n wtset PrankMinimum (VECTOR) = \n ";
 
         int l = root->getSequence()->length();
 
         root->setSiteLength(l);
-        for (int i=0;i<l;i++) {
+        for (int i=0; i<l; i++)
+        {
             root->setSiteIndex(i,i);
         }
 
-        for(int offset = 0;offset<l;offset++)
+        for (int offset = 0; offset<l; offset++)
         {
             double p = 1.0;
             root->getLowestAlignmentPostProbAt(&p,offset);
             output<<fixed<<setprecision(2);
             output<<" "<<p;
-            if(translate || CODON)
+            if (translate || CODON)
                 output<<" "<<p<<" "<<p;
         }
 
@@ -279,14 +284,15 @@ void WriteFile::writeSimpleNexus(const char* outputfile, vector<string> * names,
     ofstream output( outputfile );
 
     // Checking the existence of specified file, and possibility to open it in write mode
-    if (! output) {
+    if (! output)
+    {
         cout<<"Failed to open output file "<<outputfile<<". Exiting.\n\n";
         exit(-1);
     }
 
     string datatype = "protein";
 
-    if(this->dnaSeqs(seqs))
+    if (this->dnaSeqs(seqs))
         datatype = "dna";
 
     int length = seqs->begin()->length();
@@ -294,14 +300,14 @@ void WriteFile::writeSimpleNexus(const char* outputfile, vector<string> * names,
     output<<"#NEXUS\nbegin data;\ndimensions ntax="<<seqs->size()<<" nchar="<<length<<";\nformat datatype="<<datatype<<" interleave=yes gap=-;\nmatrix\n"<<endl;
 
 
-    for(int offset = 0;offset<length;offset+=chars_by_line)
+    for (int offset = 0; offset<length; offset+=chars_by_line)
     {
         output<<endl;
 
         vector<string>::iterator si = seqs->begin();
         vector<string>::iterator ni = names->begin();
 
-        for(;ni!=names->end();ni++,si++)
+        for (; ni!=names->end(); ni++,si++)
         {
             string tmp = ni->substr(0,20)+"'                    ";
             output << "'"<<tmp.substr(0,21)<<"     ";
@@ -314,7 +320,8 @@ void WriteFile::writeSimpleNexus(const char* outputfile, vector<string> * names,
     output.close();
 }
 
-bool WriteFile::dnaSeqs(vector<string> * seqs) {
+bool WriteFile::dnaSeqs(vector<string> * seqs)
+{
 
     string nucs = "ACGTUN";
 
@@ -323,14 +330,16 @@ bool WriteFile::dnaSeqs(vector<string> * seqs) {
     int total2=0;
     int pos;
     vector<string>::iterator si = seqs->begin();
-    for (;si!=seqs->end();si++){
+    for (; si!=seqs->end(); si++)
+    {
         total1 += (*si).length();
-        for (unsigned int i=0;i<(*si).length();i++){
+        for (unsigned int i=0; i<(*si).length(); i++)
+        {
             pos= nucs.find((*si).at(i));
             if (pos>=0 && pos<=(int)nucs.length())
                 match++;
 //            if((*si).at(i) != '-')
-            if((*si).at(i) != '-' && (*si).at(i) != '?')
+            if ((*si).at(i) != '-' && (*si).at(i) != '?')
                 total2++;
         }
     }

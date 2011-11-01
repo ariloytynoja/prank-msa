@@ -27,7 +27,7 @@ PwSite::PwSite()
 }
 PwSite::PwSite(int i)
 {
-	in = i;
+    in = i;
 }
 PwSite::~PwSite()
 {
@@ -35,68 +35,68 @@ PwSite::~PwSite()
 
 void PwSite::setMatrices(int longest,int slongest)
 {
-	int s;
-	if(PWMATRIXMAXSIZE)
-		s = longest+slongest+2;
-	else
-		s = (int)(pwInitialMatrixSize*(float)longest);
+    int s;
+    if (PWMATRIXMAXSIZE)
+        s = longest+slongest+2;
+    else
+        s = (int)(pwInitialMatrixSize*(float)longest);
 
-	lSite = new IntMatrix(s,"pwsite_lSite");
-	rSite = new IntMatrix(s,"pwsite_rSite");
-	lSite->allowResize(true);
-	rSite->allowResize(true);
+    lSite = new IntMatrix(s,"pwsite_lSite");
+    rSite = new IntMatrix(s,"pwsite_rSite");
+    lSite->allowResize(true);
+    rSite->allowResize(true);
 
-	cIndex1 = new IntMatrix(s,"pwsite_cIndex1");
-	rIndex1 = new IntMatrix(s,"pwsite_rIndex1");
-	lIndex1 = new IntMatrix(s,"pwsite_lIndex1");
-	cIndex2 = new IntMatrix(s,"pwsite_cIndex2");
-	rIndex2 = new IntMatrix(s,"pwsite_rIndex2");
-	lIndex2 = new IntMatrix(s,"pwsite_lIndex2");
-	cIndex1->allowResize(true);
-	rIndex1->allowResize(true);
-	lIndex1->allowResize(true);
-	cIndex2->allowResize(true);
-	rIndex2->allowResize(true);
-	lIndex2->allowResize(true);
+    cIndex1 = new IntMatrix(s,"pwsite_cIndex1");
+    rIndex1 = new IntMatrix(s,"pwsite_rIndex1");
+    lIndex1 = new IntMatrix(s,"pwsite_lIndex1");
+    cIndex2 = new IntMatrix(s,"pwsite_cIndex2");
+    rIndex2 = new IntMatrix(s,"pwsite_rIndex2");
+    lIndex2 = new IntMatrix(s,"pwsite_lIndex2");
+    cIndex1->allowResize(true);
+    rIndex1->allowResize(true);
+    lIndex1->allowResize(true);
+    cIndex2->allowResize(true);
+    rIndex2->allowResize(true);
+    lIndex2->allowResize(true);
 
-	currMS = new IntMatrix(s,"pwsite_currMS");
-	currMS->allowResize(true);
+    currMS = new IntMatrix(s,"pwsite_currMS");
+    currMS->allowResize(true);
 
-	vfX = new IntMatrix(s,"pwsite_vfX");
-	vfY = new IntMatrix(s,"pwsite_vfY");
-	vfM = new IntMatrix(s,"pwsite_vfM");
-	vbX = new IntMatrix(s,"pwsite_vbX");
-	vbY = new IntMatrix(s,"pwsite_vbY");
-	vbM = new IntMatrix(s,"pwsite_vbM");
-	vfX->allowResize(true);
-	vfY->allowResize(true);
-	vfM->allowResize(true);
-	vbX->allowResize(true);
-	vbY->allowResize(true);
-	vbM->allowResize(true);
+    vfX = new IntMatrix(s,"pwsite_vfX");
+    vfY = new IntMatrix(s,"pwsite_vfY");
+    vfM = new IntMatrix(s,"pwsite_vfM");
+    vbX = new IntMatrix(s,"pwsite_vbX");
+    vbY = new IntMatrix(s,"pwsite_vbY");
+    vbM = new IntMatrix(s,"pwsite_vbM");
+    vfX->allowResize(true);
+    vfY->allowResize(true);
+    vfM->allowResize(true);
+    vbX->allowResize(true);
+    vbY->allowResize(true);
+    vbM->allowResize(true);
 
 }
 
 void PwSite::deleteMatrices()
 {
-	delete lSite;
-	delete rSite;
+    delete lSite;
+    delete rSite;
 
-	delete cIndex1;
-	delete rIndex1;
-	delete lIndex1;
-	delete cIndex2;
-	delete rIndex2;
-	delete lIndex2;
+    delete cIndex1;
+    delete rIndex1;
+    delete lIndex1;
+    delete cIndex2;
+    delete rIndex2;
+    delete lIndex2;
 
-	delete currMS;
+    delete currMS;
 
-	delete vfX;
-	delete vfY;
-	delete vfM;
-	delete vbX;
-	delete vbY;
-	delete vbM;
+    delete vfX;
+    delete vfY;
+    delete vfM;
+    delete vbX;
+    delete vbY;
+    delete vbM;
 
 }
 

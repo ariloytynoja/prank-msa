@@ -35,14 +35,14 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     nState = hmm->getNStates();
     sAlpha = hmm->getASize();
 
-	sSite = new Site();
+    sSite = new Site();
 
-	cSite = new Site();
-	cSite->index(1);
-	cSite->prev();
+    cSite = new Site();
+    cSite->index(1);
+    cSite->prev();
 
-	cSite->index(0);
-	cSite->next();
+    cSite->index(0);
+    cSite->next();
 
     li=0;
     ri=0;
@@ -51,54 +51,66 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
     skipMatch = -1;
 
-    if (LOGVALUES) {
-        if (sq1->isTerminal() && sq2->isTerminal()) {
+    if (LOGVALUES)
+    {
+        if (sq1->isTerminal() && sq2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(sq1);
             t2 = static_cast<TerminalSequence*>(sq2);
             logScoresSS();
         }
-        else if (sq1->isTerminal() && !sq2->isTerminal()) {
+        else if (sq1->isTerminal() && !sq2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(sq1);
             a2 = static_cast<AncestralSequence*>(sq2);
             logScoresSM();
         }
-        else if (!sq1->isTerminal() && sq2->isTerminal()) {
+        else if (!sq1->isTerminal() && sq2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(sq1);
             t2 = static_cast<TerminalSequence*>(sq2);
             logScoresMS();
         }
-        else if (!sq1->isTerminal() && !sq2->isTerminal()) {
+        else if (!sq1->isTerminal() && !sq2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(sq1);
             a2 = static_cast<AncestralSequence*>(sq2);
             logScoresMM();
         }
-        else {
+        else
+        {
             cout<<"CharacterProbability(Sequence* sq1,Sequence* sq2)"<<endl;
             exit(-1);
         }
     }
-    else {
-        if (sq1->isTerminal() && sq2->isTerminal()) {
+    else
+    {
+        if (sq1->isTerminal() && sq2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(sq1);
             t2 = static_cast<TerminalSequence*>(sq2);
             scoresSS();
         }
-        else if (sq1->isTerminal() && !sq2->isTerminal()) {
+        else if (sq1->isTerminal() && !sq2->isTerminal())
+        {
             t1 = static_cast<TerminalSequence*>(sq1);
             a2 = static_cast<AncestralSequence*>(sq2);
             scoresSM();
         }
-        else if (!sq1->isTerminal() && sq2->isTerminal()) {
+        else if (!sq1->isTerminal() && sq2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(sq1);
             t2 = static_cast<TerminalSequence*>(sq2);
             scoresMS();
         }
-        else if (!sq1->isTerminal() && !sq2->isTerminal()) {
+        else if (!sq1->isTerminal() && !sq2->isTerminal())
+        {
             a1 = static_cast<AncestralSequence*>(sq1);
             a2 = static_cast<AncestralSequence*>(sq2);
             scoresMM();
         }
-        else {
+        else
+        {
             cout<<"CharacterProbability(Sequence* sq1,Sequence* sq2)"<<endl;
             exit(-1);
         }
@@ -121,27 +133,33 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
     double t;
 
-	cSite->index(0);
-	cSite->next();
+    cSite->index(0);
+    cSite->next();
 
-	pSite = new Site();
-	pSite->index(0);
+    pSite = new Site();
+    pSite->index(0);
 
     int moveFrom;
     int moveTo = cSite->currMatchState();
 
     int lastMove;
 
-    FOR(k,nState) {
-        if (moveTo==0 || moveTo==3 || moveTo==9){
+    FOR(k,nState)
+    {
+        if (moveTo==0 || moveTo==3 || moveTo==9)
+        {
             t = hmm->structBgFreq(k)+ hmm->probWX(k);
             pSite->stateProb( t, k );
             prev->s( t, k );
-        } else if (moveTo==1 || moveTo==7 || moveTo==13){
+        }
+        else if (moveTo==1 || moveTo==7 || moveTo==13)
+        {
             t = hmm->structBgFreq(k)+ hmm->probWY(k);
             pSite->stateProb( t, k );
             prev->s( t, k );
-        } else if (moveTo==2 || moveTo==5 || moveTo==8 || moveTo==11 || moveTo==14){
+        }
+        else if (moveTo==2 || moveTo==5 || moveTo==8 || moveTo==11 || moveTo==14)
+        {
             t = hmm->structBgFreq(k)+ hmm->probWM(k);
             pSite->stateProb( t, k );
             prev->s( t, k );
@@ -149,7 +167,8 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     }
 
 
-    for (;cSite->index()!=1; cSite->next(),pSite->next()) {
+    for (; cSite->index()!=1; cSite->next(),pSite->next())
+    {
 
         moveFrom = pSite->currMatchState();
         moveTo = cSite->currMatchState();
@@ -157,27 +176,33 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
         if (moveFrom<0||moveFrom>14)
             moveFrom = 2;
 
-        FOR(l,nState) {
+        FOR(l,nState)
+        {
 
             double score;
 
-            if (LOGVALUES) {
+            if (LOGVALUES)
+            {
 
                 score=small;
-                FOR(j,sAlpha) {
+                FOR(j,sAlpha)
+                {
                     score = sumLogs(score,hmm->logCharBgFreq(l,j)+cSite->mlCharProb(l,j));
                 }
 
-            } else {
+            }
+            else
+            {
 
                 score=0;
-                FOR(j,sAlpha) {
+                FOR(j,sAlpha)
+                {
                     score += hmm->charBgFreq(l,j)*cSite->mlCharProb(l,j);
                 }
                 score = log(score);
             }
 
-            if(score<-100)
+            if (score<-100)
                 score = -100;
 
             if ((FOREVER || FOREVER_OLD) && moveTo>2)
@@ -189,41 +214,68 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
             }
             sum=-HUGE_VAL;
 
-            FOR(k,nState) {
+            FOR(k,nState)
+            {
 
-                if (moveFrom==0 || moveFrom==3 || moveFrom==5 || moveFrom==9 || moveFrom==11) {
+                if (moveFrom==0 || moveFrom==3 || moveFrom==5 || moveFrom==9 || moveFrom==11)
+                {
 
-                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11) {
+                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probXX(k,l) + score);
-                    } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+                    }
+                    else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probXY(k,l) + score);
-                    } else if (moveTo==2) {
+                    }
+                    else if (moveTo==2)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probXM(k,l) + score);
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"CharacterProbability: impossible pointer "<<moveFrom<<" "<<moveTo<<endl;
                     }
 
-                } else if (moveFrom==1 || moveFrom==7 || moveFrom==8 || moveFrom==13 || moveFrom==14) {
+                }
+                else if (moveFrom==1 || moveFrom==7 || moveFrom==8 || moveFrom==13 || moveFrom==14)
+                {
 
-                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11) {
+                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probYX(k,l) + score);
-                    } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+                    }
+                    else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probYY(k,l) + score);
-                    } else if (moveTo==2) {
+                    }
+                    else if (moveTo==2)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probYM(k,l) + score);
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"CharacterProbability: impossible pointer "<<moveFrom<<" "<<moveTo<<endl;
                     }
 
-                } else if (moveFrom==2) {
+                }
+                else if (moveFrom==2)
+                {
 
-                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11) {
+                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probMX(k,l) + score);
-                    } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+                    }
+                    else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probMY(k,l) + score);
-                    } else if (moveTo==2) {
+                    }
+                    else if (moveTo==2)
+                    {
                         sum = sumLogs(sum,prev->g(k) + hmm->probMM(k,l) + score);
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"CharacterProbability: impossible pointer "<<moveFrom<<" "<<moveTo<<endl;
                     }
                 }
@@ -242,7 +294,8 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
 
     double full = -HUGE_VAL;
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
         if (lastMove==0 || lastMove==3 || lastMove==5 || lastMove==9 || lastMove==11)
             full = sumLogs(full,prev->g(k)+hmm->probXW(k));
         else if (lastMove==1 || lastMove==7 || lastMove==8 || lastMove==13 || lastMove==14)
@@ -256,7 +309,7 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     cSite->index(1); // current site
     cSite->prev();
 
-     cSite->prev();
+    cSite->prev();
 
     prev = vec1;
     curr = vec2;
@@ -265,12 +318,18 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     moveFrom = cSite->currMatchState();
 
     double all=0;
-    FOR(k,nState) {
-        if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11){
+    FOR(k,nState)
+    {
+        if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+        {
             prev->s( hmm->probXW(k), k );
-        } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+        }
+        else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+        {
             prev->s( hmm->probYW(k), k );
-        } else if (moveTo==2){
+        }
+        else if (moveTo==2)
+        {
             prev->s( hmm->probMW(k), k );
         }
         t = exp(pSite->stateProb(k)+prev->g(k) - full);
@@ -279,13 +338,17 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
         all+=pSite->stateProb(k);
     }
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
         pSite->stateProb( pSite->stateProb(k)/all, k );
     }
 
-    cSite->next();pSite->next();
-    do {
-        cSite->prev();pSite->prev();
+    cSite->next();
+    pSite->next();
+    do
+    {
+        cSite->prev();
+        pSite->prev();
 
         moveTo = pSite->currMatchState();
         moveFrom = cSite->currMatchState();
@@ -293,32 +356,45 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
         if (moveFrom<0||moveFrom>14)
             moveFrom = 2;
 
-        if (LOGVALUES) {
-            FOR(l,nState) {
+        if (LOGVALUES)
+        {
+            FOR(l,nState)
+            {
 
-                if ((FOREVER || FOREVER_OLD) && moveTo>2) {
+                if ((FOREVER || FOREVER_OLD) && moveTo>2)
+                {
                     score->s(0,l);
 
-                } else {
+                }
+                else
+                {
 
                     score->s(small,l);
 
-                    FOR(j,sAlpha) {
+                    FOR(j,sAlpha)
+                    {
                         score->alog( hmm->logCharBgFreq(l,j)+pSite->mlCharProb(l,j), l );
                     }
                 }
             }
-        } else {
-            FOR(l,nState) {
+        }
+        else
+        {
+            FOR(l,nState)
+            {
 
-                if ((FOREVER || FOREVER_OLD) && moveTo>2) {
+                if ((FOREVER || FOREVER_OLD) && moveTo>2)
+                {
                     score->s(1,l);
 
-                } else {
+                }
+                else
+                {
 
                     score->s(0,l);
 
-                    FOR(j,sAlpha) {
+                    FOR(j,sAlpha)
+                    {
                         score->a( hmm->charBgFreq(l,j)*pSite->mlCharProb(l,j), l );
                     }
                     score->clog(l);
@@ -326,45 +402,73 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
             }
         }
 
-        FOR(k,nState) {
+        FOR(k,nState)
+        {
 
             sum=-HUGE_VAL;
 
-            FOR(l,nState) {
+            FOR(l,nState)
+            {
 
-                if (moveFrom==0 || moveFrom==3 || moveFrom==5 || moveFrom==9 || moveFrom==11) {
+                if (moveFrom==0 || moveFrom==3 || moveFrom==5 || moveFrom==9 || moveFrom==11)
+                {
 
-                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11) {
+                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+                    {
                         sum = sumLogs(sum,hmm->probXX(k,l) + score->g(l) + prev->g(l));
-                    } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+                    }
+                    else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+                    {
                         sum = sumLogs(sum,hmm->probXY(k,l) + score->g(l) + prev->g(l));
-                    } else if (moveTo==2) {
+                    }
+                    else if (moveTo==2)
+                    {
                         sum = sumLogs(sum,hmm->probXM(k,l) + score->g(l) + prev->g(l));
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"CharacterProbabilityL: impossible pointer "<<moveFrom<<" "<<moveTo<<endl;
                     }
 
-                } else if (moveFrom==1 || moveFrom==7 || moveFrom==8 || moveFrom==13 || moveFrom==14) {
+                }
+                else if (moveFrom==1 || moveFrom==7 || moveFrom==8 || moveFrom==13 || moveFrom==14)
+                {
 
-                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11) {
+                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+                    {
                         sum = sumLogs(sum,hmm->probYX(k,l) + score->g(l) + prev->g(l));
-                    } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+                    }
+                    else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+                    {
                         sum = sumLogs(sum,hmm->probYY(k,l) + score->g(l) + prev->g(l));
-                    } else if (moveTo==2) {
+                    }
+                    else if (moveTo==2)
+                    {
                         sum = sumLogs(sum,hmm->probYM(k,l) + score->g(l) + prev->g(l));
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"CharacterProbabilityL: impossible pointer "<<moveFrom<<" "<<moveTo<<endl;
                     }
 
-                } else if (moveFrom==2) {
+                }
+                else if (moveFrom==2)
+                {
 
-                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11) {
+                    if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
+                    {
                         sum = sumLogs(sum,hmm->probMX(k,l) + score->g(l) + prev->g(l));
-                    } else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14) {
+                    }
+                    else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
+                    {
                         sum = sumLogs(sum,hmm->probMY(k,l) + score->g(l) + prev->g(l));
-                    } else if (moveTo==2) {
+                    }
+                    else if (moveTo==2)
+                    {
                         sum = sumLogs(sum,hmm->probMM(k,l) + score->g(l) + prev->g(l));
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"CharacterProbabilityL: impossible pointer "<<moveFrom<<" "<<moveTo<<endl;
                     }
                 }
@@ -374,15 +478,17 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
         all=0;
 
 
-        FOR(k,nState) {
+        FOR(k,nState)
+        {
             t = exp(cSite->stateProb(k)+curr->g(k) - full);
             cSite->stateProb( t, k );
             all+=t;
         }
 
-        FOR(k,nState) {
-			cSite->stateProb( cSite->stateProb(k)/all, k );
-		}
+        FOR(k,nState)
+        {
+            cSite->stateProb( cSite->stateProb(k)/all, k );
+        }
 
         temp = prev;
         prev = curr;
@@ -390,13 +496,15 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
         lastMove = moveTo;
 
-	} while (cSite->index()!=0);
+    }
+    while (cSite->index()!=0);
 
     fwdScore = full;
 
     full = -HUGE_VAL;
 
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
         if (lastMove==0 || lastMove==3 || lastMove==9)
             full = sumLogs(full,prev->g(k)+hmm->structBgFreq(k)+hmm->probWX(k));
         else if (lastMove==1 || lastMove==7 || lastMove==13)
@@ -413,27 +521,31 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     delete vec1;
     delete vec2;
 
-	delete pSite;
-	delete cSite;
-	delete sSite;
+    delete pSite;
+    delete cSite;
+    delete sSite;
 
 }
 
 void CharacterProbability::logScoresSS()
 {
 
-    for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
         cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->logCharSbProbL(k,n,t1->charAt(li));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -443,12 +555,16 @@ void CharacterProbability::logScoresSS()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->logCharSbProbR(k,n,t2->charAt(ri));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -458,10 +574,14 @@ void CharacterProbability::logScoresSS()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1 = hmm->logCharSbProbL(k,n,t1->charAt(li));
                     sum2 = hmm->logCharSbProbR(k,n,t2->charAt(ri));
                     cSite->mlCharProb( sum1+sum2, k, n );
@@ -471,8 +591,10 @@ void CharacterProbability::logScoresSS()
             li++;
             ri++;
 
-        } else {
-			cout<<"CharacterProbability: impossible state "<<cSite->index()<<" "<<cSite->currMatchState()<<endl;
+        }
+        else
+        {
+            cout<<"CharacterProbability: impossible state "<<cSite->index()<<" "<<cSite->currMatchState()<<endl;
         }
     }
 }
@@ -480,21 +602,25 @@ void CharacterProbability::logScoresSS()
 void CharacterProbability::logScoresSM()
 {
 
-    for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
-      if( a2->isPermInsertion(ri) )
-        cSite->permInsertion(1);
-      else
-        cSite->permInsertion(0);
+        if ( a2->isPermInsertion(ri) )
+            cSite->permInsertion(1);
+        else
+            cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->logCharSbProbL(k,n,t1->charAt(li));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -504,14 +630,19 @@ void CharacterProbability::logScoresSM()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum = sumLogs(sum,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,ri,k));
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -522,13 +653,18 @@ void CharacterProbability::logScoresSM()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1 = hmm->logCharSbProbL(k,n,t1->charAt(li));
                     sum2=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum2 = sumLogs(sum2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,ri,k));
                     }
                     cSite->mlCharProb( sum1+sum2, k, n );
@@ -540,26 +676,39 @@ void CharacterProbability::logScoresSM()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14){
+        }
+        else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( small, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a2->mlCharProbAt(n,ri,k), k, n );
                     }
                 }
@@ -567,16 +716,22 @@ void CharacterProbability::logScoresSM()
 
             ri++;
 
-        } else {
+        }
+        else
+        {
             cout<<"CharacterProbability: impossible state "<<cSite->currMatchState()<<endl;
         }
 
-        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0) {
-            if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0)
+        {
+            if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
             {
-                for (;sSite->index()!=cSite->index(); sSite->next()) {
-                    FOR(k,nState) {
-                        FOR(n,sAlpha) {
+                for (; sSite->index()!=cSite->index(); sSite->next())
+                {
+                    FOR(k,nState)
+                    {
+                        FOR(n,sAlpha)
+                        {
                             sSite->mlCharProb( small, k, n );
                         }
                     }
@@ -589,12 +744,16 @@ void CharacterProbability::logScoresSM()
     }
 
     // 030310
-    if (FOREVER && skipMatch>0) {
-        if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+    if (FOREVER && skipMatch>0)
+    {
+        if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
         {
-            for (;sSite->index()!=cSite->index(); sSite->next()) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            for (; sSite->index()!=cSite->index(); sSite->next())
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         sSite->mlCharProb( small, k, n );
                     }
                 }
@@ -610,23 +769,28 @@ void CharacterProbability::logScoresSM()
 void CharacterProbability::logScoresMS()
 {
 
-	for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
-      if( a1->isPermInsertion(li) )
-        cSite->permInsertion(1);
-      else
-        cSite->permInsertion(0);
+        if ( a1->isPermInsertion(li) )
+            cSite->permInsertion(1);
+        else
+            cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum = sumLogs(sum,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,li,k));
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -637,12 +801,16 @@ void CharacterProbability::logScoresMS()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->logCharSbProbR(k,n,t2->charAt(ri));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -652,12 +820,17 @@ void CharacterProbability::logScoresMS()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum1 = sumLogs(sum1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,li,k));
                     }
                     sum2 = hmm->logCharSbProbR(k,n,t2->charAt(ri));
@@ -668,26 +841,39 @@ void CharacterProbability::logScoresMS()
             li++;
             ri++;
 
-        } else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11){
+        }
+        else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) ){  /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) )   /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( small, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a1->mlCharProbAt(n,li,k), k, n );
                     }
                 }
@@ -695,16 +881,22 @@ void CharacterProbability::logScoresMS()
 
             li++;
 
-        } else {
+        }
+        else
+        {
             cout<<"CharacterProbability: impossible state "<<cSite->currMatchState()<<endl;
         }
 
-        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0) {
-            if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0)
+        {
+            if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
             {
-                for (;sSite->index()!=cSite->index(); sSite->next()) {
-                    FOR(k,nState) {
-                        FOR(n,sAlpha) {
+                for (; sSite->index()!=cSite->index(); sSite->next())
+                {
+                    FOR(k,nState)
+                    {
+                        FOR(n,sAlpha)
+                        {
                             sSite->mlCharProb( small, k, n );
                         }
                     }
@@ -717,12 +909,16 @@ void CharacterProbability::logScoresMS()
     }
 
     //030310
-    if (FOREVER && skipMatch>0) {
-        if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+    if (FOREVER && skipMatch>0)
+    {
+        if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
         {
-            for (;sSite->index()!=cSite->index(); sSite->next()) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            for (; sSite->index()!=cSite->index(); sSite->next())
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         sSite->mlCharProb( small, k, n );
                     }
                 }
@@ -737,25 +933,30 @@ void CharacterProbability::logScoresMS()
 void CharacterProbability::logScoresMM()
 {
 
-	// Compute the probability of alternative characters given the tree below
+    // Compute the probability of alternative characters given the tree below
     //
-    for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
-      if( a1->isPermInsertion(li) || a2->isPermInsertion(ri) )
-        cSite->permInsertion(1);
-      else
-        cSite->permInsertion(0);
+        if ( a1->isPermInsertion(li) || a2->isPermInsertion(ri) )
+            cSite->permInsertion(1);
+        else
+            cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum = sumLogs(sum,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,li,k));
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -766,14 +967,19 @@ void CharacterProbability::logScoresMM()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum = sumLogs(sum,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,ri,k));
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -784,13 +990,18 @@ void CharacterProbability::logScoresMM()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1=small;
                     sum2=small;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum1 = sumLogs(sum1,hmm->logCharSbProbL(k,n,m)+a1->mlCharProbAt(m,li,k));
                         sum2 = sumLogs(sum2,hmm->logCharSbProbR(k,n,m)+a2->mlCharProbAt(m,ri,k));
                     }
@@ -803,26 +1014,39 @@ void CharacterProbability::logScoresMM()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11){
+        }
+        else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( small, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a1->mlCharProbAt(n,li,k), k, n );
                     }
                 }
@@ -832,26 +1056,39 @@ void CharacterProbability::logScoresMM()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14){
+        }
+        else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( small, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a2->mlCharProbAt(n,ri,k), k, n );
                     }
                 }
@@ -859,16 +1096,22 @@ void CharacterProbability::logScoresMM()
 
             ri++;
 
-        } else {
+        }
+        else
+        {
             cout<<"CharacterProbability: impossible state "<<cSite->currMatchState()<<endl;
         }
 
-        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0) {
-            if(TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
+        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0)
+        {
+            if (TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
             {
-                for (;sSite->index()!=cSite->index(); sSite->next()) {
-                    FOR(k,nState) {
-                        FOR(n,sAlpha) {
+                for (; sSite->index()!=cSite->index(); sSite->next())
+                {
+                    FOR(k,nState)
+                    {
+                        FOR(n,sAlpha)
+                        {
                             sSite->mlCharProb( small, k, n );
                         }
                     }
@@ -881,12 +1124,16 @@ void CharacterProbability::logScoresMM()
     }
 
     //030310
-    if (FOREVER && skipMatch>0) {
-        if(TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
+    if (FOREVER && skipMatch>0)
+    {
+        if (TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
         {
-            for (;sSite->index()!=cSite->index(); sSite->next()) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            for (; sSite->index()!=cSite->index(); sSite->next())
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         sSite->mlCharProb( small, k, n );
                     }
                 }
@@ -901,18 +1148,22 @@ void CharacterProbability::logScoresMM()
 void CharacterProbability::scoresSS()
 {
 
-    for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
         cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->charSbProbL(k,n,t1->charAt(li));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -922,12 +1173,16 @@ void CharacterProbability::scoresSS()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->charSbProbR(k,n,t2->charAt(ri));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -937,10 +1192,14 @@ void CharacterProbability::scoresSS()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1 = hmm->charSbProbL(k,n,t1->charAt(li));
                     sum2 = hmm->charSbProbR(k,n,t2->charAt(ri));
                     cSite->mlCharProb( sum1*sum2, k, n );
@@ -950,8 +1209,10 @@ void CharacterProbability::scoresSS()
             li++;
             ri++;
 
-        } else {
-			cout<<"CharacterProbability: impossible state "<<cSite->index()<<" "<<cSite->currMatchState()<<endl;
+        }
+        else
+        {
+            cout<<"CharacterProbability: impossible state "<<cSite->index()<<" "<<cSite->currMatchState()<<endl;
         }
 
     }
@@ -961,21 +1222,25 @@ void CharacterProbability::scoresSS()
 void CharacterProbability::scoresSM()
 {
 
-	for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
-      if( a2->isPermInsertion(ri) )
-        cSite->permInsertion(1);
-      else
-        cSite->permInsertion(0);
+        if ( a2->isPermInsertion(ri) )
+            cSite->permInsertion(1);
+        else
+            cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->charSbProbL(k,n,t1->charAt(li));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -985,14 +1250,19 @@ void CharacterProbability::scoresSM()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=0;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,ri,k);
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -1003,13 +1273,18 @@ void CharacterProbability::scoresSM()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1 = hmm->charSbProbL(k,n,t1->charAt(li));
                     sum2=0;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,ri,k);
                     }
                     cSite->mlCharProb( sum1*sum2, k, n );
@@ -1021,26 +1296,39 @@ void CharacterProbability::scoresSM()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14){
+        }
+        else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( 0, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a2->mlCharProbAt(n,ri,k), k, n );
                     }
                 }
@@ -1048,17 +1336,23 @@ void CharacterProbability::scoresSM()
 
             ri++;
 
-        } else {
+        }
+        else
+        {
             cout<<"CharacterProbability: impossible state "<<cSite->currMatchState()<<endl;
         }
 
         //030310
-        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0) {
-            if(TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
+        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0)
+        {
+            if (TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
             {
-                for (;sSite->index()!=cSite->index(); sSite->next()) {
-                    FOR(k,nState) {
-                        FOR(n,sAlpha) {
+                for (; sSite->index()!=cSite->index(); sSite->next())
+                {
+                    FOR(k,nState)
+                    {
+                        FOR(n,sAlpha)
+                        {
                             sSite->mlCharProb( 0, k, n );
                         }
                     }
@@ -1070,12 +1364,16 @@ void CharacterProbability::scoresSM()
     }
 
     //030310
-    if (FOREVER && skipMatch>0) {
-        if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+    if (FOREVER && skipMatch>0)
+    {
+        if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
         {
-            for (;sSite->index()!=cSite->index(); sSite->next()) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            for (; sSite->index()!=cSite->index(); sSite->next())
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         sSite->mlCharProb( 0, k, n );
                     }
                 }
@@ -1090,23 +1388,28 @@ void CharacterProbability::scoresSM()
 void CharacterProbability::scoresMS()
 {
 
-	for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
-      if( a1->isPermInsertion(li) )
-        cSite->permInsertion(1);
-      else
-        cSite->permInsertion(0);
+        if ( a1->isPermInsertion(li) )
+            cSite->permInsertion(1);
+        else
+            cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=0;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,li,k);
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -1117,12 +1420,16 @@ void CharacterProbability::scoresMS()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum = hmm->charSbProbR(k,n,t2->charAt(ri));
                     cSite->mlCharProb( sum, k, n );
                 }
@@ -1132,13 +1439,18 @@ void CharacterProbability::scoresMS()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1=0;
                     sum2 = hmm->charSbProbR(k,n,t2->charAt(ri));
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,li,k);
                     }
                     cSite->mlCharProb( sum1*sum2, k, n );
@@ -1150,26 +1462,39 @@ void CharacterProbability::scoresMS()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11){
+        }
+        else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( 0, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a1->mlCharProbAt(n,li,k), k, n );
                     }
                 }
@@ -1177,17 +1502,23 @@ void CharacterProbability::scoresMS()
 
             li++;
 
-        } else {
+        }
+        else
+        {
             cout<<"CharacterProbability: impossible state "<<cSite->currMatchState()<<endl;
         }
 
         //030310
-        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0) {
-            if(TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
+        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0)
+        {
+            if (TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
             {
-                for (;sSite->index()!=cSite->index(); sSite->next()) {
-                    FOR(k,nState) {
-                        FOR(n,sAlpha) {
+                for (; sSite->index()!=cSite->index(); sSite->next())
+                {
+                    FOR(k,nState)
+                    {
+                        FOR(n,sAlpha)
+                        {
                             sSite->mlCharProb( 0, k, n );
                         }
                     }
@@ -1199,12 +1530,16 @@ void CharacterProbability::scoresMS()
     }
 
     //030310
-    if (FOREVER && skipMatch>0) {
-        if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+    if (FOREVER && skipMatch>0)
+    {
+        if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
         {
-            for (;sSite->index()!=cSite->index(); sSite->next()) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            for (; sSite->index()!=cSite->index(); sSite->next())
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         sSite->mlCharProb( 0, k, n );
                     }
                 }
@@ -1219,23 +1554,28 @@ void CharacterProbability::scoresMS()
 void CharacterProbability::scoresMM()
 {
 
-	for (;cSite->index()!=1; cSite->next()) {
+    for (; cSite->index()!=1; cSite->next())
+    {
 
-        if( a1->isPermInsertion(li) || a2->isPermInsertion(ri) )
-          cSite->permInsertion(1);
+        if ( a1->isPermInsertion(li) || a2->isPermInsertion(ri) )
+            cSite->permInsertion(1);
         else
-          cSite->permInsertion(0);
+            cSite->permInsertion(0);
 
         // X-gap
         //
-        if (cSite->currMatchState()==0){
+        if (cSite->currMatchState()==0)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=0;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,li,k);
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -1246,14 +1586,19 @@ void CharacterProbability::scoresMM()
 
             // Y-gap
             //
-        } else if (cSite->currMatchState()==1){
+        }
+        else if (cSite->currMatchState()==1)
+        {
 
             skipMatch = -1;
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum=0;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,ri,k);
                     }
                     cSite->mlCharProb( sum, k, n );
@@ -1264,13 +1609,18 @@ void CharacterProbability::scoresMM()
 
             // match
             //
-        } else if (cSite->currMatchState()==2){
+        }
+        else if (cSite->currMatchState()==2)
+        {
 
-            FOR(k,nState) {
-                FOR(n,sAlpha) {
+            FOR(k,nState)
+            {
+                FOR(n,sAlpha)
+                {
                     sum1=0;
                     sum2=0;
-                    FOR(m,sAlpha) {
+                    FOR(m,sAlpha)
+                    {
                         sum1 += hmm->charSbProbL(k,n,m)*a1->mlCharProbAt(m,li,k);
                         sum2 += hmm->charSbProbR(k,n,m)*a2->mlCharProbAt(m,ri,k);
                     }
@@ -1283,26 +1633,39 @@ void CharacterProbability::scoresMM()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11){
+        }
+        else if (cSite->currMatchState()==3 || cSite->currMatchState()==5 || cSite->currMatchState()==9 || cSite->currMatchState()==11)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==5 || cSite->currMatchState()==11 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( 0, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a1->mlCharProbAt(n,li,k), k, n );
                     }
                 }
@@ -1312,26 +1675,39 @@ void CharacterProbability::scoresMM()
 
             // insertion skipped; copy old values
             //
-        } else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14){
+        }
+        else if (cSite->currMatchState()==7 || cSite->currMatchState()==8 || cSite->currMatchState()==13 || cSite->currMatchState()==14)
+        {
 
-            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) ){ /*e090626*/
-                if (skipMatch<0) {
+            if (FOREVER && ( cSite->currMatchState()==8 || cSite->currMatchState()==14 ) )  /*e090626*/
+            {
+                if (skipMatch<0)
+                {
                     sSite->index(cSite->index());
                 }
                 skipMatch = 1;
-            } else {
+            }
+            else
+            {
                 skipMatch = -1;
             }
 
-            if (FOREVER_OLD) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            if (FOREVER_OLD)
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( 0, k, n );
                     }
                 }
-            } else {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            }
+            else
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         cSite->mlCharProb( a2->mlCharProbAt(n,ri,k), k, n );
                     }
                 }
@@ -1339,17 +1715,23 @@ void CharacterProbability::scoresMM()
 
             ri++;
 
-        } else {
+        }
+        else
+        {
             cout<<"CharacterProbability: impossible state "<<cSite->currMatchState()<<endl;
         }
 
         //030310
-        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0) {
-            if(TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
+        if (FOREVER && cSite->currMatchState()==2 && skipMatch>0)
+        {
+            if (TERMF || ( sSite->getLSite()!=0 && sSite->getRSite()!=1 ))
             {
-                for (;sSite->index()!=cSite->index(); sSite->next()) {
-                    FOR(k,nState) {
-                        FOR(n,sAlpha) {
+                for (; sSite->index()!=cSite->index(); sSite->next())
+                {
+                    FOR(k,nState)
+                    {
+                        FOR(n,sAlpha)
+                        {
                             sSite->mlCharProb( 0, k, n );
                         }
                     }
@@ -1361,12 +1743,16 @@ void CharacterProbability::scoresMM()
     }
 
     //030310
-    if (FOREVER && skipMatch>0) {
-        if(TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
+    if (FOREVER && skipMatch>0)
+    {
+        if (TERMF || ( sSite->getLSite()!=0 && cSite->index()!=1 ))
         {
-            for (;sSite->index()!=cSite->index(); sSite->next()) {
-                FOR(k,nState) {
-                    FOR(n,sAlpha) {
+            for (; sSite->index()!=cSite->index(); sSite->next())
+            {
+                FOR(k,nState)
+                {
+                    FOR(n,sAlpha)
+                    {
                         sSite->mlCharProb( 0, k, n );
                     }
                 }

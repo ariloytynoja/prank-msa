@@ -26,8 +26,9 @@
 #include <fstream>
 #include "flmatrix.h"
 
-class ReadAnnotation{
-	int end,k;
+class ReadAnnotation
+{
+    int end,k;
 public:
 
     ReadAnnotation(std::string annofile,std::map<std::string,FlMatrix*>*);

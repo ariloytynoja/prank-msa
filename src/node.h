@@ -29,7 +29,8 @@
 #include <sstream>
 
 using namespace std;
-class Node{
+class Node
+{
     std::string tree;
     std::string subTrees[2];
     std::string revTrees[2];
@@ -56,43 +57,98 @@ class Node{
     bool node_has_left_child;
     bool node_has_right_child;
 
-    bool is_leaf() { return isLast; }
-    void is_leaf(bool i) { isLast = i; }
+    bool is_leaf()
+    {
+        return isLast;
+    }
+    void is_leaf(bool i)
+    {
+        isLast = i;
+    }
 
-    bool has_left_child() { return node_has_left_child; }
-    void has_left_child(bool h) { node_has_left_child = h; }
+    bool has_left_child()
+    {
+        return node_has_left_child;
+    }
+    void has_left_child(bool h)
+    {
+        node_has_left_child = h;
+    }
 
-    bool has_right_child() { return node_has_right_child; }
-    void has_right_child(bool h) { node_has_right_child = h; }
+    bool has_right_child()
+    {
+        return node_has_right_child;
+    }
+    void has_right_child(bool h)
+    {
+        node_has_right_child = h;
+    }
 
 
-    void has_sequence(bool s) { node_has_sequence = s; }
-    bool has_sequence() { return node_has_sequence; }
+    void has_sequence(bool s)
+    {
+        node_has_sequence = s;
+    }
+    bool has_sequence()
+    {
+        return node_has_sequence;
+    }
 
     void prune_up();
     void prune_down();
 
     string name;
-    void set_name(string n) { name = n; }
-    string get_name() { return name; }
+    void set_name(string n)
+    {
+        name = n;
+    }
+    string get_name()
+    {
+        return name;
+    }
 
     double dist_to_parent;
-    void set_distance_to_parent(double d) { dist_to_parent = d; }
-    double get_distance_to_parent() { return dist_to_parent; }
+    void set_distance_to_parent(double d)
+    {
+        dist_to_parent = d;
+    }
+    double get_distance_to_parent()
+    {
+        return dist_to_parent;
+    }
 
-    void add_left_child(Node *child) { child0 = child; is_leaf(false); this->has_left_child(true); }
-    void add_right_child(Node *child) { child1 = child; is_leaf(false); this->has_right_child(true); }
+    void add_left_child(Node *child)
+    {
+        child0 = child;
+        is_leaf(false);
+        this->has_left_child(true);
+    }
+    void add_right_child(Node *child)
+    {
+        child1 = child;
+        is_leaf(false);
+        this->has_right_child(true);
+    }
 
-    void delete_left_child() { delete child0; }
-    void delete_right_child() { delete child1; }
+    void delete_left_child()
+    {
+        delete child0;
+    }
+    void delete_right_child()
+    {
+        delete child1;
+    }
 
-    string print_subtree() {
-        if(!is_leaf())
+    string print_subtree()
+    {
+        if (!is_leaf())
         {
             stringstream ss;
             ss<<"("<<child0->print_subtree()<<","<<child1->print_subtree()<<"):"<<dist_to_parent;
             return ss.str();
-        } else {
+        }
+        else
+        {
             stringstream ss;
             ss<<tree<<":"<<dist_to_parent;
             return ss.str();
@@ -109,11 +165,16 @@ public:
 
     void mark_sequences(vector<string> *names);
 
-    void prune_tree() { this->prune_down(); this->prune_up(); }
+    void prune_tree()
+    {
+        this->prune_down();
+        this->prune_up();
+    }
 
     void printTerminal()
     {
-        if(!isLast)        {
+        if (!isLast)
+        {
             child0->printTerminal();
             child1->printTerminal();
         }
@@ -125,40 +186,43 @@ public:
 
     void countMatchingLeaves(int *leaves,int *matches)
     {
-        if(this->has_left_child())
+        if (this->has_left_child())
             child0->countMatchingLeaves(leaves,matches);
-        if(this->has_right_child())
+        if (this->has_right_child())
             child1->countMatchingLeaves(leaves,matches);
 
-        if(is_leaf())
+        if (is_leaf())
         {
             (*leaves)++;
-            if(this->has_sequence())
+            if (this->has_sequence())
                 (*matches)++;
         }
     }
 
-    string print_tree() {
-    if(!is_leaf())
+    string print_tree()
+    {
+        if (!is_leaf())
         {
             stringstream ss;
             ss<<"(";
             bool hasleft = false;
-            if(this->has_left_child())
+            if (this->has_left_child())
             {
                 ss<<child0->print_subtree();
                 hasleft = true;
             }
-            if(this->has_right_child())
+            if (this->has_right_child())
             {
-                if(hasleft)
+                if (hasleft)
                     ss<<",";
 
                 ss<<child1->print_subtree();
             }
             ss<<");";
             return ss.str();
-        } else {
+        }
+        else
+        {
             return "";
         }
     }

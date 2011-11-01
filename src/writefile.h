@@ -24,7 +24,8 @@
 #include <string>
 #include "ancestralnode.h"
 
-class WriteFile{
+class WriteFile
+{
     std::string error;
     int chars_by_line;
 public:
@@ -40,8 +41,14 @@ public:
 
     bool dnaSeqs(std::vector<std::string> * seqs);
 
-    bool hasError() { return error != ""; }
-    std::string getError() { return error; }
+    bool hasError()
+    {
+        return error != "";
+    }
+    std::string getError()
+    {
+        return error;
+    }
 
 };
 

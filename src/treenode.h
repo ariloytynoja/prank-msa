@@ -34,7 +34,8 @@
 
 extern float minBrL;
 
-class TreeNode {
+class TreeNode
+{
 protected:
     std::string nodeName; // name
     float branchLength;   // length of the branch below
@@ -75,28 +76,78 @@ public:
     virtual int getTerminalNodeNumber() = 0;
     virtual int getInternalNodeNumber() = 0;
 
-    virtual std::string getGroupName() { return groupName; }
+    virtual std::string getGroupName()
+    {
+        return groupName;
+    }
 
-    void setTotalNodes() { totalNodes = this->getTerminalNodeNumber(); alignedNodes = 1; }
+    void setTotalNodes()
+    {
+        totalNodes = this->getTerminalNodeNumber();
+        alignedNodes = 1;
+    }
 
-    void setBranchLength(float l) { if(l<minBrL){ branchLength = minBrL;} else { branchLength = l;} } //set the length of the  branch below
-    float getBranchLength() { return branchLength; }
+    void setBranchLength(float l)
+    {
+        if (l<minBrL)
+        {
+            branchLength = minBrL;    //set the length of the  branch below
+        }
+        else
+        {
+            branchLength = l;
+        }
+    }
+    float getBranchLength()
+    {
+        return branchLength;
+    }
 
 
-    std::string getNodeName(){ return nodeName; }    // get node name
-    void setNodeName(std::string s){ nodeName = s; } // set node name
+    std::string getNodeName()
+    {
+        return nodeName;    // get node name
+    }
+    void setNodeName(std::string s)
+    {
+        nodeName = s;    // set node name
+    }
 
-    bool isRoot(){ return root; }
-    void setRoot(){ root = true; }
+    bool isRoot()
+    {
+        return root;
+    }
+    void setRoot()
+    {
+        root = true;
+    }
 
-    bool isRooted(){ return rooted; }
-    bool isLInternal(){ return lInternal; }
-    bool isRInternal(){ return rInternal; }
+    bool isRooted()
+    {
+        return rooted;
+    }
+    bool isLInternal()
+    {
+        return lInternal;
+    }
+    bool isRInternal()
+    {
+        return rInternal;
+    }
 
-    bool isTerminal(){ return terminal; }
+    bool isTerminal()
+    {
+        return terminal;
+    }
 
-    float getLeftBrL(){ return ld; }
-    float getRightBrL(){ return rd; }
+    float getLeftBrL()
+    {
+        return ld;
+    }
+    float getRightBrL()
+    {
+        return rd;
+    }
 
     int gappedLength();
 
@@ -112,23 +163,35 @@ public:
 
     virtual Sequence* getSequence() = 0;
 
-    void setLChild(TreeNode* tn){ lChild = tn; } // set child nodes
-    void setRChild(TreeNode* tn){ rChild = tn; }
+    void setLChild(TreeNode* tn)
+    {
+        lChild = tn;    // set child nodes
+    }
+    void setRChild(TreeNode* tn)
+    {
+        rChild = tn;
+    }
 
-    std::string getLName(){ return ln; }      // get child node names
-    std::string getRName(){ return rn; }
+    std::string getLName()
+    {
+        return ln;    // get child node names
+    }
+    std::string getRName()
+    {
+        return rn;
+    }
 
-    virtual void getCharactersAt(std::vector<std::string>* ,int ){}
-    virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool ){}
+    virtual void getCharactersAt(std::vector<std::string>* ,int ) {}
+    virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool ) {}
 
-    virtual void setSiteLength(int ){}
-    virtual void setSiteIndex(int ,int ){};
+    virtual void setSiteLength(int ) {}
+    virtual void setSiteIndex(int ,int ) {};
 
     virtual void getLowestAlignmentPostProbAt(double*,int) = 0;
 
     virtual void outputXml(std::ofstream* out,bool triple) = 0;
 
-    virtual void writeNewick(std::string* ,int* ){}
+    virtual void writeNewick(std::string* ,int* ) {}
     virtual void getNewick(std::string* tree) = 0;
     virtual void getLabelledNewickBrl(std::string* tree) = 0;
     virtual void getNewickBrl(std::string* tree) = 0;
@@ -136,9 +199,9 @@ public:
     virtual void writeAncCharacters(int *parSite,int iteration) = 0;
 
     void getCleanNewick(std::string* tree);
-    virtual void getMLAncestralSeqs(std::vector<std::string>* ,std::vector<std::string>* ){}
+    virtual void getMLAncestralSeqs(std::vector<std::string>* ,std::vector<std::string>* ) {}
 
-    virtual void setPermanentInsertion(int ){}
+    virtual void setPermanentInsertion(int ) {}
 
 };
 

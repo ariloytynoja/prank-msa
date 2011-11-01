@@ -48,10 +48,13 @@ ChaosAnchors::ChaosAnchors(string* s1,string* s2)
                     -114,  100, -125,  -31, -43,
                     -31, -125,  100, -114, -43,
                     -123,  -31, -114,   91, -43,
-                    -43,  -43,  -43,  -43, -43 };
+                    -43,  -43,  -43,  -43, -43
+                };
 
-    FOR(i,5){
-        FOR(j,5){
+    FOR(i,5)
+    {
+        FOR(j,5)
+        {
             subst->s( tmp[i*5+j], i, j );
         }
     }
@@ -66,7 +69,8 @@ ChaosAnchors::~ChaosAnchors()
 {
     delete subst;
 
-    if (nanch>0) {
+    if (nanch>0)
+    {
         delete anchps;
     }
 }
@@ -83,7 +87,8 @@ IntMatrix* ChaosAnchors::getAnchors(int *na)
 
     vector<int> pairs;
 
-    for (int co=25;co>=15;co-=5){
+    for (int co=25; co>=15; co-=5)
+    {
 
         pairs.clear();
         char cutoff[4];
@@ -101,7 +106,8 @@ IntMatrix* ChaosAnchors::getAnchors(int *na)
         string s;
 
         int j=0;
-        while (getline(read,s)){
+        while (getline(read,s))
+        {
             int beg1 = atoi(s.substr(1,s.find(" ")).c_str());
             int end1 = atoi(s.substr(s.find(" ")+1,s.find(")=")).c_str());
             s=s.substr(s.find("=")+1);
@@ -109,60 +115,78 @@ IntMatrix* ChaosAnchors::getAnchors(int *na)
             int end2 = atoi(s.substr(s.find(" ")+1,s.find(") ")).c_str());
 
             int c1,c2;
-            if (end1-beg1>2*minAnchDist && end2-beg2>2*minAnchDist) {
+            if (end1-beg1>2*minAnchDist && end2-beg2>2*minAnchDist)
+            {
                 int pos1,pos2;
-                for (pos1=end1-minAnchDist,pos2=end2-minAnchDist;pos1>(beg1+minAnchDist) && pos2>(beg2+minAnchDist);pos1-=minAnchDist,pos2-=minAnchDist){
+                for (pos1=end1-minAnchDist,pos2=end2-minAnchDist; pos1>(beg1+minAnchDist) && pos2>(beg2+minAnchDist); pos1-=minAnchDist,pos2-=minAnchDist)
+                {
                     alignRegions(&c1,&c2,pos1,pos1+minAnchDist,pos2,pos2+minAnchDist);
                     pairs.push_back(c1);
                     pairs.push_back(c2);
-                    j++;j++;
+                    j++;
+                    j++;
                     if (NOISE>0)
                         cout<<"fragment anchor*; "<<c1<<" "<<c2<<endl;
                 }
 
-                if (pos1>beg1 && pos2>beg2){
+                if (pos1>beg1 && pos2>beg2)
+                {
                     alignRegions(&c1,&c2,beg1,pos1,beg2,pos2);
-                    if (c1>minAnchDist && c2>minAnchDist) {
+                    if (c1>minAnchDist && c2>minAnchDist)
+                    {
                         pairs.push_back(c1);
                         pairs.push_back(c2);
-                        j++;j++;
+                        j++;
+                        j++;
                         if (NOISE>0)
                             cout<<"last anchors*; "<<c1<<" "<<c2<<endl;
                     }
                 }
-            } else {
+            }
+            else
+            {
                 alignRegions(&c1,&c2,beg1,end1,beg2,end2);
-                if (j==0 && (int)left->length()-c1>minAnchDist && (int)right->length()-c2>minAnchDist) {
+                if (j==0 && (int)left->length()-c1>minAnchDist && (int)right->length()-c2>minAnchDist)
+                {
                     pairs.push_back(c1);
                     pairs.push_back(c2);
-                    j++;j++;
+                    j++;
+                    j++;
                     if (NOISE>0)
                         cout<<"first anchor; "<<c1<<" "<<c2<<endl;
-                } else if (j>0 && pairs.at(j-2)-c1>minAnchDist && pairs.at(j-1)-c2>minAnchDist){
+                }
+                else if (j>0 && pairs.at(j-2)-c1>minAnchDist && pairs.at(j-1)-c2>minAnchDist)
+                {
                     pairs.push_back(c1);
                     pairs.push_back(c2);
-                    j++;j++;
+                    j++;
+                    j++;
                     if (NOISE>0)
                         cout<<"other anchors; "<<c1<<" "<<c2<<endl;
-                } else {
+                }
+                else
+                {
                     if (NOISE>0)
                         cout<<"skipped anchor; "<<c1<<" "<<c2<<endl;
                 }
             }
 
-            if (j>2 && pairs.at(j-4)-pairs.at(j-2)>maxAnchDist && pairs.at(j-3)-pairs.at(j-1)>maxAnchDist){
+            if (j>2 && pairs.at(j-4)-pairs.at(j-2)>maxAnchDist && pairs.at(j-3)-pairs.at(j-1)>maxAnchDist)
+            {
                 if (NOISE>0)
                     cout<<"anchors too distant: "<<pairs.at(j-2)<<"; "<<pairs.at(j-1)<<endl;
                 DISTOK=false;
             }
         }
-        if (j>0 && pairs.at(j-2)>maxAnchDist && pairs.at(j-1)>maxAnchDist){
+        if (j>0 && pairs.at(j-2)>maxAnchDist && pairs.at(j-1)>maxAnchDist)
+        {
             if (NOISE>0)
                 cout<<"first anchors too distant: "<<pairs.at(j-2)<<"; "<<pairs.at(j-1)<<endl;
             DISTOK=false;
         }
 
-        if (j>0 && (int)left->length()-pairs.at(0)>maxAnchDist && (int)right->length()-pairs.at(1)>maxAnchDist){
+        if (j>0 && (int)left->length()-pairs.at(0)>maxAnchDist && (int)right->length()-pairs.at(1)>maxAnchDist)
+        {
             if (NOISE>0)
                 cout<<"last anchors too distant: "<<pairs.at(1)<<"; "<<pairs.at(0)<<endl;
             DISTOK=false;
@@ -183,11 +207,13 @@ IntMatrix* ChaosAnchors::getAnchors(int *na)
     if (fopen((outfile+".pwrt").c_str(),"r")>0)
         rename((outfile+".pwrt").c_str(),(outfile+".pwrt_old").c_str());
 
-    if (*na>0) {
+    if (*na>0)
+    {
         anchps = new IntMatrix(2,*na,"chaos anchorpairs");
 
         j=0;
-        FOR(i,*na){
+        FOR(i,*na)
+        {
             anchps->s( pairs.at(j), 0, i );
             j++;
             anchps->s( pairs.at(j), 1, i );
@@ -242,24 +268,33 @@ void ChaosAnchors::alignRegions(int *c1,int *c2,int beg1,int end1,int beg2,int e
 
     int t;
 
-    FOR(j,len2) {
+    FOR(j,len2)
+    {
 
-        FOR(i,len1){
+        FOR(i,len1)
+        {
 
-            if (i==0 && j==0){
-                cfX->s(0,i);cfY->s(0,i);cfM->s(0,i);
-                continue;
-            }
-
-            if (i==0){
-                cfY->s(0,i);
-                cfX->s(small,i);cfM->s(small,i);
-                continue;
-            }
-
-            if (j==0){
+            if (i==0 && j==0)
+            {
                 cfX->s(0,i);
-                cfY->s(small,i);cfM->s(small,i);
+                cfY->s(0,i);
+                cfM->s(0,i);
+                continue;
+            }
+
+            if (i==0)
+            {
+                cfY->s(0,i);
+                cfX->s(small,i);
+                cfM->s(small,i);
+                continue;
+            }
+
+            if (j==0)
+            {
+                cfX->s(0,i);
+                cfY->s(small,i);
+                cfM->s(small,i);
                 continue;
             }
 
@@ -278,21 +313,24 @@ void ChaosAnchors::alignRegions(int *c1,int *c2,int beg1,int end1,int beg2,int e
                     pM->g(i-1))+match;
             cfM->s(t,i);
 
-            if (i==len1-1){
+            if (i==len1-1)
+            {
                 t = max(pX->g(i)+gOpen,
                         pY->g(i),
                         pM->g(i)+gOpen);
                 cfY->s(t,i);
             }
 
-            if (j==len2-1){
+            if (j==len2-1)
+            {
                 t = max(cfX->g(i-1),
                         cfY->g(i-1)+gOpen,
                         cfM->g(i-1)+gOpen);
                 cfX->s(t,i);
             }
 
-            if (cfM->g(i)>maxScore){
+            if (cfM->g(i)>maxScore)
+            {
                 maxScore=cfM->g(i);
                 maxi=i;
                 maxj=j;
@@ -370,24 +408,33 @@ void ChaosAnchors::reverseAlignRegions(int *c1,int *c2,int beg1,int end1,int beg
 
     int t;
 
-    RFOR(j,len2-1) {
+    RFOR(j,len2-1)
+    {
 
-        RFOR(i,len1-1){
+        RFOR(i,len1-1)
+        {
 
-            if (i==len1-1 && j==len2-1){
-                cfX->s(0,i);cfY->s(0,i);cfM->s(0,i);
-                continue;
-            }
-
-            if (i==len1-1){
-                cfY->s(0,i);
-                cfX->s(small,i);cfM->s(small,i);
-                continue;
-            }
-
-            if (j==len2-1){
+            if (i==len1-1 && j==len2-1)
+            {
                 cfX->s(0,i);
-                cfY->s(small,i);cfM->s(small,i);
+                cfY->s(0,i);
+                cfM->s(0,i);
+                continue;
+            }
+
+            if (i==len1-1)
+            {
+                cfY->s(0,i);
+                cfX->s(small,i);
+                cfM->s(small,i);
+                continue;
+            }
+
+            if (j==len2-1)
+            {
+                cfX->s(0,i);
+                cfY->s(small,i);
+                cfM->s(small,i);
                 continue;
             }
 
@@ -406,21 +453,24 @@ void ChaosAnchors::reverseAlignRegions(int *c1,int *c2,int beg1,int end1,int beg
                     pM->g(i+1))+match;
             cfM->s(t,i);
 
-            if (i==0){
+            if (i==0)
+            {
                 t = max(pX->g(i)+gOpen,
                         pY->g(i),
                         pM->g(i)+gOpen);
                 cfY->s(t,i);
             }
 
-            if (j==0){
+            if (j==0)
+            {
                 t = max(cfX->g(i+1),
                         cfY->g(i+1)+gOpen,
                         cfM->g(i+1)+gOpen);
                 cfX->s(t,i);
             }
 
-            if (cfM->g(i)>maxScore){
+            if (cfM->g(i)>maxScore)
+            {
                 maxScore=cfM->g(i);
                 maxi=i;
                 maxj=j;
@@ -464,14 +514,16 @@ int ChaosAnchors::matchScore(int site1,int site2)
     if (site1<0 || site1 > (int)left->length())
         cout<<"ChaosAnchors: site1 "<<site1<<" ("<<left->length()<<")"<<endl;
     int i1=alpha.find(left->at(site1));
-    if (i1<0 || i1>3) {
+    if (i1<0 || i1>3)
+    {
         i1=4;
     }
 
     if (site2<0 || site2> (int)right->length())
         cout<<"ChaosAnchors: site2 "<<site2<<" ("<<right->length()<<")"<<endl;
     int i2=alpha.find(right->at(site2));
-    if (i2<0 || i2>3) {
+    if (i2<0 || i2>3)
+    {
         i2=4;
     }
 
@@ -481,16 +533,26 @@ int ChaosAnchors::matchScore(int site1,int site2)
 
 int ChaosAnchors::max(int a,int b)
 {
-    if (a<=0 && b<=0) {
+    if (a<=0 && b<=0)
+    {
         return 0;
-    } else if (a>b) {
+    }
+    else if (a>b)
+    {
         return a;
-    } else if (a<b) {
+    }
+    else if (a<b)
+    {
         return b;
-    } else {
-        if (rndBool()) {
+    }
+    else
+    {
+        if (rndBool())
+        {
             return a;
-        } else {
+        }
+        else
+        {
             return b;
         }
     }
@@ -498,41 +560,72 @@ int ChaosAnchors::max(int a,int b)
 
 int ChaosAnchors::max(int a,int b, int c)
 {
-    if (a<=0 && b<=0 && c<=0) {
+    if (a<=0 && b<=0 && c<=0)
+    {
         return 0;
-    } else if (a>b && a>c) {
+    }
+    else if (a>b && a>c)
+    {
         return a;
-    } else if (a<b && b>c) {
+    }
+    else if (a<b && b>c)
+    {
         return b;
-    } else if (a<c && b<c) {
+    }
+    else if (a<c && b<c)
+    {
         return c;
-    } else if (a>b && a==c) {
-        if (rndBool()) {
+    }
+    else if (a>b && a==c)
+    {
+        if (rndBool())
+        {
             return a;
-        } else {
+        }
+        else
+        {
             return c;
         }
-    } else if (a>c && a==b) {
-        if (rndBool()) {
+    }
+    else if (a>c && a==b)
+    {
+        if (rndBool())
+        {
             return a;
-        } else {
+        }
+        else
+        {
             return b;
         }
-    } else if (a<b && b==c) {
-        if (rndBool()) {
+    }
+    else if (a<b && b==c)
+    {
+        if (rndBool())
+        {
             return b;
-        } else {
+        }
+        else
+        {
             return c;
         }
-    } else {
+    }
+    else
+    {
         int i = rndInt(3);
-        if (i==0 || i==3){
+        if (i==0 || i==3)
+        {
             return a;
-        } else if (i==1){
+        }
+        else if (i==1)
+        {
             return b;
-        } else if (i==2){
+        }
+        else if (i==2)
+        {
             return c;
-        } else {
+        }
+        else
+        {
             cout <<"ChaosAnchors::random number error: i="<<i<<endl;
             exit(1);
         }

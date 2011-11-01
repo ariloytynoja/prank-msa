@@ -84,10 +84,10 @@ bool WRITEANCSEQ = false;
 bool PRINTNODES = false;
 
 // don't print tree
-bool PRINTTREE = true;
+bool PRINTTREE = false;
 
 // don't write xml
-bool WRITEXML = true;
+bool WRITEXML = false;
 
 // print dots for insertions
 bool DOTS = false;
@@ -137,7 +137,7 @@ bool DNA = false;
 bool PROTEIN = false;
 
 // no posterior probabiliity calculation
-bool DOPOST = true;
+bool DOPOST = false;
 
 // penalise terminal gaps
 bool NOTGAP = true;
@@ -237,7 +237,7 @@ bool SKIPINS = false;
 
 // use anchors
 bool ANCHORS = false;
-bool EXONERATE = false;
+bool EXONERATE = true;
 
 // maximum anchor distance
 int initialAnchDist = 500;
@@ -297,16 +297,20 @@ bool HARDANCHORS = false;
 //
 double sumLogs(double a, double b)
 {
-    if (a==-HUGE_VAL && b==-HUGE_VAL) {
+    if (a==-HUGE_VAL && b==-HUGE_VAL)
+    {
         return -HUGE_VAL;
     }
-    else if (a==-HUGE_VAL){
+    else if (a==-HUGE_VAL)
+    {
         return b;
     }
-    else if (b==-HUGE_VAL){
+    else if (b==-HUGE_VAL)
+    {
         return a;
     }
-    if (b>a){
+    if (b>a)
+    {
         double c = a;
         a = b;
         b = c;

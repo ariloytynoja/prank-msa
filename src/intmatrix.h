@@ -33,18 +33,19 @@
 #include <iostream>
 #include <cassert>
 
-class IntMatrix{
+class IntMatrix
+{
 private:
     int x;
     int y;
     int z;
     int w;
-	bool xar;
-	bool yar;
-	bool zar;
-	bool war;
+    bool xar;
+    bool yar;
+    bool zar;
+    bool war;
 
-	std::string name;
+    std::string name;
     int* data;
     int i,j,k,l;
 public:
@@ -58,20 +59,49 @@ public:
     void allocate();
     void initialise(int v = 0);
 
-    int g(int xa, int ya=0, int za = 0, int wa = 0) { /**/ if(!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;/**/ assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z); assert(wa>=0); assert(wa<w); return data[xa + ya*x + za*x*y + wa*x*y*z]; }
-/*    void s(int v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] = v; }*/
-	void s(int v, int xa, int ya=0, int za = 0, int wa = 0);
-	void a(int v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] += v; }
-    void printName() { std::cout<<"Name "<<name<<": x = "<<x<<", y = "<<y<<", z = "<<z<<", w = "<<w<<std::endl; }
+    int g(int xa, int ya=0, int za = 0, int wa = 0)
+    { /**/
+        if (!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;/**/
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        return data[xa + ya*x + za*x*y + wa*x*y*z];
+    }
+    /*    void s(int v, int xa, int ya=0, int za = 0, int wa = 0) { assert(xa>=0); assert(xa<x); assert(ya>=0); assert(ya<y); assert(za>=0); assert(za<z);  assert(wa>=0); assert(wa<w); data[xa + ya*x + za*x*y + wa*x*y*z] = v; }*/
+    void s(int v, int xa, int ya=0, int za = 0, int wa = 0);
+    void a(int v, int xa, int ya=0, int za = 0, int wa = 0)
+    {
+        assert(xa>=0);
+        assert(xa<x);
+        assert(ya>=0);
+        assert(ya<y);
+        assert(za>=0);
+        assert(za<z);
+        assert(wa>=0);
+        assert(wa<w);
+        data[xa + ya*x + za*x*y + wa*x*y*z] += v;
+    }
+    void printName()
+    {
+        std::cout<<"Name "<<name<<": x = "<<x<<", y = "<<y<<", z = "<<z<<", w = "<<w<<std::endl;
+    }
     void print();
-	void print(int m);
+    void print(int m);
 
-	int X() { return x; }
+    int X()
+    {
+        return x;
+    }
 
-	void resize(int i);
-	void copyData(int *tmp,int new_x,int new_y,int new_z,int new_w);
+    void resize(int i);
+    void copyData(int *tmp,int new_x,int new_y,int new_z,int new_w);
 
-	void allowResize(bool xr, bool yr=false, bool zr=false, bool wr=false);
+    void allowResize(bool xr, bool yr=false, bool zr=false, bool wr=false);
 };
 
 #endif

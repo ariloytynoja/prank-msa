@@ -27,7 +27,8 @@
  * anchoring with chaos. need more work!
  */
 
-class ChaosAnchors{
+class ChaosAnchors
+{
 
     std::string* left;
     std::string* right;

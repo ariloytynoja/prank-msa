@@ -28,7 +28,8 @@
 #include <map>
 #include "treenode.h"
 
-class ReadNewick{
+class ReadNewick
+{
     std::string s;
     std::string root;
     std::map<std::string,TreeNode*> nodes;
@@ -38,7 +39,10 @@ public:
 
     std::string readFile(const char* filename);
     void buildTree(std::string s,std::map<std::string,TreeNode*>* nodes);
-    std::string getRoot(){ return root; }
+    std::string getRoot()
+    {
+        return root;
+    }
 };
 
 #endif

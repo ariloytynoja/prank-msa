@@ -25,12 +25,15 @@
 
 class TerminalNode : public TreeNode
 {
-	TerminalSequence* seq;
+    TerminalSequence* seq;
 public:
     ~TerminalNode();
     TerminalNode(std::string s,float l);
 
-    TerminalSequence* getSequence() { return seq; }
+    TerminalSequence* getSequence()
+    {
+        return seq;
+    }
 
     int getTerminalNodeNumber();
     int getInternalNodeNumber();
@@ -53,14 +56,17 @@ public:
 
     void writeNewick(std::string* tree,int* sInd);
     void getNewick(std::string* tree);
-    void getLabelledNewickBrl(std::string* tree){ this->getNewickBrl(tree);};
+    void getLabelledNewickBrl(std::string* tree)
+    {
+        this->getNewickBrl(tree);
+    };
     void getNewickBrl(std::string* tree);
     void getNexusTree(std::string* tree, int *count);
     void writeAncCharacters(int *parSite,int iteration);
 
     void getMLAncestralSeqs(std::vector<std::string>* sqs,std::vector<std::string>* nms);
-    void setSiteLength(int ){}
-    void setSiteIndex(int ,int ){}
+    void setSiteLength(int ) {}
+    void setSiteIndex(int ,int ) {}
 
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getCharactersAt(std::vector<std::string>* col,int i);

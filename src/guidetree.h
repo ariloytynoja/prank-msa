@@ -25,14 +25,18 @@
 #include "flmatrix.h"
 #include "intmatrix.h"
 
-class GuideTree{
+class GuideTree
+{
     std::string tree;
 public:
     GuideTree(std::vector<std::string>* seqs,std::vector<std::string>* names,IntMatrix* substScores);
     GuideTree(std::vector<std::string>* seqs,std::vector<std::string>* names,bool idDna);
 
     ~GuideTree();
-    std::string getTree() {return tree;}
+    std::string getTree()
+    {
+        return tree;
+    }
 
     void makeTree(FlMatrix* distance, std::vector<std::string>* names);
     void joinNeighbors(FlMatrix* distance, std::string* names,FlMatrix* newDistance, std::string* newNames,FlMatrix* rDist,int* no);

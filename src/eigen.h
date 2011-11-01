@@ -30,7 +30,7 @@ public:
     void HouseholderRealSym(double a[], int n, double d[], double e[]);
     int EigenTridagQLImplicit(double d[], double e[], int n, double z[]);
     void EigenSort(double d[], double U[], int n);
-    
+
 };
 
 #endif

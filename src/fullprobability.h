@@ -30,43 +30,50 @@
  * Forward and backward loops to compute full probability within a band.
  */
 
-class FullProbability{
+class FullProbability
+{
 
-   Sequence* seq1;
-   Sequence* seq2;
+    Sequence* seq1;
+    Sequence* seq2;
 
-   int sAlpha;
-   int nState;
-   int width;
+    int sAlpha;
+    int nState;
+    int width;
 
-   IntMatrix* minBIndex;
-   IntMatrix* maxBIndex;
-   IntMatrix* diffIndex;
+    IntMatrix* minBIndex;
+    IntMatrix* maxBIndex;
+    IntMatrix* diffIndex;
 
-   double small;
-   PhyloMatchScore *msr;
+    double small;
+    PhyloMatchScore *msr;
 
-   double maxFwdScore;
-   double maxBwdScore;
+    double maxFwdScore;
+    double maxBwdScore;
 
-   // initialise the indeces for banding
-   void initialiseIndex(Site* sites);
+    // initialise the indeces for banding
+    void initialiseIndex(Site* sites);
 
-   int xgap;
-   int i,j,k;
+    int xgap;
+    int i,j,k;
 public:
     FullProbability();
 
     ~FullProbability();
-   FullProbability(Sequence* s1,Sequence* s2,PhyloMatchScore *msr);
+    FullProbability(Sequence* s1,Sequence* s2,PhyloMatchScore *msr);
 
-   void alignSeqs();
-   void alignBand();
+    void alignSeqs();
+    void alignBand();
 
-   double getMaxFwdScore() { return maxFwdScore; }
-   double getMaxBwdScore() { return maxBwdScore; }
+    double getMaxFwdScore()
+    {
+        return maxFwdScore;
+    }
+    double getMaxBwdScore()
+    {
+        return maxBwdScore;
+    }
 
-   void printMatrix(std::string s,int i,DbMatrix* n);
+    void printMatrix(std::string s,int i,DbMatrix* n);
 };
 
 #endif

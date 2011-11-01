@@ -31,69 +31,85 @@
 #include "dbmatrix.h"
 #include "intmatrix.h"
 
-class ReadAlignment{
-	static int count;
-	static int sAlpha;
-	static int nState;
+class ReadAlignment
+{
+    static int count;
+    static int sAlpha;
+    static int nState;
 
-	Sequence* seq1;
-	Sequence* seq2;
-	PhyloMatchScore* msr;
-	TreeNode *tnode;
+    Sequence* seq1;
+    Sequence* seq2;
+    PhyloMatchScore* msr;
+    TreeNode *tnode;
 
-	int sl1;
-	int sl2;
-	int maxIndex;
+    int sl1;
+    int sl2;
+    int maxIndex;
 
-	static int matrixSize;
+    static int matrixSize;
 
-	static FlMatrix* vX; static FlMatrix* vY; static FlMatrix* vM;
-	static FlMatrix* xX; static FlMatrix* xM;
-	static FlMatrix* wX; static FlMatrix* wM;
-	static FlMatrix* yY; static FlMatrix* yM;
-	static FlMatrix* zY; static FlMatrix* zM;
+    static FlMatrix* vX;
+    static FlMatrix* vY;
+    static FlMatrix* vM;
+    static FlMatrix* xX;
+    static FlMatrix* xM;
+    static FlMatrix* wX;
+    static FlMatrix* wM;
+    static FlMatrix* yY;
+    static FlMatrix* yM;
+    static FlMatrix* zY;
+    static FlMatrix* zM;
 
 
     // matrices for pointers; just forward
-	static IntMatrix* ptVM; static IntMatrix* ptVX; static IntMatrix* ptVY;
-	static IntMatrix* ptXM; static IntMatrix* ptXX;
-	static IntMatrix* ptWM; static IntMatrix* ptWX;
-	static IntMatrix* ptYM; static IntMatrix* ptYY;
-	static IntMatrix* ptZM; static IntMatrix* ptZY;
+    static IntMatrix* ptVM;
+    static IntMatrix* ptVX;
+    static IntMatrix* ptVY;
+    static IntMatrix* ptXM;
+    static IntMatrix* ptXX;
+    static IntMatrix* ptWM;
+    static IntMatrix* ptWX;
+    static IntMatrix* ptYM;
+    static IntMatrix* ptYY;
+    static IntMatrix* ptZM;
+    static IntMatrix* ptZY;
 
     // Temp variables
-	int sX,sY,sM,sxX,sxM,swX,swM,syY,syM,szY,szM;    // state
-	double mX,mY,mM,mxX,mxM,mwX,mwM,myY,myM,mzY,mzM; // max
-	double cX,cY,cM,cxX,cxM,cwX,cwM,cyY,cyM,czY,czM; // current
+    int sX,sY,sM,sxX,sxM,swX,swM,syY,syM,szY,szM;    // state
+    double mX,mY,mM,mxX,mxM,mwX,mwM,myY,myM,mzY,mzM; // max
+    double cX,cY,cM,cxX,cxM,cwX,cwM,cyY,cyM,czY,czM; // current
 
-	Site *beg;
-	Site *end;
-	Site* newsite;
+    Site *beg;
+    Site *end;
+    Site* newsite;
 
-	//
-	double maxFullScore;
+    //
+    double maxFullScore;
 
-	int totalSites;
-	int countSites;
-	int i,j,k;
-	double small;
+    int totalSites;
+    int countSites;
+    int i,j,k;
+    double small;
 public:
     ReadAlignment();
     ~ReadAlignment();
 
-	void readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore* pms,TreeNode* tnode,std::vector<int>* path);
+    void readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore* pms,TreeNode* tnode,std::vector<int>* path);
 
-	void defineBegin();
-	void defineEnd();
+    void defineBegin();
+    void defineEnd();
 
-	void initialiseMatrices(int size);
-	void cleanUp();
-	double getMaxScore() { return maxFullScore; }
+    void initialiseMatrices(int size);
+    void cleanUp();
+    double getMaxScore()
+    {
+        return maxFullScore;
+    }
 
-	bool rndBool();
-	int rndInt(int i);
-	double max(double a,double b);
-	double max(double a,double b,double c);
+    bool rndBool();
+    int rndInt(int i);
+    double max(double a,double b);
+    double max(double a,double b,double c);
 };
 
 #endif

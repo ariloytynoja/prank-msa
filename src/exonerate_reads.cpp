@@ -8,10 +8,11 @@
 #include <vector>
 #include <algorithm>
 #include <boost/regex.hpp>
+#include "config.h"
+#include "translatesequences.h"
 
 using namespace std;
 
-extern bool NOISE;
 
 Exonerate_reads::Exonerate_reads()
 {
@@ -31,7 +32,7 @@ bool Exonerate_reads::split_sugar_string(const string& row,hit *h)
     boost::match_results<string::const_iterator> result;
     bool valid = boost::regex_match(row, result, pattern);
 
-    if(valid)
+    if (valid)
     {
         h->query    = result[1];
         h->q_start  = atoi( string(result[2]).c_str() );
@@ -56,7 +57,7 @@ bool Exonerate_reads::split_vulgar_string(const string& row,hit *h)
     boost::match_results<string::const_iterator> result;
     bool valid = boost::regex_match(row, result, pattern);
 
-    if(valid)
+    if (valid)
     {
         h->query    = result[1];
         h->q_start  = atoi( string(result[2]).c_str() );
@@ -83,14 +84,43 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
     int r = rand();
 
+    char ic = 'X';
+    if(DNA)
+        ic = 'N';
+
     string left;
-    for(int i=0;i<ls->length();i++)
-        if(ls->at(i)!='-')
+    for (int i=0; i<ls->length(); i++)
+        if (ls->at(i)!='-')
             left+=(ls->at(i));
+        else
+            left+= ic;
     string right;
-    for(int i=0;i<rs->length();i++)
-        if(rs->at(i)!='-')
+    for (int i=0; i<rs->length(); i++)
+        if (rs->at(i)!='-')
             right+=(rs->at(i));
+        else
+            right+= ic;
+
+    if(CODON)
+    {
+//        cout<<"l "<<left<<endl<<"r "<<right<<endl;
+
+        TranslateSequences ts;
+        vector<string> names;
+        names.push_back("left");
+        names.push_back("right");
+        vector<string> sequences;
+        sequences.push_back(left);
+        sequences.push_back(right);
+
+        ts.translateProtein(&names,&sequences);
+
+        left = sequences.at(0);
+        right = sequences.at(1);
+
+//        cout<<"l "<<left<<endl<<"r "<<right<<endl;
+
+    }
 
     stringstream q_name;
     q_name <<"q"<<r<<".fas";
@@ -110,7 +140,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
     // exonerate command for local alignment
 
     stringstream command;
-    if(is_local)
+    if (is_local)
         command << "exonerate -q q"<<r<<".fas -t t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
     else
         command << "exonerate -q q"<<r<<".fas -t t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no -m affine:local -E 2>&1";
@@ -131,7 +161,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
         hit h;
         bool valid = split_sugar_string(string(line),&h);
 
-        if(valid)
+        if (valid)
         {
             hits->push_back(h);
         }
@@ -142,20 +172,24 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
     vector<hit>::iterator iter1 = hits->begin();
     vector<hit>::iterator iter2 = hits->begin();
-    if( iter2 != hits->end() )
+    if ( iter2 != hits->end() )
         iter2++;
 
-    while( iter2 != hits->end() )
+    while ( iter2 != hits->end() )
     {
-        if(iter1->t_start > iter2->t_start)
+        if (iter1->t_start > iter2->t_start)
         {
-            if(iter1->score > iter2->score)
+//            cout<<"t_start1 comes before t_start2 "<<iter1->t_start<<" "<<iter2->t_start<<endl;
+
+            if (iter1->score > iter2->score)
             {
                 hits->erase(iter2);
                 iter2 = iter1;
                 iter2++;
-            } else {
-                if(iter1 == hits->begin())
+            }
+            else
+            {
+                if (iter1 == hits->begin())
                 {
                     hits->erase(iter1);
                     iter1 = iter2;
@@ -178,33 +212,62 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
     iter1 = hits->begin();
     iter2 = hits->begin();
-    if( iter2 != hits->end() )
+    if ( iter2 != hits->end() )
         iter2++;
 
-    while( iter2 != hits->end() )
+    while ( iter2 != hits->end() )
     {
-        if(iter1->t_end > iter2->t_start)
+
+
+        if (iter1->t_end > iter2->t_start)
         {
+//            cout<<"t_end1 overlaps with t_start2: "<<iter1->t_end<<" "<<iter1->q_end<<", "<<iter2->t_start<<" "<<iter2->q_start<<endl;
+
             int overlap = iter1->t_end - iter2->t_start;
-            iter1->t_end-=overlap;
-            iter1->q_end-=overlap;
-            iter2->t_start+=overlap;
-            iter2->q_start+=overlap;
+
+            if(float(iter1->score/(iter1->t_end - iter1->t_start)) <
+                    float(iter2->score/(iter2->t_end - iter2->t_start)))
+            {
+                iter1->t_end-=overlap;
+                iter1->q_end-=overlap;
+            }
+            else
+            {
+                iter2->t_start+=overlap;
+                iter2->q_start+=overlap;
+            }
+
+//            cout<<"fixed: "<<iter1->t_end<<" "<<iter1->q_end<<", "<<iter2->t_start<<" "<<iter2->q_start<<endl;
+
         }
-        if(iter1->q_end > iter2->q_start)
+        if (iter1->q_end > iter2->q_start)
         {
+//            cout<<"q_end1 overlaps with q_start2: "<<iter1->t_end<<" "<<iter1->q_end<<", "<<iter2->t_start<<" "<<iter2->q_start<<endl;
+
             int overlap = iter1->q_end - iter2->q_start;
-            iter1->t_end-=overlap;
-            iter1->q_end-=overlap;
-            iter2->t_start+=overlap;
-            iter2->q_start+=overlap;
+            if(float(iter1->score/(iter1->q_end - iter1->q_start)) <
+                    float(iter2->score/(iter2->q_end - iter2->q_start)))
+            {
+                iter1->t_end-=overlap;
+                iter1->q_end-=overlap;
+            }
+            else
+            {
+                iter2->t_start+=overlap;
+                iter2->q_start+=overlap;
+            }
+
+//            cout<<"fixed: "<<iter1->t_end<<" "<<iter1->q_end<<", "<<iter2->t_start<<" "<<iter2->q_start<<endl;
         }
+
 
         iter1++;
         iter2++;
     }
 
-    if(NOISE==0)
+//    cout<<"Exonerate id "<<r<<".\n";
+
+//    if(NOISE==0)
         this->delete_files(r);
 }
 
@@ -216,8 +279,8 @@ void Exonerate_reads::delete_files(int r)
     stringstream t_name;
     t_name <<"t"<<r<<".fas";
 
-    if( remove( q_name.str().c_str() ) != 0 )
-       perror( "Error deleting file" );
-    if( remove( t_name.str().c_str() ) != 0 )
-       perror( "Error deleting file" );
+    if ( remove( q_name.str().c_str() ) != 0 )
+        perror( "Error deleting file" );
+    if ( remove( t_name.str().c_str() ) != 0 )
+        perror( "Error deleting file" );
 }

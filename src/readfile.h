@@ -26,14 +26,15 @@
 
 using namespace std;
 
-class ReadFile{
+class ReadFile
+{
     vector<string> names;
     vector<string> seqs;
-    
+
 public:
     ReadFile();
     ~ReadFile();
- 
+
     int readFile(const char* filename);
     void readFasta(istream & input);
     void readNexus(istream & input);
@@ -46,8 +47,14 @@ public:
     string remove_whitespaces(const string & s);
     bool is_whitespace_character(char c);
 
-    vector<string> getNames(){ return names; }
-    vector<string> getSeqs(){ return seqs; }
+    vector<string> getNames()
+    {
+        return names;
+    }
+    vector<string> getSeqs()
+    {
+        return seqs;
+    }
 
     bool dnaSeqs();
     void countDnaFreqs(float* freqs);

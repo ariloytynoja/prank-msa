@@ -34,76 +34,107 @@
 
 extern bool PRIORS;
 
-class Sequence {
+class Sequence
+{
 
 protected:
-	std::string charseq;
+    std::string charseq;
     std::string gappedseq;
 
-	int seqLength;    // length of sequence
-	int realLength;   // length when insertion-sites are skipped
-	bool terminal;    // is/not terminal
-	int sAlpha;
+    int seqLength;    // length of sequence
+    int realLength;   // length when insertion-sites are skipped
+    bool terminal;    // is/not terminal
+    int sAlpha;
 
-	bool hasPrior;
-	int i,j,k;
+    bool hasPrior;
+    int i,j,k;
 public:
-	~Sequence();
-	Sequence();
+    ~Sequence();
+    Sequence();
 
-	bool isTerminal() { return terminal; }
-	int length() { return seqLength; }
-	int lengthF() { return realLength; }
-    int gappedLength() { return gappedseq.length(); }
+    bool isTerminal()
+    {
+        return terminal;
+    }
+    int length()
+    {
+        return seqLength;
+    }
+    int lengthF()
+    {
+        return realLength;
+    }
+    int gappedLength()
+    {
+        return gappedseq.length();
+    }
 
-    bool prealignedGapAt(int i){ return gappedseq.at(i)=='-'; }
+    bool prealignedGapAt(int i)
+    {
+        return gappedseq.at(i)=='-';
+    }
 
-    int charAt(int ){ return -1; }
+    int charAt(int )
+    {
+        return -1;
+    }
 
-	double mlCharProbAt(int j,int i,int k);
-	double mlCharProbAtF(int j,int i,int k);
+    double mlCharProbAt(int j,int i,int k);
+    double mlCharProbAtF(int j,int i,int k);
 
-	int getLIndex(int i) { return i; }
-	int getRIndex(int i) { return i; }
+    int getLIndex(int i)
+    {
+        return i;
+    }
+    int getRIndex(int i)
+    {
+        return i;
+    }
 
-	std::string* getMLsequence(){ return &charseq; }
-    std::string* getGappedSeq(){ return &gappedseq; }
+    std::string* getMLsequence()
+    {
+        return &charseq;
+    }
+    std::string* getGappedSeq()
+    {
+        return &gappedseq;
+    }
 
-	virtual bool isGap(int i) = 0;
-	virtual bool isXGap(int i) = 0;
-	virtual bool isYGap(int i) = 0;
-	virtual bool isChildGap(int i) = 0;
-	virtual bool hasNeighborGaps(int i) = 0;
-	virtual bool isInsertion(int i) = 0;
+    virtual bool isGap(int i) = 0;
+    virtual bool isXGap(int i) = 0;
+    virtual bool isYGap(int i) = 0;
+    virtual bool isChildGap(int i) = 0;
+    virtual bool hasNeighborGaps(int i) = 0;
+    virtual bool isInsertion(int i) = 0;
     virtual bool isPermInsertion(int i) = 0;
     virtual void setPermInsertion(int i) = 0;
 
-	virtual bool fwdGapStarts(int i) = 0;
-	virtual bool fwdGapContinues(int i) = 0;
-	virtual bool fwdGapEnds(int i) = 0;
+    virtual bool fwdGapStarts(int i) = 0;
+    virtual bool fwdGapContinues(int i) = 0;
+    virtual bool fwdGapEnds(int i) = 0;
 
-	virtual bool fwdGapStartsNext(int i) = 0;
-	virtual bool fwdGapContinuesNext(int i) = 0;
-	virtual bool fwdGapEndsNext(int i) = 0;
+    virtual bool fwdGapStartsNext(int i) = 0;
+    virtual bool fwdGapContinuesNext(int i) = 0;
+    virtual bool fwdGapEndsNext(int i) = 0;
 
-	virtual bool bwdGapStarts(int i) = 0;
-	virtual bool bwdGapContinues(int i) = 0;
-	virtual bool bwdGapEnds(int i) = 0;
+    virtual bool bwdGapStarts(int i) = 0;
+    virtual bool bwdGapContinues(int i) = 0;
+    virtual bool bwdGapEnds(int i) = 0;
 //
-	virtual bool fwdChildGapStarts(int i) = 0;
-	virtual bool fwdChildGapContinues(int i) = 0;
-	virtual bool fwdChildGapEnds(int i) = 0;
+    virtual bool fwdChildGapStarts(int i) = 0;
+    virtual bool fwdChildGapContinues(int i) = 0;
+    virtual bool fwdChildGapEnds(int i) = 0;
 
-	virtual bool fwdChildGapStartsNext(int i) = 0;
-	virtual bool fwdChildGapContinuesNext(int i) = 0;
-	virtual bool fwdChildGapEndsNext(int i) = 0;
+    virtual bool fwdChildGapStartsNext(int i) = 0;
+    virtual bool fwdChildGapContinuesNext(int i) = 0;
+    virtual bool fwdChildGapEndsNext(int i) = 0;
 
-	virtual bool bwdChildGapStarts(int i) = 0;
-	virtual bool bwdChildGapContinues(int i) = 0;
-	virtual bool bwdChildGapEnds(int i) = 0;
+    virtual bool bwdChildGapStarts(int i) = 0;
+    virtual bool bwdChildGapContinues(int i) = 0;
+    virtual bool bwdChildGapEnds(int i) = 0;
 
-	void cleanSpace(){};
-    void writeSequence(std::string ){}
+    void cleanSpace() {};
+    void writeSequence(std::string ) {}
 
 };
 

@@ -28,7 +28,8 @@
 #include "flmatrix.h"
 #include "intmatrix.h"
 
-class PwHirschberg{
+class PwHirschberg
+{
 protected:
     static int count;
     int sAlpha;
@@ -45,20 +46,34 @@ protected:
     int mLen;
     int mSize;
     int maxIndex;
-	int small;
+    int small;
 
-    int fwdvX; int fwdvY; int fwdvM; // starting/ending values for Viterbi
-    int bwdvX; int bwdvY; int bwdvM;
+    int fwdvX;
+    int fwdvY;
+    int fwdvM; // starting/ending values for Viterbi
+    int bwdvX;
+    int bwdvY;
+    int bwdvM;
 
     // matrices for the two rows kept in memory
-    IntMatrix* fVM1; IntMatrix* fVX1; IntMatrix* fVY1;
-    IntMatrix* fVM2; IntMatrix* fVX2; IntMatrix* fVY2;
+    IntMatrix* fVM1;
+    IntMatrix* fVX1;
+    IntMatrix* fVY1;
+    IntMatrix* fVM2;
+    IntMatrix* fVX2;
+    IntMatrix* fVY2;
 
-    IntMatrix* bVM1; IntMatrix* bVX1; IntMatrix* bVY1;
-    IntMatrix* bVM2; IntMatrix* bVX2; IntMatrix* bVY2;
+    IntMatrix* bVM1;
+    IntMatrix* bVX1;
+    IntMatrix* bVY1;
+    IntMatrix* bVM2;
+    IntMatrix* bVX2;
+    IntMatrix* bVY2;
 
     // matrices for pointers; just forward
-    IntMatrix* ptVM; IntMatrix* ptVX; IntMatrix* ptVY;
+    IntMatrix* ptVM;
+    IntMatrix* ptVX;
+    IntMatrix* ptVY;
 
     // Temp variables
     int sX,sY,sM;    // state
@@ -66,39 +81,50 @@ protected:
     int cX,cY,cM; // current
 
     // pointers to the two rows
-    IntMatrix* cfVX; IntMatrix* cfVY; IntMatrix* cfVM;
-    IntMatrix* cbVX; IntMatrix* cbVY; IntMatrix* cbVM;
-    IntMatrix* pVX; IntMatrix* pVY; IntMatrix* pVM;
+    IntMatrix* cfVX;
+    IntMatrix* cfVY;
+    IntMatrix* cfVM;
+    IntMatrix* cbVX;
+    IntMatrix* cbVY;
+    IntMatrix* cbVM;
+    IntMatrix* pVX;
+    IntMatrix* pVY;
+    IntMatrix* pVM;
 
     // tmp pointers needed during the re-pointing
-    IntMatrix* tmpVX; IntMatrix* tmpVY; IntMatrix* tmpVM;
+    IntMatrix* tmpVX;
+    IntMatrix* tmpVY;
+    IntMatrix* tmpVM;
 
     int maxFullScore;
     int matchScore;
 
-	PwSite *beg;
-	PwSite *end;
-	PwSite* pwsite;
+    PwSite *beg;
+    PwSite *end;
+    PwSite* pwsite;
 
     int totalSites;
     int countSites;
     int i,j,k;
-	static int depth;
+    static int depth;
 public:
 
     PwHirschberg(int length);
     ~PwHirschberg();
-	void setSequences(std::string* s1,std::string* s2);
-	void setModel(IntMatrix* scores,int delta, int epsilon);
+    void setSequences(std::string* s1,std::string* s2);
+    void setModel(IntMatrix* scores,int delta, int epsilon);
 
     void defineBegin();
     void defineEnd();
 
     void getMidSite(int s1,int e1,int s2,int e2);
-	void alignSeqs();
-	void divideSeq();
+    void alignSeqs();
+    void divideSeq();
 
-    double getMaxScore() { return maxFullScore; }
+    double getMaxScore()
+    {
+        return maxFullScore;
+    }
 
     bool rndBool();
     int rndInt(int i);
@@ -119,7 +145,8 @@ public:
 #ifndef STRUCTCELL_H
 #define STRUCTCELL_H
 
-struct Cell {
+struct Cell
+{
     int prev;
     int curr;
     int k;

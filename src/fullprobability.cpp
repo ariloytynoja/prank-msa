@@ -29,7 +29,8 @@ using namespace std;
 
 FullProbability::~FullProbability()
 {
-    if (!FULLFULL) {
+    if (!FULLFULL)
+    {
         delete minBIndex;
         delete maxBIndex;
         delete diffIndex;
@@ -41,7 +42,7 @@ FullProbability::FullProbability(Sequence* s1,Sequence* s2,PhyloMatchScore* pms)
     seq2 = s2;
     msr = pms;
 
-	sAlpha = hmm->getASize();
+    sAlpha = hmm->getASize();
     nState = hmm->getNStates();
 
     small = -HUGE_VAL;
@@ -63,47 +64,60 @@ void FullProbability::initialiseIndex(Site *sites)
     int maxi = 0;
     int maxj = 0;
 
-	sites->index(0);
-	sites->next();
+    sites->index(0);
+    sites->next();
 
-	while (sites->nullSite()){
+    while (sites->nullSite())
+    {
         sites->next();
     }
-	while(sites->index()!=1 && !sites->nullSite()) {
+    while (sites->index()!=1 && !sites->nullSite())
+    {
 
-        if (sites->currMatchState()!=1) {
+        if (sites->currMatchState()!=1)
+        {
             diffIndex->a( 1, mini );
         }
 
 
-        if (sites->currMatchState()!=0) {
+        if (sites->currMatchState()!=0)
+        {
             mini++;
         }
-        if (sites->currMatchState()!=1) {
+        if (sites->currMatchState()!=1)
+        {
             minj++;
         }
 
         maxBIndex->s( maxj, maxi );
 
-        if (sites->currMatchState()!=0) {
+        if (sites->currMatchState()!=0)
+        {
             minBIndex->s( minj, mini );
-        } else if (sites->currMatchState()==0 && mini>0) {
+        }
+        else if (sites->currMatchState()==0 && mini>0)
+        {
             minBIndex->s( minBIndex->g(mini-1), mini );
-        } else if (sites->currMatchState()==0){
+        }
+        else if (sites->currMatchState()==0)
+        {
             minBIndex->s( -1, mini );
         }
 
-        if (sites->currMatchState()!=0) {
+        if (sites->currMatchState()!=0)
+        {
             maxi++;
         }
-        if (sites->currMatchState()!=1) {
+        if (sites->currMatchState()!=1)
+        {
             maxj++;
         }
 
         sites->next();
 
-		while(sites->index()!=1 && sites->nullSite()) {
-			sites->next();
+        while (sites->index()!=1 && sites->nullSite())
+        {
+            sites->next();
         }
     }
 
@@ -116,17 +130,20 @@ void FullProbability::initialiseIndex(Site *sites)
     diffIndex->s( sl1-minBIndex->g(sl2), sl2 );
 
 
-    if (FULLBAND) {
+    if (FULLBAND)
+    {
         int sum = 0;
         int msum = 0;
         int sLen2 = seq2->lengthF();
 
-        for (int i=0;i<FBW+5 && i<sLen2;i++){
+        for (int i=0; i<FBW+5 && i<sLen2; i++)
+        {
             sum += diffIndex->g(i);
         }
 
         msum = sum;
-        for (int i=FBW+5;i<sLen2;i++){
+        for (int i=FBW+5; i<sLen2; i++)
+        {
             sum += diffIndex->g(i);
             sum -= diffIndex->g(i-FBW-5);
             if (sum>msum)
@@ -140,19 +157,20 @@ void FullProbability::initialiseIndex(Site *sites)
 
 void FullProbability::alignSeqs()
 {
-	Site *sites = new Site();
-	sites->index(0);
-	sites->next();
+    Site *sites = new Site();
+    sites->index(0);
+    sites->next();
 
     if (!FULLFULL)
         initialiseIndex(sites);
 
 
-	sites->index(0);
+    sites->index(0);
 
-	while (sites->nullSite()){
-		sites->next();
-	}
+    while (sites->nullSite())
+    {
+        sites->next();
+    }
 
 
 
@@ -182,15 +200,28 @@ void FullProbability::alignSeqs()
     DbMatrix* tmpX;
     DbMatrix* tmpY;
 
-    if (FULLFULL) {
-        curX->initialise(small); curY->initialise(small); curM->initialise(small);
-        prevX->initialise(small); prevY->initialise(small); prevM->initialise(small);
-    } else {
+    if (FULLFULL)
+    {
+        curX->initialise(small);
+        curY->initialise(small);
+        curM->initialise(small);
+        prevX->initialise(small);
+        prevY->initialise(small);
+        prevM->initialise(small);
+    }
+    else
+    {
         int si = min(mLen2-1,FBW);
-        for (int j=0;j<maxBIndex->g(si)+10 && j<mLen1;j++) {
-            FOR(k,nState) {
-                curX->s(small,k,j); curY->s(small,k,j); curM->s(small,k,j);
-                prevM->s(small,k,j); prevX->s(small,k,j); prevY->s(small,k,j);
+        for (int j=0; j<maxBIndex->g(si)+10 && j<mLen1; j++)
+        {
+            FOR(k,nState)
+            {
+                curX->s(small,k,j);
+                curY->s(small,k,j);
+                curM->s(small,k,j);
+                prevM->s(small,k,j);
+                prevX->s(small,k,j);
+                prevY->s(small,k,j);
             }
         }
     }
@@ -201,12 +232,16 @@ void FullProbability::alignSeqs()
 
     // Iterate through the matrix
     //
-    FOR(i,mLen2) {
-        FOR(j,mLen1) {
+    FOR(i,mLen2)
+    {
+        FOR(j,mLen1)
+        {
 
-            if (i==0 && j==0) { // Corner: starting values
+            if (i==0 && j==0)   // Corner: starting values
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
                     curX->s( hmm->structBgFreq(k)+ hmm->probWX(k), k, 0 );
                     curY->s( hmm->structBgFreq(k)+ hmm->probWY(k), k, 0 );
                     curM->s( hmm->structBgFreq(k)+ hmm->probWM(k), k, 0 );
@@ -220,20 +255,24 @@ void FullProbability::alignSeqs()
                     ( j>minBIndex->g(i)-FBW-1 && j<maxBIndex->g(i)+FBW+1 ) ||
                     ( i-FBW>=0 && i+FBW>=mLen2 && j>minBIndex->g(i-FBW) ) ||
                     ( i-FBW<0 && i+FBW<mLen2 && j<maxBIndex->g(i+FBW) ) ||
-                    ( i-FBW>=0 && i+FBW<mLen2 && j>minBIndex->g(i-FBW) && j<maxBIndex->g(i+FBW) ) ){ /*e090626*/
+                    ( i-FBW>=0 && i+FBW<mLen2 && j>minBIndex->g(i-FBW) && j<maxBIndex->g(i+FBW) ) )  /*e090626*/
+            {
 
                 msr->computeFullFwd(j,i);
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
 
-                    if (i==0 && j>0) { // only X-gaps are possible
+                    if (i==0 && j>0)   // only X-gaps are possible
+                    {
 
                         // move into X-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndY(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX,curX->g(l,j-1) + hmm->probXX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX,curY->g(l,j-1) + hmm->probYX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX,curM->g(l,j-1) + hmm->probMX(l,k) + msr->indelX(k));
@@ -246,14 +285,17 @@ void FullProbability::alignSeqs()
                         curM->s( cM, k, j );
                         continue;
 
-                    } else if (i>0 && j==0) { // only Y-gaps are possible
+                    }
+                    else if (i>0 && j==0)   // only Y-gaps are possible
+                    {
 
                         // move into Y-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndY(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cY = sumLogs(cY,prevX->g(l,j) + hmm->probXY(l,k) + msr->indelY(k));
                             cY = sumLogs(cY,prevY->g(l,j) + hmm->probYY(l,k) + msr->indelY(k));
                             cY = sumLogs(cY,prevM->g(l,j) + hmm->probMY(l,k) + msr->indelY(k));
@@ -266,14 +308,17 @@ void FullProbability::alignSeqs()
                         curM->s( cM, k, j );
                         continue;
 
-                    } else {  // so far, the moves have been exceptional; from now on they are "normal"
+                    }
+                    else    // so far, the moves have been exceptional; from now on they are "normal"
+                    {
 
                         // all moves
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndY(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, curX->g(l,j-1) + hmm->probXX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX, curY->g(l,j-1) + hmm->probYX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX, curM->g(l,j-1) + hmm->probMX(l,k) + msr->indelX(k));
@@ -296,14 +341,17 @@ void FullProbability::alignSeqs()
                 }
 
                 // wipe out the old values and surround the band area with -inf's
-            } else if (
+            }
+            else if (
                 ( j>minBIndex->g(i)-FBW-2 && j<maxBIndex->g(i)+FBW+2 ) ||
                 ( i-1>=0 && i+1<mLen2 && j>minBIndex->g(i-1)-FBW-2 && j<maxBIndex->g(i+1)+FBW+2 ) ||
                 ( i-FBW-1>=0 && i+FBW+1>=mLen2 && j>minBIndex->g(i-FBW-1)-1 ) ||
                 ( i-FBW-1<0 && i+FBW+1<mLen2 && j<maxBIndex->g(i+FBW+1)+1 ) ||
-                ( i-FBW-1>=0 && i+FBW+1<mLen2 && j>minBIndex->g(i-FBW-1)-1 && j<maxBIndex->g(i+FBW+1)+1 ) ) { /*e090626*/
+                ( i-FBW-1>=0 && i+FBW+1<mLen2 && j>minBIndex->g(i-FBW-1)-1 && j<maxBIndex->g(i+FBW+1)+1 ) )   /*e090626*/
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
                     curX->s( small, k, j );
                     curY->s( small, k, j );
                     curM->s( small, k, j );
@@ -311,23 +359,27 @@ void FullProbability::alignSeqs()
             }
         }
 
-		while(sites->index()!=1 && sites->nInd2()==i) {
+        while (sites->index()!=1 && sites->nInd2()==i)
+        {
 
-            FOR(k,nState) {
+            FOR(k,nState)
+            {
                 sites->fullFwdX( curX->g(k,sites->nInd1()), k );
-				sites->fullFwdY( curY->g(k,sites->nInd1()), k );
+                sites->fullFwdY( curY->g(k,sites->nInd1()), k );
                 sites->fullFwdM( curM->g(k,sites->nInd1()), k );
             }
 
             sites->next();
 
-			while (sites->index()!=1 && sites->nullSite()){
+            while (sites->index()!=1 && sites->nullSite())
+            {
                 sites->next();
             }
         }
 
 
-        if (NOISE>2) {
+        if (NOISE>2)
+        {
             printMatrix("fx",i,curX);
             printMatrix("fy",i,curY);
             printMatrix("fm",i,curM);
@@ -348,17 +400,19 @@ void FullProbability::alignSeqs()
     }
 
     maxFwdScore = small;
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
         maxFwdScore = sumLogs(maxFwdScore,
                               sumLogs(prevX->g(k,mLen1-1)+hmm->probXW(k),
                                       sumLogs(prevY->g(k,mLen1-1)+hmm->probYW(k),
                                               prevM->g(k,mLen1-1)+hmm->probMW(k))));
     }
 
-	sites->index(1);
-	sites->prev();
+    sites->index(1);
+    sites->prev();
 
-    while (sites->nullSite()){
+    while (sites->nullSite())
+    {
         sites->prev();
     }
 
@@ -370,33 +424,52 @@ void FullProbability::alignSeqs()
     prevX = matX2;
     prevY = matY2;
 
-    if (FULLFULL) {
+    if (FULLFULL)
+    {
 
-        RFOR(j,mLen1-1) {
-            FOR(k,nState) {
-                curX->s( small, k, j); curY->s( small, k, j); curM->s( small, k, j);
-                prevM->s( small, k, j); prevX->s( small, k, j); prevY->s( small, k, j);
+        RFOR(j,mLen1-1)
+        {
+            FOR(k,nState)
+            {
+                curX->s( small, k, j);
+                curY->s( small, k, j);
+                curM->s( small, k, j);
+                prevM->s( small, k, j);
+                prevX->s( small, k, j);
+                prevY->s( small, k, j);
             }
         }
 
-    } else {
+    }
+    else
+    {
         int si = min(mLen2-1,FBW);
 
-        for (int j=mLen1-1;j>minBIndex->g(mLen2-si-1)-10 && j>=0;j--) {
-            FOR(k,nState) {
-                curX->s( small, k, j); curY->s( small, k, j); curM->s( small, k, j);
-                prevM->s( small, k, j); prevX->s( small, k, j); prevY->s( small, k, j);
+        for (int j=mLen1-1; j>minBIndex->g(mLen2-si-1)-10 && j>=0; j--)
+        {
+            FOR(k,nState)
+            {
+                curX->s( small, k, j);
+                curY->s( small, k, j);
+                curM->s( small, k, j);
+                prevM->s( small, k, j);
+                prevX->s( small, k, j);
+                prevY->s( small, k, j);
             }
         }
 
     }
 
-    RFOR(i,mLen2-1) {
-        RFOR(j,mLen1-1) {
+    RFOR(i,mLen2-1)
+    {
+        RFOR(j,mLen1-1)
+        {
 
-            if (i==mLen2-1 && j==mLen1-1) { // Corner: starting values
+            if (i==mLen2-1 && j==mLen1-1)   // Corner: starting values
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
 
                     curX->s( hmm->probXW(k), k, j );
                     curY->s( hmm->probYW(k), k, j );
@@ -411,22 +484,26 @@ void FullProbability::alignSeqs()
                     ( j>minBIndex->g(i)-FBW-1 && j<maxBIndex->g(i)+FBW+1 ) ||
                     ( i-FBW>=0 && i+FBW>=mLen2 && j>minBIndex->g(i-FBW) ) ||
                     ( i-FBW<0 && i+FBW<mLen2 && j<maxBIndex->g(i+FBW) ) ||
-                    ( i-FBW>=0 && i+FBW<mLen2 && j>minBIndex->g(i-FBW) && j<maxBIndex->g(i+FBW) ) ) { /*e090626*/
+                    ( i-FBW>=0 && i+FBW<mLen2 && j>minBIndex->g(i-FBW) && j<maxBIndex->g(i+FBW) ) )   /*e090626*/
+            {
 
 
                 // Compute the substitution prices
                 //
                 msr->computeFullBwd(j,i);
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
 
-                    if (i==mLen2-1 && j<mLen1-1) { // only x-gaps possible
+                    if (i==mLen2-1 && j<mLen1-1)   // only x-gaps possible
+                    {
 
                         // move into X-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndX(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, hmm->probXX(k,l) + msr->indelX(l) + curX->g(l,j+1) );
                             cY = sumLogs(cY, hmm->probYX(k,l) + msr->indelX(l) + curX->g(l,j+1) );
                             cM = sumLogs(cM, hmm->probMX(k,l) + msr->indelX(l) + curX->g(l,j+1) );
@@ -438,14 +515,17 @@ void FullProbability::alignSeqs()
                         curY->s( cY, k, j );
                         curM->s( cM, k, j );
 
-                    } else if (i<mLen2-1 && j==mLen1-1) { // only y-gaps possible
+                    }
+                    else if (i<mLen2-1 && j==mLen1-1)   // only y-gaps possible
+                    {
 
                         // move into Y-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndX(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, hmm->probXY(k,l) + msr->indelY(l) + prevY->g(l,j));
                             cY = sumLogs(cY, hmm->probYY(k,l) + msr->indelY(l) + prevY->g(l,j));
                             cM = sumLogs(cM, hmm->probMY(k,l) + msr->indelY(l) + prevY->g(l,j));
@@ -457,14 +537,17 @@ void FullProbability::alignSeqs()
                         curY->s( cY, k, j );
                         curM->s( cM, k, j );
 
-                    } else if (i<mLen2-1 && j<mLen1-1) { // everything possible
+                    }
+                    else if (i<mLen2-1 && j<mLen1-1)   // everything possible
+                    {
 
                         // all moves
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndX(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, hmm->probXX(k,l) + msr->indelX(l) + curX->g(l,j+1));
                             cX = sumLogs(cX, hmm->probXY(k,l) + msr->indelY(l) + prevY->g(l,j));
                             cX = sumLogs(cX, hmm->probXM(k,l) + msr->fullM(l) + prevM->g(l,j+1));
@@ -484,21 +567,26 @@ void FullProbability::alignSeqs()
                         curY->s( cY, k, j );
                         curM->s( cM, k, j );
 
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"FullProbability::error"<<endl;
                         exit(1);
                     }
                 }
 
                 // wipe out the old values and surround the band area with -inf's
-            } else if (
+            }
+            else if (
                 ( j>minBIndex->g(i)-FBW-3 && j<maxBIndex->g(i)+FBW+3 ) ||
                 ( i-1>=0 && i+1<mLen2 && j>minBIndex->g(i-1)-FBW-3 && j<maxBIndex->g(i+1)+FBW+3 ) ||
                 ( i-FBW-1>=0 && i+FBW+1>=mLen2 && j>minBIndex->g(i-FBW-1)-1 ) ||
                 ( i-FBW-1<0 && i+FBW+1<mLen2 && j<maxBIndex->g(i+FBW+1)+1 ) ||
-                ( i-FBW-1>=0 && i+FBW+1<mLen2 && j>minBIndex->g(i-FBW-1)-1 && j<maxBIndex->g(i+FBW+1)+1 ) ) { /*e090626*/
+                ( i-FBW-1>=0 && i+FBW+1<mLen2 && j>minBIndex->g(i-FBW-1)-1 && j<maxBIndex->g(i+FBW+1)+1 ) )   /*e090626*/
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
                     curX->s( small, k, j );
                     curY->s( small, k, j );
                     curM->s( small, k, j );
@@ -507,9 +595,11 @@ void FullProbability::alignSeqs()
             }
         }
 
-        while (sites->nInd2()==i && sites->index()!=0) {
+        while (sites->nInd2()==i && sites->index()!=0)
+        {
 
-            for (int k=0;k<nState;k++) {
+            for (int k=0; k<nState; k++)
+            {
                 sites->fullBwdX( curX->g(k, sites->nInd1()), k );
                 sites->fullBwdY( curY->g(k, sites->nInd1()), k );
                 sites->fullBwdM( curM->g(k, sites->nInd1()), k );
@@ -517,21 +607,25 @@ void FullProbability::alignSeqs()
 
             sites->prev();
 
-            while (sites->index()!=0 && sites->nullSite()){
+            while (sites->index()!=0 && sites->nullSite())
+            {
                 sites->prev();
             }
         }
 
-		if (sites->nInd2()==i && sites->index()==0) {
+        if (sites->nInd2()==i && sites->index()==0)
+        {
 
-			for (int k=0;k<nState;k++) {
-				sites->fullBwdX( curX->g(k, sites->nInd1()), k );
-				sites->fullBwdY( curY->g(k, sites->nInd1()), k );
-				sites->fullBwdM( curM->g(k, sites->nInd1()), k );
-			}
-		}
+            for (int k=0; k<nState; k++)
+            {
+                sites->fullBwdX( curX->g(k, sites->nInd1()), k );
+                sites->fullBwdY( curY->g(k, sites->nInd1()), k );
+                sites->fullBwdM( curM->g(k, sites->nInd1()), k );
+            }
+        }
 
-        if (NOISE>2) {
+        if (NOISE>2)
+        {
             printMatrix("bx",i,curX);
             printMatrix("by",i,curY);
             printMatrix("bm",i,curM);
@@ -552,7 +646,8 @@ void FullProbability::alignSeqs()
     }
 
     maxBwdScore = small;
-    for (int k=0;k<nState;k++) {
+    for (int k=0; k<nState; k++)
+    {
         maxBwdScore = sumLogs(maxBwdScore,
                               sumLogs(prevX->g(k,0) + hmm->structBgFreq(k) + hmm->probWX(k),
                                       sumLogs(prevY->g(k,0) + hmm->structBgFreq(k) + hmm->probWY(k),
@@ -568,15 +663,15 @@ void FullProbability::alignSeqs()
     delete matX2;
     delete matY2;
 
-	delete sites;
+    delete sites;
 }
 
 void FullProbability::alignBand()
 {
 
-	Site *sites = new Site();
-	sites->index(0);
-	sites->next();
+    Site *sites = new Site();
+    sites->index(0);
+    sites->next();
 
     initialiseIndex(sites);
 
@@ -606,35 +701,48 @@ void FullProbability::alignBand()
     DbMatrix* tmpX;
     DbMatrix* tmpY;
 
-    curX->initialise(small); curY->initialise(small); curM->initialise(small);
-    prevM->initialise(small); prevX->initialise(small); prevY->initialise(small);
+    curX->initialise(small);
+    curY->initialise(small);
+    curM->initialise(small);
+    prevM->initialise(small);
+    prevX->initialise(small);
+    prevY->initialise(small);
 
 
     // Temp variables
     //
     double cX,cY,cM; // current
-    int i=0; int cj=0; int rj; int dif = 0;
+    int i=0;
+    int cj=0;
+    int rj;
+    int dif = 0;
 
     // Iterate through the matrix
     //
-	while (sites->nullSite()){
-		sites->next();
-	}
+    while (sites->nullSite())
+    {
+        sites->next();
+    }
 
-    while (sites->index()!=1) {
+    while (sites->index()!=1)
+    {
 
-        while (sites->nullSite()){
+        while (sites->nullSite())
+        {
             sites->next();
-			if (sites->index()!=1)
+            if (sites->index()!=1)
                 break;
         }
-        FOR(j,width) {
+        FOR(j,width)
+        {
 
             rj = cj + j - width/2;
 
-            if (i==0 && rj==0) { // Corner: starting values
+            if (i==0 && rj==0)   // Corner: starting values
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
                     curX->s( hmm->structBgFreq(k)+ hmm->probWX(k), k , j );
                     curY->s( hmm->structBgFreq(k)+ hmm->probWY(k), k , j );
                     curM->s( hmm->structBgFreq(k)+ hmm->probWM(k), k , j );
@@ -648,20 +756,24 @@ void FullProbability::alignBand()
                     ( ( rj>minBIndex->g(i)-FBW-1 && rj<maxBIndex->g(i)+FBW+1 ) ||
                       ( i-FBW>=0 && i+FBW>=mLen2 && rj>minBIndex->g(i-FBW) ) ||
                       ( i-FBW<0 && i+FBW<mLen2 && rj<maxBIndex->g(i+FBW) ) ||
-                      ( i-FBW>=0 && i+FBW<mLen2 && rj>minBIndex->g(i-FBW) && rj<maxBIndex->g(i+FBW) ) ) ) { /*e090626*/
+                      ( i-FBW>=0 && i+FBW<mLen2 && rj>minBIndex->g(i-FBW) && rj<maxBIndex->g(i+FBW) ) ) )   /*e090626*/
+            {
 
                 msr->computeFullFwd(rj,i);
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
 
-                    if (i==0 && rj>0) { // only X-gaps are possible
+                    if (i==0 && rj>0)   // only X-gaps are possible
+                    {
 
                         // move into X-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndY(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX,curX->g(l,j-1) + hmm->probXX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX,curY->g(l,j-1) + hmm->probYX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX,curM->g(l,j-1) + hmm->probMX(l,k) + msr->indelX(k));
@@ -674,14 +786,17 @@ void FullProbability::alignBand()
                         curM->s( cM, k, j );
                         continue;
 
-                    } else if (i>0 && rj==0) { // only Y-gaps are possible
+                    }
+                    else if (i>0 && rj==0)   // only Y-gaps are possible
+                    {
 
                         // move into Y-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndY(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cY = sumLogs(cY,prevX->g(l,j+dif) + hmm->probXY(l,k) + msr->indelY(k));
                             cY = sumLogs(cY,prevY->g(l,j+dif) + hmm->probYY(l,k) + msr->indelY(k));
                             cY = sumLogs(cY,prevM->g(l,j+dif) + hmm->probMY(l,k) + msr->indelY(k));
@@ -694,14 +809,17 @@ void FullProbability::alignBand()
                         curM->s( cM, k, j );
                         continue;
 
-                    } else {  // so far, the moves have been exceptional; from now on they are "normal"
+                    }
+                    else    // so far, the moves have been exceptional; from now on they are "normal"
+                    {
 
                         // all moves
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndY(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, curX->g(l,j-1) + hmm->probXX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX, curY->g(l,j-1) + hmm->probYX(l,k) + msr->indelX(k));
                             cX = sumLogs(cX, curM->g(l,j-1) + hmm->probMX(l,k) + msr->indelX(k));
@@ -724,14 +842,17 @@ void FullProbability::alignBand()
                 }
 
                 // wipe out the old values and surround the band area with -inf's
-            } else if (
+            }
+            else if (
                 ( rj>minBIndex->g(i)-FBW-2 && rj<maxBIndex->g(i)+FBW+2 ) ||
                 ( i-1>=0 && i+1<mLen2 && rj>minBIndex->g(i-1)-FBW-2 && rj<maxBIndex->g(i+1)+FBW+2 ) ||
                 ( i-FBW-1>=0 && i+FBW+1>=mLen2 && rj>minBIndex->g(i-FBW-1)-1 ) ||
                 ( i-FBW-1<0 && i+FBW+1<mLen2 && rj<maxBIndex->g(i+FBW+1)+1 ) ||
-                ( i-FBW-1>=0 && i+FBW+1<mLen2 && rj>minBIndex->g(i-FBW-1)-1 && rj<maxBIndex->g(i+FBW+1)+1 ) ) { /*e090626*/
+                ( i-FBW-1>=0 && i+FBW+1<mLen2 && rj>minBIndex->g(i-FBW-1)-1 && rj<maxBIndex->g(i+FBW+1)+1 ) )   /*e090626*/
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
                     curX->s(small, k, j );
                     curY->s(small, k, j );
                     curM->s(small, k, j );
@@ -740,38 +861,44 @@ void FullProbability::alignBand()
         }
 
 
-        FOR(k,nState) {
+        FOR(k,nState)
+        {
             sites->fullFwdX( curX->g(k, width/2), k );
             sites->fullFwdY( curY->g(k, width/2), k );
             sites->fullFwdM( curM->g(k, width/2), k );
         }
         sites->next();
 
-        while (sites->index()!=1 && sites->nullSite()){
+        while (sites->index()!=1 && sites->nullSite())
+        {
             sites->next();
         }
 
         xgap=0;
 
-		while (sites->index()!=1 && sites->currMatchState()==0){
+        while (sites->index()!=1 && sites->currMatchState()==0)
+        {
 
             xgap++;
 
-            FOR(k,nState) {
+            FOR(k,nState)
+            {
                 sites->fullFwdX( curX->g(k, width/2 + xgap), k );
                 sites->fullFwdY( curY->g(k, width/2 + xgap), k );
                 sites->fullFwdM( curM->g(k, width/2 + xgap), k );
             }
 
             cj++;
-			sites->next();
+            sites->next();
         }
 
-		while (sites->index()!=1 && sites->nullSite()){
-			sites->next();
+        while (sites->index()!=1 && sites->nullSite())
+        {
+            sites->next();
         }
 
-        if (NOISE>2) {
+        if (NOISE>2)
+        {
             printMatrix("fx",i,curX);
             printMatrix("fy",i,curY);
             printMatrix("fm",i,curM);
@@ -800,7 +927,8 @@ void FullProbability::alignBand()
     }
 
     maxFwdScore = small;
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
         maxFwdScore = sumLogs(maxFwdScore,
                               sumLogs(prevX->g(k, width/2 + xgap)+hmm->probXW(k),
                                       sumLogs(prevY->g(k, width/2 + xgap)+hmm->probYW(k),
@@ -816,34 +944,46 @@ void FullProbability::alignBand()
     prevX = matX2;
     prevY = matY2;
 
-    curX->initialise(small); curY->initialise(small); curM->initialise(small);
-    prevX->initialise(small); prevY->initialise(small); prevM->initialise(small);
+    curX->initialise(small);
+    curY->initialise(small);
+    curM->initialise(small);
+    prevX->initialise(small);
+    prevY->initialise(small);
+    prevM->initialise(small);
 
-    i=mLen2-1; cj=mLen1-1; dif = 0;
+    i=mLen2-1;
+    cj=mLen1-1;
+    dif = 0;
 
 
     // Iterate through the matrix
     //
     sites->index(1);
-	sites->prev();
+    sites->prev();
 
-    while (sites->nullSite()){
-		sites->prev();
-	}
+    while (sites->nullSite())
+    {
+        sites->prev();
+    }
 
-    while (sites->index()!=0) {
+    while (sites->index()!=0)
+    {
 
-        while (sites->nullSite()){
+        while (sites->nullSite())
+        {
             sites->prev();
         }
 
-        RFOR(j,width-1) {
+        RFOR(j,width-1)
+        {
 
             rj = cj + j - width/2;
 
-            if (i==mLen2-1 && rj==mLen1-1) { // Corner: starting values
+            if (i==mLen2-1 && rj==mLen1-1)   // Corner: starting values
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
 
                     curX->s( hmm->probXW(k), k, j );
                     curY->s( hmm->probYW(k), k, j );
@@ -858,22 +998,26 @@ void FullProbability::alignBand()
                     ( ( rj>minBIndex->g(i)-FBW-1 && rj<maxBIndex->g(i)+FBW+1 ) ||
                       ( i-FBW>=0 && i+FBW>=mLen2 && rj>minBIndex->g(i-FBW) ) ||
                       ( i-FBW<0 && i+FBW<mLen2 && rj<maxBIndex->g(i+FBW) ) ||
-                      ( i-FBW>=0 && i+FBW<mLen2 && rj>minBIndex->g(i-FBW) && rj<maxBIndex->g(i+FBW) ) ) ) { /*e090626*/
+                      ( i-FBW>=0 && i+FBW<mLen2 && rj>minBIndex->g(i-FBW) && rj<maxBIndex->g(i+FBW) ) ) )   /*e090626*/
+            {
 
                 // Compute the substitution prices
                 //
                 msr->computeFullBwd(rj,i);
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
 
-                    if (i==mLen2-1 && rj<mLen1-1) { // only x-gaps possible
+                    if (i==mLen2-1 && rj<mLen1-1)   // only x-gaps possible
+                    {
 
                         // move into X-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndX(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, hmm->probXX(k,l) + msr->indelX(l) + curX->g(l,j+1));
                             cY = sumLogs(cY, hmm->probYX(k,l) + msr->indelX(l) + curX->g(l,j+1));
                             cM = sumLogs(cM, hmm->probMX(k,l) + msr->indelX(l) + curX->g(l,j+1));
@@ -885,14 +1029,17 @@ void FullProbability::alignBand()
                         curY->s(cY, k, j );
                         curM->s(cM, k, j );
 
-                    } else if (i<mLen2-1 && rj==mLen1-1) { // only y-gaps possible
+                    }
+                    else if (i<mLen2-1 && rj==mLen1-1)   // only y-gaps possible
+                    {
 
                         // move into Y-matrix
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndX(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, hmm->probXY(k,l) + msr->indelY(l) + prevY->g(l,j-dif));
                             cY = sumLogs(cY, hmm->probYY(k,l) + msr->indelY(l) + prevY->g(l,j-dif));
                             cM = sumLogs(cM, hmm->probMY(k,l) + msr->indelY(l) + prevY->g(l,j-dif));
@@ -904,14 +1051,17 @@ void FullProbability::alignBand()
                         curY->s(cY, k, j );
                         curM->s(cM, k, j );
 
-                    } else if (i<mLen2-1 && rj<mLen1-1) { // everything possible
+                    }
+                    else if (i<mLen2-1 && rj<mLen1-1)   // everything possible
+                    {
 
                         // all moves
                         //
                         cX=cY=cM=small;
 
                         int l = hmm->transIndX(k,0);
-                        while (l>=0) {
+                        while (l>=0)
+                        {
                             cX = sumLogs(cX, hmm->probXX(k,l) + msr->indelX(l) + curX->g(l,j+1));
                             cX = sumLogs(cX, hmm->probXY(k,l) + msr->indelY(l) + prevY->g(l,j-dif));
                             cX = sumLogs(cX, hmm->probXM(k,l) + msr->fullM(l) + prevM->g(l,j+1-dif));
@@ -931,21 +1081,26 @@ void FullProbability::alignBand()
                         curY->s(cY, k, j );
                         curM->s(cM, k, j );
 
-                    } else {
+                    }
+                    else
+                    {
                         cout<<"FullProbability::error"<<endl;
                         exit(1);
                     }
                 }
 
                 // wipe out the old values and surround the band area with -inf's
-            } else if (
+            }
+            else if (
                 ( rj>minBIndex->g(i)-FBW-2 && rj<maxBIndex->g(i)+FBW+2 ) ||
                 ( i-1>=0 && i+1<mLen2 && rj>minBIndex->g(i-1)-FBW-2 && rj<maxBIndex->g(i+1)+FBW+2 ) ||
                 ( i-FBW-1>=0 && i+FBW+1>=mLen2 && rj>minBIndex->g(i-FBW-1)-1 ) ||
                 ( i-FBW-1<0 && i+FBW+1<mLen2 && rj<maxBIndex->g(i+FBW+1)+1 ) ||
-                ( i-FBW-1>=0 && i+FBW+1<mLen2 && rj>minBIndex->g(i-FBW-1)-1 && rj<maxBIndex->g(i+FBW+1)+1 ) ) { /*e090626*/
+                ( i-FBW-1>=0 && i+FBW+1<mLen2 && rj>minBIndex->g(i-FBW-1)-1 && rj<maxBIndex->g(i+FBW+1)+1 ) )   /*e090626*/
+            {
 
-                FOR(k,nState) {
+                FOR(k,nState)
+                {
                     curX->s( small, k, j );
                     curY->s( small, k, j );
                     curM->s( small, k, j );
@@ -954,7 +1109,8 @@ void FullProbability::alignBand()
             }
         }
 
-        FOR(k,nState) {
+        FOR(k,nState)
+        {
             sites->fullBwdX( curX->g(k, width/2), k );
             sites->fullBwdY( curY->g(k, width/2), k );
             sites->fullBwdM( curM->g(k, width/2), k );
@@ -965,31 +1121,36 @@ void FullProbability::alignBand()
 
         sites->prev();
 
-        while (sites->index()!=0 && sites->nullSite()){
+        while (sites->index()!=0 && sites->nullSite())
+        {
             sites->prev();
         }
 
         xgap = 0;
 
-		while (sites->index()!=0 && sites->currMatchState()==0){
+        while (sites->index()!=0 && sites->currMatchState()==0)
+        {
 
             xgap++;
 
-            FOR(k,nState) {
+            FOR(k,nState)
+            {
                 sites->fullBwdX( curX->g(k, width/2 - xgap), k );
                 sites->fullBwdY( curY->g(k, width/2 - xgap), k );
                 sites->fullBwdM( curM->g(k, width/2 - xgap), k );
             }
 
             cj--;
-			sites->prev();
-		}
-
-		while (sites->index()!=0 && sites->nullSite()){
             sites->prev();
         }
 
-        if (NOISE>2) {
+        while (sites->index()!=0 && sites->nullSite())
+        {
+            sites->prev();
+        }
+
+        if (NOISE>2)
+        {
             printMatrix("bx",i,curX);
             printMatrix("by",i,curY);
             printMatrix("bm",i,curM);
@@ -1017,7 +1178,8 @@ void FullProbability::alignBand()
 
 
     maxBwdScore = small;
-    FOR(k,nState) {
+    FOR(k,nState)
+    {
         maxBwdScore = sumLogs(maxBwdScore,
                               sumLogs(prevX->g(k, width/2-1-xgap) + hmm->structBgFreq(k) + hmm->probWX(k),
                                       sumLogs(prevY->g(k, width/2-1-xgap) + hmm->structBgFreq(k) + hmm->probWY(k),
@@ -1033,7 +1195,7 @@ void FullProbability::alignBand()
     delete matX2;
     delete matY2;
 
-	delete sites;
+    delete sites;
 }
 
 

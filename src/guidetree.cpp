@@ -36,34 +36,39 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
 
     vector<string>::iterator si = seqs->begin();
     int longest = 0;
-	int slongest = 0;
-	for (;si!=seqs->end();si++){
-        if ((int)si->length()>longest) {
-			slongest = longest;
+    int slongest = 0;
+    for (; si!=seqs->end(); si++)
+    {
+        if ((int)si->length()>longest)
+        {
+            slongest = longest;
             longest = si->length();
-        } else if((int)si->length()>slongest) {
-			slongest = si->length();
-		}
+        }
+        else if ((int)si->length()>slongest)
+        {
+            slongest = si->length();
+        }
     }
 
     int delta = int(log( 1-exp(-1.0*pwGapRate*pwDist) )*1000);
-	int epsilon = int(log( pwGapExt )*1000);
+    int epsilon = int(log( pwGapExt )*1000);
 
 //     cout<<delta<<" "<<epsilon<<endl;
 //     substScores->print();
 
-    if (NOISE>1) {
-      cout<<"Pairwise gap scoring penalties"<<endl;
-      cout<<"open: "<<delta<<", extension: "<<epsilon<<endl;
+    if (NOISE>1)
+    {
+        cout<<"Pairwise gap scoring penalties"<<endl;
+        cout<<"open: "<<delta<<", extension: "<<epsilon<<endl;
     }
 
-	PwSite *pws = new PwSite();
-	pws->setMatrices(longest,slongest);
+    PwSite *pws = new PwSite();
+    pws->setMatrices(longest,slongest);
 
-	PwHirschberg* pwh = new PwHirschberg(longest);
+    PwHirschberg* pwh = new PwHirschberg(longest);
     pwh->setModel( substScores,delta,epsilon );
 
-	FlMatrix* distance = new FlMatrix(ns,ns,"pw distances");
+    FlMatrix* distance = new FlMatrix(ns,ns,"pw distances");
     distance->initialise(0);
 
     si = seqs->begin();
@@ -74,19 +79,23 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
     int done = 1;
 
     int i = 0;
-    for (;si!=se;si++){
+    for (; si!=se; si++)
+    {
         vector<string>::iterator si2 = si;
         si2++;
 
         int j = i+1;
-        for (;si2!=seqs->end();si2++){
+        for (; si2!=seqs->end(); si2++)
+        {
 
 // 	    cout<<endl<<"unaligned"<<endl;
 // 	    cout<<">1"<<endl<<*si<<endl<<">2"<<endl<<*si2<<endl;
 
-            if (SCREEN){
+            if (SCREEN)
+            {
                 unsigned int m;
-                FOR(m,message.length()) {
+                FOR(m,message.length())
+                {
                     cout<<'\b';
                 }
 
@@ -104,18 +113,22 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
             }
 
             pwh->setSequences(&(*si),&(*si2));
-			pwh->alignSeqs();
+            pwh->alignSeqs();
 
             pws->index(0);
-			pws->next();
+            pws->next();
             int l1 = si->length();
             int l2 = si2->length();
 
-            string a = ""; string b = "";
-            int s = 0; int m = 0;
-            int s1,s2; char c1,c2;
+            string a = "";
+            string b = "";
+            int s = 0;
+            int m = 0;
+            int s1,s2;
+            char c1,c2;
 
-			while(pws->index()!=1) {
+            while (pws->index()!=1)
+            {
 
                 c1 = '-';
                 c2 = '-';
@@ -128,7 +141,8 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
                 if ( s2>=0 && s2<l2)
                     c2 = si2->at(s2);
 
-                if (c1!='-' && c2!='-') {
+                if (c1!='-' && c2!='-')
+                {
                     s++;
                     if (c1==c2)
                         m++;
@@ -139,7 +153,7 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
                 a+=c1;
                 b+=c2;
 
-				pws->next();
+                pws->next();
             }
 
             if (NOISE>1)
@@ -149,30 +163,37 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
 //             float p = 1-(float)m/(float)min(l1,l2);
 
 //               cout<<m<<" "<<s<<" "<<p<<" ";//<<min(l1,l2)<<" "<<1-(float)m/(float)min(l1,l2)<<" ";
-            if(CORRECTP){
-              if (isDna) {
-                if(p>0.7)
-                  p=0.9;
+            if (CORRECTP)
+            {
+                if (isDna)
+                {
+                    if (p>0.7)
+                        p=0.9;
+                    else
+                        p = -0.75*log(1-4/3*p);
+                }
                 else
-                  p = -0.75*log(1-4/3*p);
-              } else {
-                if (p>0.85)
-                  p=2.26;
-                else
-                  p = -1*log(1-p-0.2*p*p);
-              }
+                {
+                    if (p>0.85)
+                        p=2.26;
+                    else
+                        p = -1*log(1-p-0.2*p*p);
+                }
             }
 
-            if(CORRECTP){
-              if (isDna && p!=p)
-                p=0.9;
-              else if (p!=p)
-                p=2.26;
-            } else {
-              if (isDna && p!=p)
-                p=1;
-              else if (p!=p)
-                p=1;
+            if (CORRECTP)
+            {
+                if (isDna && p!=p)
+                    p=0.9;
+                else if (p!=p)
+                    p=2.26;
+            }
+            else
+            {
+                if (isDna && p!=p)
+                    p=1;
+                else if (p!=p)
+                    p=1;
             }
 
 //    	    cout<<p<<endl;
@@ -185,18 +206,21 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* subst
         i++;
     }
 
-	delete pwh;
-	pws->deleteMatrices();
-	delete pws;
+    delete pwh;
+    pws->deleteMatrices();
+    delete pws;
 
-    if (SCREEN){
+    if (SCREEN)
+    {
         unsigned int m;
-        FOR(m,message.length()) {
+        FOR(m,message.length())
+        {
             cout<<'\b';
         }
     }
 
-    if (NOISE>=1) {
+    if (NOISE>=1)
+    {
         cout<<"Pairwise distances"<<endl;
         distance->print();
     }
@@ -220,23 +244,28 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,bool isDna)
     se--;
 
     int i = 0;
-    for (;si!=se;si++){
+    for (; si!=se; si++)
+    {
         vector<string>::iterator si2 = si;
         si2++;
 
         int j = i+1;
-        for (;si2!=seqs->end();si2++){
+        for (; si2!=seqs->end(); si2++)
+        {
 
-            int s = 0; int m = 0;
+            int s = 0;
+            int m = 0;
 //            int s1,s2;
             char c1,c2;
 
-            for (unsigned int k=0;k<si->length();k++) {
+            for (unsigned int k=0; k<si->length(); k++)
+            {
 
                 c1 = si->at(k);
                 c2 = si2->at(k);
 
-                if (c1!='-' && c2!='-') {
+                if (c1!='-' && c2!='-')
+                {
                     s++;
                     if (c1==c2)
                         m++;
@@ -245,30 +274,37 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,bool isDna)
 
             float p = 1-(float)m/(float)s;
 
-            if(CORRECTP){
-              if (isDna) {
-                if(p>0.7)
-                  p=0.9;
+            if (CORRECTP)
+            {
+                if (isDna)
+                {
+                    if (p>0.7)
+                        p=0.9;
+                    else
+                        p = -0.75*log(1-4/3*p);
+                }
                 else
-                  p = -0.75*log(1-4/3*p);
-              } else {
-                if (p>0.85)
-                  p=2.26;
-                else
-                  p = -1*log(1-p-0.2*p*p);
-              }
+                {
+                    if (p>0.85)
+                        p=2.26;
+                    else
+                        p = -1*log(1-p-0.2*p*p);
+                }
             }
 
-            if(CORRECTP){
-              if (isDna && p!=p)
-                p=0.9;
-              else if (p!=p)
-                p=2.26;
-            } else {
-              if (isDna && p!=p)
-                p=1;
-              else if (p!=p)
-                p=1;
+            if (CORRECTP)
+            {
+                if (isDna && p!=p)
+                    p=0.9;
+                else if (p!=p)
+                    p=2.26;
+            }
+            else
+            {
+                if (isDna && p!=p)
+                    p=1;
+                else if (p!=p)
+                    p=1;
             }
 
             distance->s(p,i,j);
@@ -280,9 +316,10 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,bool isDna)
     }
 
 
-    if (NOISE>=1) {
-      cout<<"Pairwise distances"<<endl;
-      distance->print();
+    if (NOISE>=1)
+    {
+        cout<<"Pairwise distances"<<endl;
+        distance->print();
     }
 
     this->makeTree(distance,names);
@@ -305,21 +342,26 @@ void GuideTree::makeTree(FlMatrix* distance,vector<string>* nms)
 
     vector<string>::iterator ir = nms->begin();
     int i = 0;
-    for (;ir!=nms->end();ir++) {
+    for (; ir!=nms->end(); ir++)
+    {
         names[i++] = *ir;
     }
 
-    while (no>2) {
+    while (no>2)
+    {
         joinNeighbors(distance,names,newDistance,newNames,rDist,&no);
     }
 
-    if (names[0].at(names[0].length()-1) == ')') {
+    if (names[0].at(names[0].length()-1) == ')')
+    {
         char dist[10];
         sprintf(dist,"%.5f",abs(distance->g(0,0)+distance->g(0,1)) );
         tree = names[0].substr(0,names[0].length()-1)+','+names[1]+':'+dist+");";
-    } else {
+    }
+    else
+    {
         char dist[10];
-		sprintf(dist,"%.5f",abs(distance->g(0,0)+distance->g(0,1))/2 );
+        sprintf(dist,"%.5f",abs(distance->g(0,0)+distance->g(0,1))/2 );
         tree = '('+names[0]+':'+dist+','+names[1]+':'+dist+");";
     }
 
@@ -329,7 +371,8 @@ void GuideTree::makeTree(FlMatrix* distance,vector<string>* nms)
     delete rDist;
 }
 
-void GuideTree::joinNeighbors(FlMatrix* distance, string* names,FlMatrix* newDistance, string* newNames,FlMatrix* rDist,int* no) {
+void GuideTree::joinNeighbors(FlMatrix* distance, string* names,FlMatrix* newDistance, string* newNames,FlMatrix* rDist,int* no)
+{
 
     int otu1=0, otu2=0;
     float minM = HUGE_VAL;
@@ -338,16 +381,22 @@ void GuideTree::joinNeighbors(FlMatrix* distance, string* names,FlMatrix* newDis
     int i,j;
 
     rDist->initialise(0);
-    FOR(i,*no) {
-        FOR(j,*no) {
+    FOR(i,*no)
+    {
+        FOR(j,*no)
+        {
             rDist->a( distance->g(i,j), i);
         }
     }
-    FOR(i,*no) {
-        FOR(j,*no) {
-            if (j!=i) {
+    FOR(i,*no)
+    {
+        FOR(j,*no)
+        {
+            if (j!=i)
+            {
                 float mDist = distance->g(i,j)-( rDist->g(i)+rDist->g(j) )/( (*no)-2);
-                if (mDist<minM) {
+                if (mDist<minM)
+                {
                     minM = mDist;
                     otu1 = min(i,j);
                     otu2 = max(i,j);
@@ -364,35 +413,53 @@ void GuideTree::joinNeighbors(FlMatrix* distance, string* names,FlMatrix* newDis
     int cj=0;
     float v;
 
-    FOR(i,*no) {
-        FOR(j,*no) {
-            if (i==j) {
+    FOR(i,*no)
+    {
+        FOR(j,*no)
+        {
+            if (i==j)
+            {
                 continue;
             }
 
-            if (j<otu2) {
+            if (j<otu2)
+            {
                 cj=j;
-            } else if (j==otu2) {
+            }
+            else if (j==otu2)
+            {
                 continue;
-            } else {
+            }
+            else
+            {
                 cj=j-1;
             }
 
-            if (i<otu2) {
+            if (i<otu2)
+            {
                 ci=i;
-            } else if (i==otu2) {
+            }
+            else if (i==otu2)
+            {
                 continue;
-            } else {
+            }
+            else
+            {
                 ci=i-1;
             }
 
-            if (i==otu1) {
+            if (i==otu1)
+            {
                 v = ( distance->g(otu1,j)+distance->g(otu2,j)-distance->g(otu1,otu2) )/2;
                 newDistance->s(v,ci,cj);
-            } else if (j==otu1) {
+            }
+            else if (j==otu1)
+            {
                 v = ( distance->g(otu1,i)+distance->g(otu2,i)-distance->g(otu1,otu2) )/2;
                 newDistance->s(v,ci,cj);
-            } else {
+            }
+            else
+            {
                 v = distance->g(i,j);
                 newDistance->s(v,ci,cj);
             }
@@ -400,29 +467,39 @@ void GuideTree::joinNeighbors(FlMatrix* distance, string* names,FlMatrix* newDis
     }
 
     string s;
-    FOR(i,*no) {
-        if (i==otu1) {
+    FOR(i,*no)
+    {
+        if (i==otu1)
+        {
             char l1[10];
-			sprintf(l1,"%.5f",abs(brl1));
+            sprintf(l1,"%.5f",abs(brl1));
             char l2[10];
-			sprintf(l2,"%.5f",abs(brl2));
+            sprintf(l2,"%.5f",abs(brl2));
             newNames[i] = '('+names[otu1]+':'+l1+','+names[otu2]+':'+l2+')';
 //	    cout<<*no<<" "<<'('+names[otu1]+':'+l1+','+names[otu2]+':'+l2+')'<<endl;
             continue;
-        } else if (i<otu2) {
+        }
+        else if (i<otu2)
+        {
             ci = i;
-        } else if (i==otu2) {
+        }
+        else if (i==otu2)
+        {
             continue;
-        } else {
+        }
+        else
+        {
             ci=i-1;
         }
         newNames[ci] = names[i];
     }
 
     (*no)--;
-    FOR(i,*no) {
+    FOR(i,*no)
+    {
         names[i] = newNames[i];
-        FOR(j,*no) {
+        FOR(j,*no)
+        {
             distance->s(newDistance->g(i,j),i,j);
         }
     }

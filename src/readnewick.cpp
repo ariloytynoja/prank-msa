@@ -44,7 +44,8 @@ string ReadNewick::readFile(const char* filename)
     string t;
     s = "";
     ifstream in(filename);
-    while (getline(in,t)){
+    while (getline(in,t))
+    {
         s += t;
     }
 
@@ -60,7 +61,8 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
     int end=0;
     int comma = 0;
 
-    for (;b!=e;b++) {
+    for (; b!=e; b++)
+    {
         if ((*b)=='(')
             open++;
         if ((*b)==')')
@@ -69,13 +71,15 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
             comma++;
     }
 
-    if (open!=end) {
+    if (open!=end)
+    {
         cout<<"brackets do not match: "<<open<<" opening and "<<end<<" closing!"<<endl;
         exit(1);
     }
 
     // unrooted
-    if (comma==open+1){
+    if (comma==open+1)
+    {
         if (NOISE>=0)
             cout<<"Unrooted tree, using midpoint rooting."<<endl;
 
@@ -89,29 +93,35 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
         end=0;
         comma = 0;
 
-        for (;b!=e;b++) {
-          if ((*b)=='(')
-            open++;
-          if ((*b)==')')
-            end++;
-          if ((*b)==',')
-            comma++;
+        for (; b!=e; b++)
+        {
+            if ((*b)=='(')
+                open++;
+            if ((*b)==')')
+                end++;
+            if ((*b)==',')
+                comma++;
         }
 
         if (NOISE>0)
             cout<<s<<endl;
         delete n;
-    } else if(comma==open && comma==end){
+    }
+    else if (comma==open && comma==end)
+    {
 
-    } else {
-      cout<<"Problem with the guidetee: brackets ("<<open<<","<<end<<") and commas ("<<comma<<") don't match)"<<endl<<endl;
-      exit(-1);
+    }
+    else
+    {
+        cout<<"Problem with the guidetee: brackets ("<<open<<","<<end<<") and commas ("<<comma<<") don't match)"<<endl<<endl;
+        exit(-1);
     }
 
     int count = 1;
     string r;
 
-    do {
+    do
+    {
         string n;
         r = "";
         b = s.begin();
@@ -119,29 +129,37 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
         bool hasText = false;
         bool isOpen = false;
 
-        while (b!=e) {
-            if ((*b)==' ' || (*b)=='\t' || (*b)=='\n') {
+        while (b!=e)
+        {
+            if ((*b)==' ' || (*b)=='\t' || (*b)=='\n')
+            {
                 b++;
                 continue;
             }
 
-            if ((*b)=='(') {
+            if ((*b)=='(')
+            {
                 isOpen = true;
                 hasText = false;
                 r += n+(*b);
                 n = "";
                 b++;
-            } else if ((*b)==')') {
-                if (hasText && isOpen) {
+            }
+            else if ((*b)==')')
+            {
+                if (hasText && isOpen)
+                {
                     char tc[15];
                     sprintf(tc,"#%i#",count++);
                     AncestralNode *tn = new AncestralNode(n);
                     tn->setNodeName(tc);
-                    if (tn->isLInternal()) {
+                    if (tn->isLInternal())
+                    {
                         tn->setLChild(nodes->find(tn->getLName())->second);
                         nodes->find(tn->getLName())->second->setBranchLength(tn->getLeftBrL());
                     }
-                    if (tn->isRInternal()) {
+                    if (tn->isRInternal())
+                    {
                         tn->setRChild(nodes->find(tn->getRName())->second);
                         nodes->find(tn->getRName())->second->setBranchLength(tn->getRightBrL());
                     }
@@ -151,14 +169,18 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                     r += tc;
                     root = tc;
                     n = "";
-                } else {
+                }
+                else
+                {
                     r += n+")";
                     n = "";
                 }
                 isOpen = false;
                 hasText = false;
                 b++;
-            } else {
+            }
+            else
+            {
                 hasText = true;
                 n += (*b);
                 b++;
@@ -166,7 +188,8 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
         }
         s = r;
 
-    } while (s.find(",")>0 && s.find(",")<s.length());
+    }
+    while (s.find(",")>0 && s.find(",")<s.length());
 
 }
 

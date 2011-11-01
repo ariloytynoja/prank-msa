@@ -20,6 +20,6 @@
 
 #include "sequence.h"
 
-Sequence::~Sequence(){}
+Sequence::~Sequence() {}
 
-Sequence::Sequence(){}
+Sequence::Sequence() {}

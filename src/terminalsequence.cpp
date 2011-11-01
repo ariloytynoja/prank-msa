@@ -36,7 +36,8 @@ TerminalSequence::~TerminalSequence()
 // gapped = re-alignment or posterior probability computation
 //
 TerminalSequence::TerminalSequence(string* s)
-        : Sequence(){
+        : Sequence()
+{
 
     terminal = true;
     hasPrior = false;
@@ -46,37 +47,42 @@ TerminalSequence::TerminalSequence(string* s)
 
     charseq = "";
     int ci;
-	string fullAlpha = hmm->getFullAlphabet();
+    string fullAlpha = hmm->getFullAlphabet();
     int sFullAlpha = fullAlpha.length();
 
     map<string,int> codons;
 
-    if(PREALIGNED || PARTLYALIGNED)
-      gappedseq = *s;
+    if (PREALIGNED || PARTLYALIGNED)
+        gappedseq = *s;
 
-    if (CODON){
-        if (s->size()%3!=0){
+    if (CODON)
+    {
+        if (s->size()%3!=0)
+        {
             cout<<"codon sequence length is not multiple of three!"<<endl;
             exit(0);
         }
-        for (int i=0;i<183;i+=3){
+        for (int i=0; i<183; i+=3)
+        {
             codons.insert(make_pair(alpha.substr(i,3),i/3));
         }
 
         sAlpha = 61;
 
         string S;
-        for (int i=0;i<(int)s->length();i++) {
+        for (int i=0; i<(int)s->length(); i++)
+        {
             S += toupper(s->at(i));
         }
 
-        for (int i=0;i<(int)S.length();i+=3) {
+        for (int i=0; i<(int)S.length(); i+=3)
+        {
             ci = codons.find(S.substr(i,3))->second;
 
             if (ci>=0 && ci<sAlpha)
                 charseq += S.substr(i,3);
-            else if(S.substr(i,3)=="---" || S.substr(i,3)=="...")
-              ;
+            else if (S.substr(i,3)=="---" || S.substr(i,3)=="...")
+                ;
             else
                 charseq += "NNN";
         }
@@ -85,27 +91,34 @@ TerminalSequence::TerminalSequence(string* s)
 
     }
 
-    else { // Protein or DNA
+    else   // Protein or DNA
+    {
 
-        if (sAlpha==20) {
-            for (int i=0;i<(int)s->length();i++) {
+        if (sAlpha==20)
+        {
+            for (int i=0; i<(int)s->length(); i++)
+            {
                 ci = fullAlpha.find(toupper(s->at(i)));
                 if (ci>=0 && ci<sFullAlpha)
                     charseq += s->at(i);
-                else {
-                  if (s->at(i)!='-' && s->at(i)!='.')
+                else
+                {
+                    if (s->at(i)!='-' && s->at(i)!='.')
                         charseq += 'X';
                 }
             }
         }
 
-        else {
-            for (int i=0;i<(int)s->length();i++) {
+        else
+        {
+            for (int i=0; i<(int)s->length(); i++)
+            {
                 ci = fullAlpha.find(toupper(s->at(i)));
                 if (ci>=0 && ci<sFullAlpha)
                     charseq += s->at(i);
-                else {
-                  if (s->at(i)!='-' && s->at(i)!='.')
+                else
+                {
+                    if (s->at(i)!='-' && s->at(i)!='.')
                         charseq += 'N';
                 }
             }
@@ -121,36 +134,50 @@ TerminalSequence::TerminalSequence(string* s)
 
 // Note: "NNN" defined as 62nd codon
 
-    if (CODON){
-        FOR(i,seqLength){
+    if (CODON)
+    {
+        FOR(i,seqLength)
+        {
             ci = codons.find(charseq.substr(i*3,3))->second;
-            if (ci>=0 && ci<sAlpha){
+            if (ci>=0 && ci<sAlpha)
+            {
                 seqvec->s(ci,i);
-            } else {
+            }
+            else
+            {
                 seqvec->s(sAlpha,i);
             }
         }
     }
 
-    else if (sAlpha==20) {
-        FOR(i,seqLength){
+    else if (sAlpha==20)
+    {
+        FOR(i,seqLength)
+        {
             ci = fullAlpha.find(toupper(charseq.at(i)));
-            if (ci>=0 && ci<sFullAlpha){
+            if (ci>=0 && ci<sFullAlpha)
+            {
                 seqvec->s(ci,i);
-            } else {
+            }
+            else
+            {
                 seqvec->s(sAlpha+1,i);
             }
         }
     }
 
-    else {
-        FOR(i,seqLength){
+    else
+    {
+        FOR(i,seqLength)
+        {
             ci = fullAlpha.find(toupper(charseq.at(i)));
-            if (ci>=0 && ci<sFullAlpha){
+            if (ci>=0 && ci<sFullAlpha)
+            {
                 seqvec->s(ci,i);
             }
-            else {
-				seqvec->s(sAlpha+1,i);
+            else
+            {
+                seqvec->s(sAlpha+1,i);
             }
         }
     }

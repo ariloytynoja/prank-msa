@@ -41,7 +41,8 @@ ReadFile::~ReadFile()
     seqs.clear();
 }
 
-bool ReadFile::dnaSeqs() {
+bool ReadFile::dnaSeqs()
+{
 
     string nucs = "ACGTUN";
 
@@ -50,14 +51,16 @@ bool ReadFile::dnaSeqs() {
     int total2=0;
     int pos;
     vector<string>::iterator si = seqs.begin();
-    for (;si!=seqs.end();si++){
+    for (; si!=seqs.end(); si++)
+    {
         total1 += (*si).length();
-        for (unsigned int i=0;i<(*si).length();i++){
+        for (unsigned int i=0; i<(*si).length(); i++)
+        {
             pos= nucs.find((*si).at(i));
             if (pos>=0 && pos<=(int)nucs.length())
                 match++;
 //            if((*si).at(i) != '-')
-            if((*si).at(i) != '-' && (*si).at(i) != '?')
+            if ((*si).at(i) != '-' && (*si).at(i) != '?')
                 total2++;
         }
     }
@@ -73,8 +76,10 @@ void ReadFile::countDnaFreqs(float* freqs)
     int nt = 0;
     int nu = 0;
     vector<string>::iterator si = seqs.begin();
-    for (;si!=seqs.end();si++){
-        for (unsigned int i=0;i<(*si).length();i++){
+    for (; si!=seqs.end(); si++)
+    {
+        for (unsigned int i=0; i<(*si).length(); i++)
+        {
             pos= nucs.find((*si).at(i));
             if (pos<0 || pos>4)
                 continue;
@@ -97,29 +102,30 @@ int ReadFile::readFile(const char* inputfile)
     ifstream input(inputfile, ios::in);
 
 
-    if (!input) {
+    if (!input)
+    {
         cout<<"Failed to open sequence file "<<inputfile<<". Exiting.\n\n";
         exit(-1);
     }
 
 
     char c = input.get();
-    while(c==' ' || c=='\n')
+    while (c==' ' || c=='\n')
     {
         c = input.get();
     }
 
-    if(c=='>')
+    if (c=='>')
     {
         input.unget();
         this->readFasta(input);
     }
-    else if(c=='#')
+    else if (c=='#')
     {
         input.unget();
         this->readNexus(input);
     }
-    else if(isdigit( c ))
+    else if (isdigit( c ))
     {
         input.unget();
         this->readPhylip(input);
@@ -132,16 +138,16 @@ int ReadFile::readFile(const char* inputfile)
     }
 
     set<string> nameset;
-    for(int i=0;i<(int)seqs.size();i++)
+    for (int i=0; i<(int)seqs.size(); i++)
     {
-        if((int)seqs.at(i).length()<1)
+        if ((int)seqs.at(i).length()<1)
         {
             cout<<"Failed to read sequence "<<names.at(i)<<". Exiting.\n\n";
             exit(-1);
         }
 
         string name = names.at(i);
-        while(nameset.find(name) != nameset.end())
+        while (nameset.find(name) != nameset.end())
         {
             cout<<"Sequence name "<<name<<" is defined more than once! Adding suffix '.1'.\n";
             names.at(i) += ".1";
@@ -166,18 +172,18 @@ void ReadFile::readFasta(istream & input)
 
     string temp, name, sequence = "";  // Initialization
 
-    while(!input.eof())
+    while (!input.eof())
     {
         getline(input, temp, '\n');  // Copy current line in temporary string
 
 
         // If first character is >
-        if(temp[0] == '>')
+        if (temp[0] == '>')
         {
             temp = this->remove_last_whitespaces(temp);
 
             // If a name and a sequence were found
-            if((name != "") && (sequence != ""))
+            if ((name != "") && (sequence != ""))
             {
                 names.push_back(name);
                 sequence = this->remove_whitespaces(sequence);
@@ -195,7 +201,7 @@ void ReadFile::readFasta(istream & input)
     }
 
     // Addition of the last sequence in file
-    if((name != "") && (sequence != ""))
+    if ((name != "") && (sequence != ""))
     {
         names.push_back(name);
         sequence = this->remove_whitespaces(sequence);
@@ -212,7 +218,7 @@ void ReadFile::readNexus(std::istream & input)
     transform( temp.begin(), temp.end(), temp.begin(), (int(*)(int))toupper );
     temp = this->remove_whitespaces(temp);
 
-    if(temp != "#NEXUS")
+    if (temp != "#NEXUS")
     {
         cout<<"Input file starts with '#' but not with '#NEXUS'. Reading the file failed. Exiting.\n";
         exit(-1);
@@ -221,12 +227,12 @@ void ReadFile::readNexus(std::istream & input)
     int ntax = -1;
     int length = -1;
 
-    while(!input.eof())
+    while (!input.eof())
     {
         getline(input, temp, '\n');  // Copy current line in temporary string
 
         string::size_type loc = temp.find("ntax");
-        if(loc!=string::npos)
+        if (loc!=string::npos)
         {
             string str = temp.substr(loc+5,temp.find_first_of(" ;",loc+5)-(loc+5));
             stringstream ss(str);
@@ -234,18 +240,18 @@ void ReadFile::readNexus(std::istream & input)
         }
 
         loc = temp.find("nchar");
-        if(loc!=string::npos)
+        if (loc!=string::npos)
         {
             string str = temp.substr(loc+6,temp.find_first_of(" ;",loc+6)-(loc+6));
             stringstream ss(str);
             ss>>length;
         }
 
-        if(temp.find("matrix")!=string::npos)
+        if (temp.find("matrix")!=string::npos)
             break;
     }
 
-    if(ntax<1 || length<1)
+    if (ntax<1 || length<1)
     {
         cout<<"Failed to read the dimensions of the Nexus alignment. Exiting.\n";
         exit(-1);
@@ -254,10 +260,10 @@ void ReadFile::readNexus(std::istream & input)
     stringstream rows;
     map<string,string> data;
 
-    while(!input.eof())
+    while (!input.eof())
     {
         getline(input, temp, '\n');  // Copy current line in temporary string
-        if(temp.find("end;")!=string::npos)
+        if (temp.find("end;")!=string::npos)
             break;
 
         rows.clear();
@@ -269,16 +275,16 @@ void ReadFile::readNexus(std::istream & input)
         name = this->remove_last_whitespaces(name);
         seq = this->remove_whitespaces(seq);
 
-        if(name.length()>0 && seq.length()>0)
+        if (name.length()>0 && seq.length()>0)
         {
-            if(name.at(0)=='\'')
+            if (name.at(0)=='\'')
                 name=name.substr(1);
 
-            if(name.at(name.length()-1)=='\'')
+            if (name.at(name.length()-1)=='\'')
                 name=name.substr(0,name.length()-1);
 
             map<string,string>::iterator mi = data.find(name);
-            if(mi==data.end())
+            if (mi==data.end())
             {
                 data.insert(make_pair(name,seq));
                 names.push_back(name);
@@ -292,12 +298,12 @@ void ReadFile::readNexus(std::istream & input)
         }
     }
 
-    for(int i=0;i<ntax;i++)
+    for (int i=0; i<ntax; i++)
     {
         map<string,string>::iterator mi = data.find(names.at(i));
         seqs.push_back(mi->second);
 
-        if(mi->second.length()!=length)
+        if (mi->second.length()!=length)
         {
             cout<<"Reading may have failed: sequences are not equally long!\n";
         }
@@ -317,7 +323,7 @@ void ReadFile::readPhylip(std::istream & input)
     stringstream nums(temp);
     nums>>nseq>>length;
 
-    if(nseq<1 || length<1)
+    if (nseq<1 || length<1)
     {
         cout<<"Input file starts with a digit but not with two positive digits. Reading the file failed. Exiting.\n";
         exit(-1);
@@ -331,7 +337,7 @@ void ReadFile::readPhylip(std::istream & input)
     name = this->remove_last_whitespaces(name);
     sequence = this->remove_whitespaces(sequence);
 
-    if((int) name.length()>0 && (int) name.length()<=10 && ( ( (int) sequence.length()>=50 && (int) sequence.length()<=60 ) || (int) sequence.length()==length )  )
+    if ((int) name.length()>0 && (int) name.length()<=10 && ( ( (int) sequence.length()>=50 && (int) sequence.length()<=60 ) || (int) sequence.length()==length )  )
         readInterleaved(temp,input,nseq,length);
     else
         readSequential(temp,input,nseq,length);
@@ -341,7 +347,7 @@ void ReadFile::readInterleaved(string temp,istream & input,int nseq, int length)
 {
     stringstream rows;
 
-    for(int i=0;i<nseq;i++)
+    for (int i=0; i<nseq; i++)
     {
         rows.clear();
         rows.str(temp);
@@ -362,14 +368,14 @@ void ReadFile::readInterleaved(string temp,istream & input,int nseq, int length)
     {
         temp = this->remove_whitespaces(temp);
         seqs.at(i++) += temp;
-        if(i==nseq)
+        if (i==nseq)
             i=0;
     }
-    while(getline(input, temp, '\n'));
+    while (getline(input, temp, '\n'));
 
-    for(i=0;i<nseq;i++)
+    for (i=0; i<nseq; i++)
     {
-        if((int) seqs.at(i).length()!=length)
+        if ((int) seqs.at(i).length()!=length)
         {
             cout<<"Reading may have failed: interleaved sequences are not equally long!\n";
         }
@@ -379,14 +385,14 @@ void ReadFile::readInterleaved(string temp,istream & input,int nseq, int length)
 
 void ReadFile::readSequential(string temp,istream & input,int nseq, int length)
 {
-    for(int i=0;i<nseq;i++)
+    for (int i=0; i<nseq; i++)
     {
         string name = temp;
         name = this->remove_last_whitespaces(name);
         names.push_back(name);
 
         string seq = "";
-        while((int) seq.length()<length)
+        while ((int) seq.length()<length)
         {
             getline(input, temp, '\n');
             temp = this->remove_whitespaces(temp);
@@ -397,9 +403,9 @@ void ReadFile::readSequential(string temp,istream & input,int nseq, int length)
         getline(input, temp, '\n');
     }
 
-    for(int i=0;i<nseq;i++)
+    for (int i=0; i<nseq; i++)
     {
-        if((int) seqs.at(i).length()!=length)
+        if ((int) seqs.at(i).length()!=length)
         {
             cout<<"Reading may have failed: sequential sequences are not equally long!\n";
             cout<<seqs.at(i)<<" "<<seqs.at(i).length()<<endl;
@@ -409,37 +415,37 @@ void ReadFile::readSequential(string temp,istream & input,int nseq, int length)
 
 string ReadFile::remove_last_whitespaces(const string & s)
 {
-  // Copy sequence
-  string st (s);
+    // Copy sequence
+    string st (s);
 
-  while(st.size() > 0 && this->is_whitespace_character(st[st.size() - 1]))
-  {
-    st.erase(st.end() - 1);
-  }
+    while (st.size() > 0 && this->is_whitespace_character(st[st.size() - 1]))
+    {
+        st.erase(st.end() - 1);
+    }
 
-  // Send result
-  return st;
+    // Send result
+    return st;
 }
 
 string ReadFile::remove_whitespaces(const string & s)
 {
-  string st="";
+    string st="";
 
-  for (unsigned int i = 0; i < s.size(); i++)
-  {
-    if(!this->is_whitespace_character(s[i]))
+    for (unsigned int i = 0; i < s.size(); i++)
     {
-      st+=s[i];
+        if (!this->is_whitespace_character(s[i]))
+        {
+            st+=s[i];
+        }
     }
-  }
-  return st;
+    return st;
 }
 
 bool ReadFile::is_whitespace_character(char c)
 {
     return (c == ' ')
-        || (c == '\t')
-        || (c == '\n')
-        || (c == '\r')
-        || (c == '\f');
+           || (c == '\t')
+           || (c == '\n')
+           || (c == '\r')
+           || (c == '\f');
 }

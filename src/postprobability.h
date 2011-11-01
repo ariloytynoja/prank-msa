@@ -27,10 +27,11 @@
 #include "sequence.h"
 #include "phylomatchscore.h"
 
-class PostProbability {
+class PostProbability
+{
 public:
-   ~PostProbability();
-   PostProbability(Sequence* sq1,Sequence* sq2,double full,PhyloMatchScore *msr);
+    ~PostProbability();
+    PostProbability(Sequence* sq1,Sequence* sq2,double full,PhyloMatchScore *msr);
 };
 
 #endif

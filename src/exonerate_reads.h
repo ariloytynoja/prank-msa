@@ -6,7 +6,8 @@
 #include <vector>
 #include <map>
 
-struct hit {
+struct hit
+{
     std::string query;
     std::string node;
     int score;
@@ -20,8 +21,14 @@ struct hit {
 
 class Exonerate_reads
 {
-    static bool better (hit i,hit j) { return (i.score>j.score); }
-    static bool q_earlier (hit i,hit j) { return (i.q_start<j.q_start); }
+    static bool better (hit i,hit j)
+    {
+        return (i.score>j.score);
+    }
+    static bool q_earlier (hit i,hit j)
+    {
+        return (i.q_start<j.q_start);
+    }
 
     bool split_sugar_string(const std::string& row,hit *h);
     bool split_vulgar_string(const std::string& row,hit *h);
