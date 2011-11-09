@@ -143,7 +143,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
     if (is_local)
         command << "exonerate -q q"<<r<<".fas -t t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
     else
-        command << "exonerate -q q"<<r<<".fas -t t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no -m affine:local -E 2>&1";
+        command << "exonerate -q q"<<r<<".fas -t t"<<r<<".fas --showalignment no --showsugar no --showvulgar yes -m affine:local -E 2>&1";
 
     FILE *fpipe;
     if ( !(fpipe = (FILE*)popen(command.str().c_str(),"r")) )
@@ -159,6 +159,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
     while ( fgets( line, sizeof line, fpipe))
     {
         hit h;
+//        bool valid = split_vulgar_string(string(line),&h);
         bool valid = split_sugar_string(string(line),&h);
 
         if (valid)
@@ -203,6 +204,12 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
                 }
             }
         }
+        else if (iter1->q_end > iter2->q_end)
+        {
+            hits->erase(iter2);
+            iter2 = iter1;
+            iter2++;
+        }
         else
         {
             iter1++;
@@ -217,8 +224,6 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
     while ( iter2 != hits->end() )
     {
-
-
         if (iter1->t_end > iter2->t_start)
         {
 //            cout<<"t_end1 overlaps with t_start2: "<<iter1->t_end<<" "<<iter1->q_end<<", "<<iter2->t_start<<" "<<iter2->q_start<<endl;
@@ -265,6 +270,12 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
         iter2++;
     }
 
+    iter1 = hits->begin();
+    while ( iter1 != hits->end() )
+    {
+        cout<<"final: "<<iter1->t_start<<" "<<iter1->q_start<<", "<<iter1->t_end<<" "<<iter1->q_end<<": "<<iter1->score<<endl;
+        iter1++;
+    }
 //    cout<<"Exonerate id "<<r<<".\n";
 
 //    if(NOISE==0)

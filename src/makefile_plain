@@ -20,8 +20,10 @@ SOURCES       = ancestralnode.cpp \
 		boolmatrix.cpp \
 		chaosanchors.cpp \
 		characterprobability.cpp \
+		check_version.cpp \
 		dbmatrix.cpp \
 		eigen.cpp \
+		exonerate_reads.cpp \
 		flmatrix.cpp \
 		fullprobability.cpp \
 		guidetree.cpp \
@@ -51,8 +53,10 @@ OBJECTS       = ancestralnode.o \
 		boolmatrix.o \
 		chaosanchors.o \
 		characterprobability.o \
+		check_version.o \
 		dbmatrix.o \
 		eigen.o \
+		exonerate_reads.o \
 		flmatrix.o \
 		fullprobability.o \
 		guidetree.o \
@@ -180,11 +184,17 @@ characterprobability.o: characterprobability.cpp config.h \
 		terminalsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o characterprobability.o characterprobability.cpp
 
+check_version.o: check_version.cpp check_version.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o check_version.o check_version.cpp
+
 dbmatrix.o: dbmatrix.cpp dbmatrix.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dbmatrix.o dbmatrix.cpp
 
 eigen.o: eigen.cpp eigen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o eigen.o eigen.cpp
+
+exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o exonerate_reads.o exonerate_reads.cpp
 
 flmatrix.o: flmatrix.cpp flmatrix.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o flmatrix.o flmatrix.cpp
