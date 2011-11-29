@@ -117,6 +117,7 @@ extern float branchScalingFactor;
 extern float dnaBranchScalingFactor;
 extern float protBranchScalingFactor;
 
+extern float defaultBranchLength;
 extern float fixedBranchLength;
 extern bool FIXEDBRANCH;
 extern bool MAXBRANCH;

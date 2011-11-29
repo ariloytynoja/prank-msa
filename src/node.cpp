@@ -31,6 +31,7 @@ using namespace std;
 std::string mpTree;
 float halfLength;
 float maxSpan;
+extern float defaultBranchLength;
 
 Node::~Node()
 {
@@ -294,12 +295,11 @@ void Node::findMiddle(int branch)
 
 void Node::divideTree(string tree,string* trees,float* distance)
 {
-
     trees[0] = "";
 
     if ((tree.substr(tree.length()-1)).compare(";")==0)
     {
-        tree = tree.substr(0,tree.find_last_of(")")); // remove last ';' and anything after the last bracket
+        tree = tree.substr(0,tree.find_last_of(")")+1); // remove last ';' and anything after the last bracket
     }
     tree = tree.substr(1,tree.length()-2);     // remove first & last '('
 
@@ -307,9 +307,13 @@ void Node::divideTree(string tree,string* trees,float* distance)
     {
 
         string tmp = tree.substr(0,tree.find(",",0));
-        trees[0] = tmp.substr(0,tmp.find(":",0));
-        distance[0] = atof((tmp.substr(tmp.find(":",0)+1).c_str()));
-
+        trees[0] = tmp;
+        distance[0] = defaultBranchLength;
+        if(tmp.find(":")!=string::npos)
+        {
+            trees[0] = tmp.substr(0,tmp.find(":",0));
+            distance[0] = atof((tmp.substr(tmp.find(":",0)+1).c_str()));
+        }
         tree = tree.substr(tree.find(",",0)+1);
 
         bool trifurc = false;
@@ -340,9 +344,14 @@ void Node::divideTree(string tree,string* trees,float* distance)
         }
         else
         {
-            trees[1] = tree.substr(0,tree.find_last_of(":"));
-            tmp = tree.substr(tree.find_last_of(":")+1);
-            distance[1] = atof(tmp.c_str());
+            trees[1] = tree;
+            distance[1] = defaultBranchLength;
+            if(tree.find(":")!=string::npos)
+            {
+                trees[1] = tree.substr(0,tree.find_last_of(":"));
+                tmp = tree.substr(tree.find_last_of(":")+1);
+                distance[1] = atof(tmp.c_str());
+            }
         }
 
     }
@@ -367,10 +376,12 @@ void Node::divideTree(string tree,string* trees,float* distance)
 
             if (open<=0)
             {
-                string tmp = tree.substr(i+2,tree.find(",",i+2));
-                distance[0] = atof(tmp.c_str());
-
-                tree = tree.substr(tree.find(",",i+2)+1);
+                distance[0] = 0;
+                if(tree.at(i+1) == ':') {
+                    string tmp = tree.substr(i+2,tree.find(",",i+2));
+                    distance[0] = atof(tmp.c_str());
+                }
+                tree = tree.substr(tree.find(",",i)+1);
 
                 bool trifurc = false;
                 open = 0;
@@ -404,11 +415,14 @@ void Node::divideTree(string tree,string* trees,float* distance)
                 else
                 {
 
-                    trees[1] = tree.substr(0,tree.find_last_of(":"));
-
-                    tmp = tree.substr(tree.find_last_of(":")+1);
-                    distance[1] = atof(tmp.c_str());
-
+                    trees[1] = tree;
+                    distance[1] = defaultBranchLength;
+                    if(tree.find(":")!=string::npos)
+                    {
+                        trees[1] = tree.substr(0,tree.find_last_of(":"));
+                        string tmp = tree.substr(tree.find_last_of(":")+1);
+                        distance[1] = atof(tmp.c_str());
+                    }
                 }
                 break;
             }

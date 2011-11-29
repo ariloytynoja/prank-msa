@@ -122,6 +122,7 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
 
     do
     {
+
         string n;
         r = "";
         b = s.begin();
@@ -151,6 +152,7 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                 {
                     char tc[15];
                     sprintf(tc,"#%i#",count++);
+
                     AncestralNode *tn = new AncestralNode(n);
                     tn->setNodeName(tc);
                     if (tn->isLInternal())

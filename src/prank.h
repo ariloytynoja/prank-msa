@@ -200,6 +200,7 @@ float dnaBranchScalingFactor = 1.0;
 float protBranchScalingFactor = 1.0;
 
 // set branch lengths
+float defaultBranchLength = 0.1; // used if nothing else provided
 float fixedBranchLength = -1;
 bool FIXEDBRANCH = false;
 bool MAXBRANCH = false;

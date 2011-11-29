@@ -37,6 +37,7 @@
 
 using namespace std;
 
+extern float defaultBranchLength;
 extern float fixedBranchLength;
 extern float branchScalingFactor;
 extern bool MAXBRANCH;
@@ -69,11 +70,19 @@ AncestralNode::AncestralNode(string s)
     rooted = true;
     ln = s.substr(0,s.find(","));
     rn = s.substr(s.find(",")+1);
-    ld = atof(ln.substr(ln.find(":")+1).c_str());
-    ln = ln.substr(0,ln.find(":"));
-    rd = atof(rn.substr(rn.find(":")+1).c_str());
-    rn = rn.substr(0,rn.find(":"));
+    ld = defaultBranchLength;
+    rd = defaultBranchLength;
 
+    if(ln.find(":") != string::npos)
+    {
+        ld = atof(ln.substr(ln.find(":")+1).c_str());
+        ln = ln.substr(0,ln.find(":"));
+    }
+    if(rn.find(":") != string::npos)
+    {
+        rd = atof(rn.substr(rn.find(":")+1).c_str());
+        rn = rn.substr(0,rn.find(":"));
+    }
     if (ln.at(0)=='#' && ln.at(ln.length()-1)=='#')
     {
         lInternal = true;
