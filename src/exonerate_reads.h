@@ -31,7 +31,6 @@ class Exonerate_reads
     }
 
     bool split_sugar_string(const std::string& row,hit *h);
-    bool split_vulgar_string(const std::string& row,hit *h);
     void delete_files(int r);
 
 public:

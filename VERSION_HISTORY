@@ -1,6 +1,7 @@
 v.111129
 - Allow guide trees with no branch lengths. Default branch length is 0.1;
   use -fixedbranches=# to change.
+- Removed the dependency to boost libraries.
 
 
 v.111013
