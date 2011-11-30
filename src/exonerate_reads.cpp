@@ -20,7 +20,7 @@ Exonerate_reads::Exonerate_reads()
 
 bool Exonerate_reads::test_executable()
 {
-    int status = system("exonerate  >/dev/null");
+    int status = system("exonerate  >/dev/null 2>/dev/null");
     return WEXITSTATUS(status) == 1;
 }
 

@@ -23,6 +23,7 @@
 #include <fstream>
 #include "config.h"
 #include "pwhirschberg.h"
+#include "exonerate_reads.h"
 #include "pwsite.h"
 
 using namespace std;
@@ -148,8 +149,8 @@ void PwHirschberg::setSequences(string* s1,string* s2)
 
     pwsite->resetCounter();
 
-    defineBegin();
-    defineEnd();
+//    defineBegin();
+//    defineEnd();
 
     count = 2;
 }
@@ -160,10 +161,80 @@ void PwHirschberg::alignSeqs()
     totalSites = sl1+sl2;
     countSites = 0;
 
+    defineBegin();
+
+    if (EXONERATE)
+    {
+         this->getAnchors();
+    }
+
+    defineEnd();
+
     divideSeq();
 
 }
 
+
+void PwHirschberg::getAnchors()
+{
+
+    if (NOISE>0)
+        cout<<"lengths: "<<sl1<<" and "<<sl2<<" ("<<anchSkipDist<<")"<<endl;
+
+    if (sl1>anchSkipDist && sl2>anchSkipDist)
+    {
+
+        vector<hit> exonerate_hits;
+        Exonerate_reads er;
+        if (er.test_executable())
+        {
+            er.local_alignment(seq1,seq2,&exonerate_hits, true);
+        }
+
+        vector<pair<int,int> > anchor_pairs;
+
+        for (int i=0; i<exonerate_hits.size(); i++)
+        {
+            hit h = exonerate_hits.at(i);
+            if (NOISE>0)
+                cout<<"e "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
+
+            for (int j=0; j+h.q_start<h.q_end; j+=10)
+            {
+                if (j+h.q_start>5 && j+h.t_start>5)
+                    anchor_pairs.push_back(make_pair(j+h.q_start,j+h.t_start));
+            }
+        }
+
+        if (anchor_pairs.size()>0)
+        {
+            for (int i=0; i<anchor_pairs.size(); i++)
+            {
+
+                if (NOISE>0)
+                    cout<<" ex anchor "<<anchor_pairs.at(i).first<<","<<anchor_pairs.at(i).second<<" *"<<endl;
+
+
+                defineESite(anchor_pairs.at(i).first,anchor_pairs.at(i).second);
+
+                if (NOISE>0)
+                {
+                    cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
+                    cout<<" anc: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
+                }
+
+                divideSeq();
+            }
+        }
+
+        if (NOISE>1)
+        {
+            cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
+            cout<<" end: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
+        }
+    }
+
+}
 
 void PwHirschberg::defineBegin()
 {
@@ -187,6 +258,28 @@ void PwHirschberg::defineBegin()
     beg->vitbY(small);
     beg->vitbM(small);
 
+}
+
+void PwHirschberg::defineESite(int l,int r)
+{
+    end->index(1);
+//    end->isAnchor(true);
+//    end->nullSite(true);
+
+    end->cInd1(l);
+    end->lInd1(l);
+    end->cInd2(r);
+    end->lInd2(r);
+    end->rInd1(l-1);
+    end->rInd2(r-1);
+
+    end->vitfX(small);
+    end->vitfY(small);
+    end->vitfM(small);
+
+    end->vitbX(deltaX1);
+    end->vitbY(deltaX1);
+    end->vitbM(0);
 }
 
 void PwHirschberg::defineEnd()

@@ -23,31 +23,78 @@
 #include "pwhirschberg.h"
 #include "pwsite.h"
 #include "config.h"
+#include "translatesequences.h"
+#include <cstdlib>
 
 using namespace std;
 
-GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,IntMatrix* substScores)
+GuideTree::GuideTree(vector<string>* sequences,vector<string>* names,IntMatrix* substScores)
 {
     bool isDna = (substScores->X()<=5);
-    int ns = seqs->size();
+    int ns = sequences->size();
+
+    string full_alphabet = "ARNDCQEGHILKMFPSTWYVX";
+    if(isDna)
+        full_alphabet = "ACGTURYMKSWHBVDN";
 
     if (NOISE>=0)
         cout<<"Generating approximate guidetree."<<endl;
 
-    vector<string>::iterator si = seqs->begin();
+    vector<string>::iterator si = sequences->begin();
     int longest = 0;
     int slongest = 0;
-    for (; si!=seqs->end(); si++)
+
+    vector<string> local_seqs;
+
+    for (; si!=sequences->end(); si++)
     {
-        if ((int)si->length()>longest)
+        string seq = *si;
+
+        string::iterator ci = seq.begin();
+        for (;ci != seq.end();ci++)
+        {
+            char c = *ci;
+            switch (c)
+            {
+            case '-':
+                seq.erase(ci);
+                ci--;
+                break;
+            default:
+                // Remove characters not in full alphabet
+                if(full_alphabet.find(c) == string::npos) {
+                    seq.erase(ci);
+                    ci--;
+                }
+            }
+        }
+
+        local_seqs.push_back(seq);
+
+        if ((int)seq.length()>longest)
         {
             slongest = longest;
-            longest = si->length();
+            longest = seq.length();
         }
-        else if ((int)si->length()>slongest)
+        else if ((int)seq.length()>slongest)
         {
-            slongest = si->length();
+            slongest = seq.length();
         }
+    }
+
+    vector<string> *seqs = &local_seqs;
+
+    if (isDna && TRANSLATE)
+    {
+        TranslateSequences *trseq = new TranslateSequences();
+        if (!trseq->translateProtein(names,seqs))
+        {
+            cout<<"Translation failed. Exiting."<<endl<<endl;
+            delete trseq;
+            exit(-1);
+        }
+
+        delete trseq;
     }
 
     int delta = int(log( 1-exp(-1.0*pwGapRate*pwDist) )*1000);

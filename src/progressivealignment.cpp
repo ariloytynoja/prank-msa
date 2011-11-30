@@ -142,7 +142,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     Exonerate_reads er;
     if (!er.test_executable())
     {
-        cout<<"The executable for Exonerate not found! Fast alignment anchoring is not used!";
+        cout<<"The executable for Exonerate not found! Fast alignment anchoring is not used!\n\n";
     }
 
     // Get the sequence data
@@ -892,7 +892,11 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         printXml(root,iteration,false);
 
         vector<string> dnaSeqs;
-        trseq->translateDNA(nms,seqs,&dnaSeqs);
+        if (!trseq->translateDNA(nms,seqs,&dnaSeqs))
+        {
+            cout<<"Backtranslation failed. Exiting."<<endl;
+            exit(-1);
+        }
 
         wfa = new WriteFile();
         file = outfile+".nuc."+itos(iteration)+formatExtension(format);

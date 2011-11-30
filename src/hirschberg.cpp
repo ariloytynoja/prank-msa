@@ -530,7 +530,6 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
     else if (EXONERATE)
     {
 
-
         defineBegin();
 
         if (NOISE>0)

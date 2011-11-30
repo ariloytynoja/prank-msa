@@ -80,8 +80,31 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
     vector<string>::iterator sit = sequences->begin();
     dnaSeqs.clear();
     bool replaced = false;
+    string full_alphabet = "ACGTN";
+
     for (; sit!=sequences->end(); sit++)
     {
+        string seq = *sit;
+        string::iterator ci = seq.begin();
+        for (;ci != seq.end();ci++)
+        {
+            char c = *ci;
+            switch (c)
+            {
+            case '-':
+                seq.erase(ci);
+                ci--;
+                break;
+            default:
+                // Remove characters not in full alphabet
+                if(full_alphabet.find(c) == string::npos) {
+                    seq.erase(ci);
+                    ci--;
+                }
+            }
+        }
+        *sit = seq;
+
         for (unsigned int j=0; j<sit->length(); j+=3)
         {
             string codon = sit->substr(j,3);
@@ -126,6 +149,7 @@ bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vecto
     {
 
         string dnaSeq = dnaSeqs.find(*nit)->second;
+
         string nuc = "";
 
         for (unsigned int j=0,i=0; j<pit->length(); j++)

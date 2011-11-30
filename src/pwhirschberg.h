@@ -115,10 +115,12 @@ public:
     void setModel(IntMatrix* scores,int delta, int epsilon);
 
     void defineBegin();
+    void defineESite(int l,int r);
     void defineEnd();
 
     void getMidSite(int s1,int e1,int s2,int e2);
     void alignSeqs();
+    void getAnchors();
     void divideSeq();
 
     double getMaxScore()
