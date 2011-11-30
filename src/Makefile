@@ -8,6 +8,7 @@ INCPATH       = -I/usr/include -I.
 LINK          = g++
 LIBS          = -L/usr/lib
 DEL_FILE      = rm -f
+POD2MAN       = pod2man --utf8 --center "The Probabilistic Alignment Kit" -release="v.111130"
 
 ####### Output directory
 
@@ -84,6 +85,8 @@ OBJECTS       = ancestralnode.o \
 
 TARGET        = prank
 
+MANPAGES      = prank.1
+
 first: all
 ####### Implicit rules
 
@@ -106,14 +109,16 @@ first: all
 
 ####### Build rules
 
-all: Makefile $(TARGET)
+all: Makefile $(TARGET) $(MANPAGES)
 
 $(TARGET):  $(OBJECTS)  
 	$(LINK) -o $(TARGET) $(OBJECTS) $(LIBS)
 
-clean:clean 
+clean:
 	-$(DEL_FILE) $(OBJECTS)
 	-$(DEL_FILE) *~ core *.core
+	-$(DEL_FILE) $(TARGET)
+	-$(DEL_FILE) $(MANPAGES)
 
 ####### Compile
 
@@ -488,3 +493,10 @@ treenode.o: treenode.cpp config.h \
 
 writefile.o: writefile.cpp writefile.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writefile.o writefile.cpp
+
+####### Manpages
+
+%.1: %.1.pod
+	$(POD2MAN) --section=1 --name="$(shell basename $@ .1 | tr a-z A-Z)" $< >$@
+
+doc: $(MANPAGES)

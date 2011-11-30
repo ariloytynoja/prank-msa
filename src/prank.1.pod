@@ -1,0 +1,162 @@
+=head1 NAME
+
+prank - Computes probabilistic multiple sequence alignments
+
+=head1 SYNOPSIS
+
+B<prank> I<sequence_file>
+
+B<prank> [optional parameters] -d=I<sequence_file> [optional parameters]
+
+=head1 DESCRIPTION
+
+The Probabilistic Alignment Kit (PRANK) is a probabilistic multiple alignment
+program for DNA, codon and amino-acid sequences. It's based on a novel algorithm
+that treats insertions correctly and avoids over-estimation of the number of
+deletion events.
+
+In addition, PRANK borrows ideas from maximum likelihood methods used in
+phylogenetics and correctly takes into account the evolutionary distances
+between sequences. Lastly, PRANK allows for defining a potential structure for
+sequences to be aligned and then, simultaneously with the alignment, predicts
+the locations of structural units in the sequences.
+
+=head1 OPTIONS
+
+=head2 INPUT/OUTPUT PARAMETERS
+
+=over 8
+
+=item B<-d=I<sequence_file>>
+
+The input sequence file in FASTA format.
+
+=item B<-t=I<tree_file>>
+
+The tree file to use. If unset, an appriximated NJ tree is generated.
+
+=item B<-o=I<output_file>>
+
+Set the name of the output file. If unset, I<output_file> is set to B<output>.
+
+=item B<-f=I<output_format>>
+
+Set the output format. I<output_format> can be one of B<fasta> (default),
+B<phylipi>, B<phylips>, B<paml>, or B<nexus>.
+
+=item B<-m=I<model_file>>
+
+The model file to use. If unset, I<model_file> is set to B<HKY2/WAG>.
+
+=item B<-support>
+
+Compute posterior support.
+
+=item B<-showxml>
+
+Output alignment xml-file.
+
+=item B<-showtree>
+
+Output alignment guidetree.
+
+=item B<-noanchors>
+
+Do not use Exonerate anchoring. (Exonerate to be installed separately.)
+
+=item B<-shortnames>
+
+Truncate names at first space character.
+
+=item B<-quiet>
+
+Reduce output.
+
+=back
+
+=head2 MODEL PARAMETERS
+
+=over 8
+
+=item B<-F>, B<+F>
+
+Force insertions to be always skipped.
+
+=item B<-gaprate=I<#>>
+
+Set the gap opening rate. The default is B<0.025> for DNA and B<0.005> for
+proteins.
+
+=item B<-gapext=I<#>>
+
+Set the gap extension probability. The default is B<0.75> for DNA and B<0.5> for
+proteins.
+
+=item B<-codon>
+
+Use empirical codon model for coding DNA.
+
+=item B<-DNA>, B<-protein>
+
+Use DNA or protein model, respectively. Disables auto-detection of model.
+
+=item B<-termgap>
+
+Penalise terminal gaps normally.
+
+=item B<-nomissing>
+
+No missing data. Use B<-F> for terminal gaps.
+
+=item B<-e>
+
+Do not remove gaps from pre-aligned sequences.
+
+=back
+
+=head2 OTHER PARAMETERS
+
+=over 8
+
+=item B<-once>
+
+Run only once. The default is to run twice if no guidetree is given.
+
+=item B<-twice>
+
+Run twice always.
+
+=item B<-prunetree>
+
+Prune guide tree branches with no sequence data.
+
+=item B<-uselogs>
+
+Slower but should work for a greater number of sequences.
+
+=item B<-translate>
+
+Translate input data to protein sequences.
+
+=item B<-mttranslate>
+
+Translate input data to protein sequencess using mt table.
+
+=item B<-convert>
+
+Do not align, just convert to a different format.
+
+=item B<-help>
+
+Show an extended help page with more options.
+
+=back
+
+=head1 AUTHORS
+
+B<prank> was written by Ari Loytynoja.
+
+This manual page was written by Manuel Prinz <manuel@debian.org> for the Debian
+project (and may be used by others).
+
+=cut
