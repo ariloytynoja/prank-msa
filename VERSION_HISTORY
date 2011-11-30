@@ -1,3 +1,7 @@
+v.111130
+- Exonerate anchoring now also for guidetree computation. Experimental!
+
+
 v.111129
 - Allow guide trees with no branch lengths. Default branch length is 0.1;
   use -fixedbranches=# to change.
@@ -5,8 +9,9 @@ v.111129
 
 
 v.111013
-- first update in Google Code
+- First update in Google Code
+- Alignment speed ups with Exonerate anchoring.
 
 
 v.101018
-- last version before migration to Google Code
+- Last version before migration to Google Code
