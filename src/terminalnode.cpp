@@ -172,7 +172,7 @@ void TerminalNode::getLowestAlignmentPostProbAt(double* ,int )
     return;
 }
 
-void TerminalNode::outputXml(std::ofstream* ,bool )
+void TerminalNode::outputXml(std::ofstream*,std::map<std::string,std::string> * ,bool )
 {
     return;
 }

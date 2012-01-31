@@ -615,6 +615,16 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         printAlignment(root,&names,&sequences,0,isDna);
 
+        if (PRINTTREE)
+        {
+            string tmpTree = "";
+            root->getCleanNewick(&tmpTree);
+
+            ofstream seqout((outfile+".0.dnd").c_str());
+            seqout<<tmpTree<<endl;
+            seqout.close();
+        }
+
         delete root;
         ra.cleanUp();
 
@@ -931,6 +941,107 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
         alignment = new char[n*l];
     }
 
+    this->getAlignmentMatrix(root,alignment,translate);
+
+    string type = "";
+
+    if (TRANSLATE && !translate)
+        type="pep.";
+    else if (TRANSLATE && translate)
+        type="nuc.";
+
+    ofstream seqout((outfile+"."+type+itos(iteration)+".xml").c_str());
+
+    vector<string> nms;
+    root->getTerminalNames(&nms);
+    vector<string>::iterator si = nms.begin();
+
+    // header
+    seqout<<"<ms_alignment>"<<endl;
+    // tree
+    string* treeStr = new string();
+    int sInd = 1;
+    root->writeNewick(treeStr,&sInd);
+    seqout<<"<newick>"<<*treeStr<<"</newick>"<<endl;
+    delete treeStr;
+
+    // nodes
+    seqout<<"<nodes>"<<endl;
+    // terminal nodes
+    for (int j=0; j<n; j++)
+    {
+        seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<(*si++)<<"\">"<<endl;
+        seqout<<"  <sequence>"<<endl<<"    ";
+        if (CODON || translate)
+        {
+            for (int i=0; i<l*3; i++)
+            {
+                seqout<<alignment[j*l*3+i];
+            }
+        }
+        else
+        {
+            for (int i=0; i<l; i++)
+            {
+                seqout<<alignment[j*l+i];
+            }
+        }
+        seqout<<endl;
+        seqout<<"  </sequence>"<<endl<<"</leaf>"<<endl;
+    }
+    nms.clear();
+
+    // internal nodes
+    map<string,string> anc_seqs;
+    this->getAncestralAlignmentSeqs(root,&anc_seqs);
+
+
+    root->setSiteLength(l);
+    for (int i=0; i<l; i++)
+    {
+        root->setSiteIndex(i,i);
+    }
+    root->outputXml(&seqout,&anc_seqs,translate);
+    seqout<<"</nodes>"<<endl;
+
+    if(nState>1 || DOPOST)
+        seqout<<"<model>"<<endl;
+
+    // model
+    if(nState>1)
+    {
+        for (int k=0; k<nState; k++)
+        {
+            seqout<<"  <probability id=\""<<k+1<<"\" name=\""<<hmm->getStName(k)<<"\" ";
+            seqout<<"color=\""<<hmm->getDrawCl(k)<<"\" style=\""<<hmm->getDrawPt(k)<<"\" ";
+            seqout<<"offset=\""<<hmm->getDrawOf(k)<<"\"";
+            if (nState>1)
+            {
+                seqout<<" show=\"yes\"/>"<<endl;
+            }
+            else
+            {
+                seqout<<" show=\"no\"/>"<<endl;
+            }
+        }
+    }
+    if (DOPOST)
+        seqout<<"  <probability id=\""<<nState+1<<"\" name=\"postprob\" color=\"gray\" style=\"bar\" show=\"yes\"/>"<<endl;
+
+    if(nState>1 || DOPOST)
+        seqout<<"</model>"<<endl;
+
+    seqout<<"</ms_alignment>"<<endl;
+
+    delete []alignment;
+
+}
+
+void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate)
+{
+    int n = root->getTerminalNodeNumber();
+    int l = root->getSequence()->length();
+
     if (!translate)
     {
 
@@ -1015,86 +1126,6 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
         }
     }
 
-
-    string type = "";
-
-    if (TRANSLATE && !translate)
-        type="pep.";
-    else if (TRANSLATE && translate)
-        type="nuc.";
-
-    ofstream seqout((outfile+"."+type+itos(iteration)+".xml").c_str());
-
-    vector<string> nms;
-    root->getTerminalNames(&nms);
-    vector<string>::iterator si = nms.begin();
-
-    // header
-    seqout<<"<ms_alignment>"<<endl;
-    // tree
-    string* treeStr = new string();
-    int sInd = 1;
-    root->writeNewick(treeStr,&sInd);
-    seqout<<"<newick>"<<*treeStr<<"</newick>"<<endl;
-    delete treeStr;
-
-    // nodes
-    seqout<<"<nodes>"<<endl;
-    // terminal nodes
-    for (int j=0; j<n; j++)
-    {
-        seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<(*si++)<<"\">"<<endl;
-        seqout<<"  <sequence>"<<endl<<"    ";
-        if (CODON || translate)
-        {
-            for (int i=0; i<l*3; i++)
-            {
-                seqout<<alignment[j*l*3+i];
-            }
-        }
-        else
-        {
-            for (int i=0; i<l; i++)
-            {
-                seqout<<alignment[j*l+i];
-            }
-        }
-        seqout<<endl;
-        seqout<<"  </sequence>"<<endl<<"</leaf>"<<endl;
-    }
-    nms.clear();
-
-    // internal nodes
-    root->setSiteLength(l);
-    for (int i=0; i<l; i++)
-    {
-        root->setSiteIndex(i,i);
-    }
-    root->outputXml(&seqout,translate);
-    seqout<<"</nodes>"<<endl<<"<model>"<<endl;
-
-    // model
-    for (int k=0; k<nState; k++)
-    {
-        seqout<<"  <probability id=\""<<k+1<<"\" name=\""<<hmm->getStName(k)<<"\" ";
-        seqout<<"color=\""<<hmm->getDrawCl(k)<<"\" style=\""<<hmm->getDrawPt(k)<<"\" ";
-        seqout<<"offset=\""<<hmm->getDrawOf(k)<<"\"";
-        if (nState>1)
-        {
-            seqout<<" show=\"yes\"/>"<<endl;
-        }
-        else
-        {
-            seqout<<" show=\"no\"/>"<<endl;
-        }
-    }
-    if (DOPOST)
-        seqout<<"  <probability id=\""<<nState+1<<"\" name=\"postprob\" color=\"gray\" style=\"bar\" show=\"yes\"/>"<<endl;
-
-    seqout<<"</model>"<<endl<<"</ms_alignment>"<<endl;
-
-    delete []alignment;
-
 }
 
 void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nms,vector<string> *sqs,int iteration)
@@ -1134,15 +1165,53 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nm
 
     char* alignment;
     if (CODON)
-    {
         alignment = new char[n*l*3];
-    }
     else
-    {
         alignment = new char[n*l];
+
+
+    this->getAncestralAlignmentMatrix(root,alignment);
+
+
+    ni = anms.begin();
+    int j=0;
+    for (; ni!=anms.end(); j++,ni++)
+    {
+        ancSeq<<">"<<*ni<<endl;
+        for (int i=0; i<l; i++)
+        {
+            ancSeq<<alignment[j*l+i];
+        }
+        ancSeq<<endl;
     }
 
+    delete []alignment;
+    ancSeq.close();
+
+    if (WRITEANCSEQ && !WRITEANC)
+        return;
+
+    FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"w");
+    fclose(ancPro);
+
+    int *insSite = new int[l];
+    int i;
+    FOR(i,l)
+    {
+        insSite[i]=0;
+    }
+    root->writeAncCharacters(insSite,iteration);
+
+    delete []insSite;
+
+    return;
+}
+
+void ProgressiveAlignment::getAncestralAlignmentMatrix(AncestralNode *root,char* alignment)
+{
     vector<string> col;
+    int n = root->getInternalNodeNumber();
+    int l = root->getSequence()->length();
 
     int i;
     FOR(i,l)
@@ -1169,38 +1238,38 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nm
             j++;
         }
     }
+}
 
-    ni = anms.begin();
+void ProgressiveAlignment::getAncestralAlignmentSeqs(AncestralNode *root,map<string,string> *anc_seqs)
+{
+    int l = root->getSequence()->length();
+    int n = root->getInternalNodeNumber();
+
+    char* anc_alignment;
+    if (CODON)
+        anc_alignment = new char[n*l*3];
+    else
+        anc_alignment = new char[n*l];
+
+    this->getAncestralAlignmentMatrix(root,anc_alignment);
+
+    vector<string> anms;
+    root->getInternalNames(&anms);
+
+    vector<string>::iterator ni = anms.begin();
     int j=0;
     for (; ni!=anms.end(); j++,ni++)
     {
-        ancSeq<<">"<<*ni<<endl;
+        stringstream ss;
         for (int i=0; i<l; i++)
         {
-            ancSeq<<alignment[j*l+i];
+            ss<<anc_alignment[j*l+i];
         }
-        ancSeq<<endl;
+        anc_seqs->insert(pair<string,string>(*ni,ss.str()));
     }
 
-    delete []alignment;
-    ancSeq.close();
+    delete []anc_alignment;
 
-    if (WRITEANCSEQ && !WRITEANC)
-        return;
-
-    FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"w");
-    fclose(ancPro);
-
-    int *insSite = new int[l];
-    FOR(i,l)
-    {
-        insSite[i]=0;
-    }
-    root->writeAncCharacters(insSite,iteration);
-
-    delete []insSite;
-
-    return;
 }
 
 string ProgressiveAlignment::formatExtension(int format)

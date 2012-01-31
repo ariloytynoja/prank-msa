@@ -185,11 +185,11 @@ public:
     virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool ) {}
 
     virtual void setSiteLength(int ) {}
-    virtual void setSiteIndex(int ,int ) {};
+    virtual void setSiteIndex(int ,int ) {}
 
     virtual void getLowestAlignmentPostProbAt(double*,int) = 0;
 
-    virtual void outputXml(std::ofstream* out,bool triple) = 0;
+    virtual void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple) = 0;
 
     virtual void writeNewick(std::string* ,int* ) {}
     virtual void getNewick(std::string* tree) = 0;

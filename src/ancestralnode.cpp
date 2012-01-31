@@ -401,7 +401,9 @@ void AncestralNode::alignThisNode()
             {
                 this->setSiteIndex(i,i);
             }
-            this->outputXml(&seqout,false);
+
+            map<string,string> anc_seqs;
+            this->outputXml(&seqout,&anc_seqs,false);
             seqout<<"</nodes>"<<endl<<"<model>"<<endl;
 
             // model
@@ -747,68 +749,78 @@ void AncestralNode::getLowestAlignmentPostProbAt(double* p,int i)
 
 }
 
-void AncestralNode::outputXml(std::ofstream* out,bool triple)
+void AncestralNode::outputXml(std::ofstream* out,map<string,string> *anc_seqs,bool triple)
 {
-    lChild->outputXml(out,triple);
-    rChild->outputXml(out,triple);
+    lChild->outputXml(out,anc_seqs,triple);
+    rChild->outputXml(out,anc_seqs,triple);
 
     (*out)<<"<node id=\""<<nodeName<<"\">"<<endl;
 
+    map<string,string>::iterator it = anc_seqs->find(nodeName);
+
+    if(it != anc_seqs->end())
+    {
+        (*out)<<"  <sequence>"<<endl<<"    "<<it->second<<endl<<"  </sequence>"<<endl;
+    }
+
     int nState = hmm->getNStates();
 
-    for (int k=0; k<hmm->getNStates(); k++)
+    if(nState>1)
     {
-        (*out)<<"  <probability id=\""<<k+1<<"\">"<<endl<<"    ";
-
-        for (int m=0; m<siteLength; m++)
+        for (int k=0; k<hmm->getNStates(); k++)
         {
+            (*out)<<"  <probability id=\""<<k+1<<"\">"<<endl<<"    ";
 
-            if (m>0)
+            for (int m=0; m<siteLength; m++)
             {
-                (*out)<<",";
-            }
 
-            int i = siteIndex[m];
-
-            if (CODON || triple)
-            {
-                if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )
+                if (m>0)
                 {
-                    (*out)<<"-1,-1,-1";
+                    (*out)<<",";
                 }
-                else
+
+                int i = siteIndex[m];
+
+                if (CODON || triple)
                 {
-                    if (seq->stateProbAt(k,i)>=0)
+                    if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )
                     {
-                        int t = (int)(seq->stateProbAt(k,i)*100+0.5);
-                        (*out)<<t<<","<<t<<","<<t;
+                        (*out)<<"-1,-1,-1";
                     }
                     else
                     {
-                        (*out)<<"0,0,0";
+                        if (seq->stateProbAt(k,i)>=0)
+                        {
+                            int t = (int)(seq->stateProbAt(k,i)*100+0.5);
+                            (*out)<<t<<","<<t<<","<<t;
+                        }
+                        else
+                        {
+                            (*out)<<"0,0,0";
+                        }
                     }
-                }
-            }
-            else
-            {
-                if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )
-                {
-                    (*out)<<"-1";
                 }
                 else
                 {
-                    if (seq->stateProbAt(k,i)>=0)
+                    if (i<0 || (SKIPINS && getSequence()->isInsertion(i)) )
                     {
-                        (*out)<<(int)(seq->stateProbAt(k,i)*100+0.5);
+                        (*out)<<"-1";
                     }
                     else
                     {
-                        (*out)<<"0";
+                        if (seq->stateProbAt(k,i)>=0)
+                        {
+                            (*out)<<(int)(seq->stateProbAt(k,i)*100+0.5);
+                        }
+                        else
+                        {
+                            (*out)<<"0";
+                        }
                     }
                 }
             }
+            (*out)<<endl<<"  </probability>"<<endl;
         }
-        (*out)<<endl<<"  </probability>"<<endl;
     }
 
     if (DOPOST)

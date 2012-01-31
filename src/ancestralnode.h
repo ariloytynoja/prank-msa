@@ -61,7 +61,7 @@ public:
     void partlyAlignSequences();
 
     void getCleanNewick(std::string* tree);
-    void outputXml(std::ofstream* out,bool triple);
+    void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple);
 
     void writeNewick(std::string* tree,int* sInd);
     void getNewick(std::string* tree);

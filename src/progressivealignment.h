@@ -25,6 +25,7 @@
  */
 
 #include <string>
+#include <map>
 #include "config.h"
 #include "ancestralnode.h"
 #include "treenode.h"
@@ -38,7 +39,10 @@ public:
     ~ProgressiveAlignment();
 
     void printXml(AncestralNode *root,int iteration,bool translate);
+    void getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate);
     void printAncestral(AncestralNode *root,std::vector<std::string> *names,std::vector<std::string> *seqs,int iteration);
+    void getAncestralAlignmentMatrix(AncestralNode *root,char* alignment);
+    void getAncestralAlignmentSeqs(AncestralNode *root,map<string,string> *anc_seqs);
     void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,int iteration, bool isDna);
     std::string formatExtension(int format);
 private:
