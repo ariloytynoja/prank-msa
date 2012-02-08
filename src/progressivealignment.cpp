@@ -587,7 +587,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     if (PREALIGNED)
     {
 
-        if (TREEFROMALIGNMENT)
+        if (TREEFROMALIGNMENT || PRINTTREE)
         {
             string tmpTree = "";
             root->getCleanNewick(&tmpTree);
