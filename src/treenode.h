@@ -69,7 +69,7 @@ protected:
 public:
     virtual ~TreeNode();
 
-    virtual void alignSequences(int ) {}
+    virtual void alignSequences() {}
     virtual void readAlignment() {}
     virtual void partlyAlignSequences() {}
 
@@ -159,7 +159,6 @@ public:
     virtual void setCharString(std::vector<std::string>* sns,std::vector<std::string>* sqs) = 0;
     virtual void getCharStrings(std::vector<std::string>* sqs) = 0;
 
-    virtual void setAnnotation(std::map<std::string,FlMatrix*>* annotation) = 0;
 
     virtual Sequence* getSequence() = 0;
 
@@ -183,6 +182,7 @@ public:
 
     virtual void getCharactersAt(std::vector<std::string>* ,int ) {}
     virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool ) {}
+    virtual void getAllCharactersAt(std::vector<std::string>* ,int ,bool ) {}
 
     virtual void setSiteLength(int ) {}
     virtual void setSiteIndex(int ,int ) {}

@@ -63,6 +63,8 @@ void WriteFile::writeSeqs(const char* outputfile, std::vector<std::string>* name
         this->writeSimpleNexus(outputfile,names,seqs);
     else if (outform == 18)
         this->writeSequential(outputfile,names,seqs,false);
+    else if (outform == 19)
+        this->writeLongSequential(outputfile,names,seqs);
     else
         this->writeFasta(outputfile,names,seqs);
 
@@ -193,6 +195,33 @@ void WriteFile::writeSequential(const char* outputfile,std::vector<std::string> 
                 seq = "";
             }
         }
+    }
+
+    output.close();
+}
+
+void WriteFile::writeLongSequential(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs)
+{
+    ofstream output( outputfile );
+
+    // Checking the existence of specified file, and possibility to open it in write mode
+    if (! output)
+    {
+        cout<<"Failed to open output file "<<outputfile<<". Exiting.\n\n";
+        exit(-1);
+    }
+
+    string seq, temp = "";  // Initialization
+
+    vector<string>::iterator si = seqs->begin();
+    vector<string>::iterator ni = names->begin();
+
+    output<<seqs->size()<<" "<<si->length()<<endl;
+
+    // Main loop : for all sequences in vector container
+    for (; ni != names->end(); ni++,si++)
+    {
+        output << *ni<< endl<<*si<<endl;
     }
 
     output.close();

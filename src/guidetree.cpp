@@ -28,7 +28,7 @@
 
 using namespace std;
 
-GuideTree::GuideTree(vector<string>* sequences,vector<string>* names,IntMatrix* substScores)
+void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntMatrix* substScores)
 {
     bool isDna = (substScores->X()<=5);
     int ns = sequences->size();
@@ -276,7 +276,7 @@ GuideTree::GuideTree(vector<string>* sequences,vector<string>* names,IntMatrix* 
     delete distance;
 }
 
-GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,bool isDna)
+void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDna)
 {
 
     int ns = seqs->size();
@@ -284,7 +284,7 @@ GuideTree::GuideTree(vector<string>* seqs,vector<string>* names,bool isDna)
     distance->initialise(0);
 
     if (NOISE>=0)
-        cout<<"Generating improved guidetree."<<endl;
+        cout<<"Computing a guidetree from a pre-defined multiple alignment."<<endl;
 
     vector<string>::iterator si = seqs->begin();
     vector<string>::iterator se = seqs->end();

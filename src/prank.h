@@ -39,12 +39,22 @@ int NOISE = 0;
 
 // sequence data file
 string seqfile = "";
+string seqfile1 = "";
+string seqfile2 = "";
 
 // guide tree file
 string treefile = "";
+string treefile1 = "";
+string treefile2 = "";
 
 // alignment output file
 string outfile = "output";
+
+// alternative temp dir
+string tempdir = "";
+
+string mafftpath = "";
+string exoneratepath = "";
 
 // structure model file
 string hmmname = "";
@@ -64,8 +74,14 @@ string dnafile = "";
 
 /********* more input/output: **********/
 
+// estimate guide tree from mafft alignment (before Prank realignment)
+bool MAFFTALIGNMENT = true;
+
 // estimate guide tree from input alignment (before realignment)
 bool TREEFROMALIGNMENT = false;
+
+// merge two alignments
+bool MERGE = false;
 
 // output alignment format
 int format = 8;
@@ -167,11 +183,6 @@ bool MTTABLE = false;
 bool NXis1 = true;
 
 
-// priors file (not really working)
-string annofile = "";
-bool PRIORS = false;
-
-
 /********* more model: pairwise alignment for guide tree **********/
 
 // expected pairwise distance
@@ -237,21 +248,19 @@ bool SKIPINS = false;
 /********* technical: anchoring **********/
 
 // use anchors
-bool ANCHORS = false;
 bool EXONERATE = true;
 
-// maximum anchor distance
+// initial anchor distance
 int initialAnchDist = 500;
-int maxAnchDist = 1000;
 
 // minimum anchor distance
-int minAnchDist = 20;
+int minAnchDist = 30;
 
 // anchor skip distance
-int anchSkipDist = 100;
+int anchSkipDist = 200;
 
 // anchor drop distance
-int anchDropDist = 15;
+int anchDropDist = 10;
 
 // don't infer gaps caused by missing data
 bool PATCHMISSING = true;
@@ -276,21 +285,10 @@ bool PWMATRIXMAXSIZE = true;
 float pwInitialMatrixSize = 1.5;
 
 
-/********* pairwise genomic alignment **********/
-
-bool PWGENOMIC = false;
-
-// parameters for pw genomic alignment
-float pwgendist = 0.3;
-
 /********* personalised stuff **********/
 
 // turn +F on at a later point
 int fOnNode = -1;
-
-// anchor file for external hard anchors
-std::string anchorfile = "";
-bool HARDANCHORS = false;
 
 
 /************************************************/

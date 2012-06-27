@@ -36,6 +36,7 @@ public:
     void writeFasta(const char* outputfile, std::vector<std::string> * names, std::vector<std::string> * seqs);
     void writeInterleaved(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs);
     void writeSequential(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs,bool truncate);
+    void writeLongSequential(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs);
     void writeNexus(const char* outputfile,std::vector<std::string> *names,std::vector<std::string> *seqs, bool isDna, AncestralNode *root, bool translate);
     void writeSimpleNexus(const char* outputfile, std::vector<std::string> * names, std::vector<std::string> * seqs);
 

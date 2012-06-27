@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <cstdlib>
+#include <climits>
 #include <iostream>
 #include <fstream>
 #include "config.h"
@@ -66,7 +67,8 @@ void PwHirschberg::cleanUp()
 
 PwHirschberg::PwHirschberg(int sl1)
 {
-    small = -100000000;
+    small = -1000000000;
+
     sl1 = sl1+1;
 
     // Initialize matrices
@@ -186,10 +188,7 @@ void PwHirschberg::getAnchors()
 
         vector<hit> exonerate_hits;
         Exonerate_reads er;
-        if (er.test_executable())
-        {
-            er.local_alignment(seq1,seq2,&exonerate_hits, true);
-        }
+        er.local_alignment(seq1,seq2,&exonerate_hits, true);
 
         vector<pair<int,int> > anchor_pairs;
 

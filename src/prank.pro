@@ -2,7 +2,8 @@
 # Project created by QtCreator 2010-06-28T10:03:12
 # -------------------------------------------------
 QT -= core \
-    gui
+    gui \
+    webkit
 TARGET = prank
 CONFIG = debug
 
@@ -18,7 +19,6 @@ SOURCES += writefile.cpp \
     sequence.cpp \
     readnewick.cpp \
     readfile.cpp \
-    readannotation.cpp \
     readalignment.cpp \
     pwsite.cpp \
     pwhirschberg.cpp \
@@ -36,12 +36,12 @@ SOURCES += writefile.cpp \
     eigen.cpp \
     dbmatrix.cpp \
     characterprobability.cpp \
-    chaosanchors.cpp \
     boolmatrix.cpp \
     ancestralsequence.cpp \
     ancestralnode.cpp \
     check_version.cpp \
-    exonerate_reads.cpp
+    exonerate_reads.cpp \
+    mafft_alignment.cpp
 OTHER_FILES += \  
     ../VERSION_HISTORY
 HEADERS += writefile.h \
@@ -53,7 +53,6 @@ HEADERS += writefile.h \
     sequence.h \
     readnewick.h \
     readfile.h \
-    readannotation.h \
     readalignment.h \
     pwsite.h \
     pwhirschberg.h \
@@ -72,16 +71,17 @@ HEADERS += writefile.h \
     dbmatrix.h \
     config.h \
     characterprobability.h \
-    chaosanchors.h \
     boolmatrix.h \
     ancestralsequence.h \
     ancestralnode.h \
     check_version.h \
-    exonerate_reads.h
+    exonerate_reads.h \
+    mafft_alignment.h
 
 
-LIBS += -lboost_regex-mt
 INCLUDEPATH += /usr/include
+
+
 
 
 

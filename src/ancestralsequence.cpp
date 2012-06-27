@@ -68,7 +68,6 @@ AncestralSequence::AncestralSequence()
 {
 
     terminal = false;
-    hasPrior = false;
 
     string alpha = hmm->getAlphabet();
     sAlpha = alpha.length();

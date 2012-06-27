@@ -40,7 +40,6 @@ TerminalSequence::TerminalSequence(string* s)
 {
 
     terminal = true;
-    hasPrior = false;
 
     string alpha = hmm->getAlphabet();
     sAlpha = alpha.length();

@@ -1054,6 +1054,40 @@ void HMModel::alignmentModel(AncestralNode *tn)
         }
     }
 
+//    cout<<"dist "<<ld<<endl;
+//    cout<<"twr\n";
+//    for(int i=0;i<as;i++)
+//    {
+//        cout<<twr[i]<<" ";
+//    }
+
+//    cout<<"\ntwu\n";
+//    for(int i=0;i<as;i++)
+//    {
+//        for(int j=0;j<as;j++)
+//        {
+//            cout<<twu[i*as+j]<<" ";
+//        }
+//        cout<<endl;
+//    }
+//    cout<<"\ntwv\n";
+//    for(int i=0;i<as;i++)
+//    {
+//        for(int j=0;j<as;j++)
+//        {
+//            cout<<twv[i*as+j]<<" ";
+//        }
+//        cout<<endl;
+//    }
+//    cout<<"tmr\n";
+//    for(int i=0;i<as;i++)
+//    {
+//        for(int j=0;j<as;j++)
+//        {
+//            cout<<tmr[i*as+j]<<" ";
+//        }
+//        cout<<endl;
+//    }
 
     if (as==4)
     {

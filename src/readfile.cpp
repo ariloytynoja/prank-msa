@@ -96,11 +96,41 @@ void ReadFile::countDnaFreqs(float* freqs)
         isRna=true;
 }
 
+void ReadFile::countDnaFreqs(float* freqs,vector<string> *pseqs)
+{
+    isRna=false;
+    string nucs = "ACGTU";
+
+    int pos;
+    int nt = 0;
+    int nu = 0;
+    vector<string>::iterator si = pseqs->begin();
+    for (; si!=pseqs->end(); si++)
+    {
+        for (unsigned int i=0; i<(*si).length(); i++)
+        {
+            pos= nucs.find((*si).at(i));
+            if (pos<0 || pos>4)
+                continue;
+            if (pos==3)
+                nt++;
+            if (pos==4)
+                nu++;
+            if (pos==4)
+                pos--;
+            freqs[pos]++;
+        }
+    }
+    if (nu>nt)
+        isRna=true;
+}
+
 int ReadFile::readFile(const char* inputfile)
 {
 
     ifstream input(inputfile, ios::in);
-
+    names.clear();
+    seqs.clear();
 
     if (!input)
     {

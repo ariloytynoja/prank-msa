@@ -29,7 +29,6 @@ class AncestralSequence : public Sequence
     DbMatrix* mlCharProb; // character probabilities given the tree below
     FlMatrix* postProb;   // alignment posterior probabilities
     FlMatrix* stateProb;  // state posterior probabilities
-    FlMatrix* priorProb;
 
     IntMatrix* lcIndex;       // index of corresponding characters in child seqs
     IntMatrix* rcIndex;

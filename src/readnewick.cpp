@@ -80,7 +80,7 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
     // unrooted
     if (comma==open+1)
     {
-        if (NOISE>=0)
+        if (NOISE>0)
             cout<<"Unrooted tree, using midpoint rooting."<<endl;
 
         Node* n = new Node(s);

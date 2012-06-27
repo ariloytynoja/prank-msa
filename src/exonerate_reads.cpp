@@ -20,13 +20,42 @@ Exonerate_reads::Exonerate_reads()
 
 bool Exonerate_reads::test_executable()
 {
-    int status = system("exonerate  >/dev/null 2>/dev/null");
+
+    int status = -1;
+
+    #if defined (__CYGWIN__)
+    char path[200];
+    int length = readlink("/proc/self/exe",path,200-1);
+	
+    string epath = string(path).substr(0,length);
+    epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+    exoneratepath = epath;
+    epath = epath+"exonerate.exe > /dev/null 2>/dev/null";
+    status = system(epath.c_str());
+
+    # else
+    status = system("exonerate  >/dev/null 2>/dev/null");
+
+    if(WEXITSTATUS(status) != 1)
+    {
+        char path[200];
+        int length = readlink("/proc/self/exe",path,200-1);
+        string epath = string(path).substr(0,length);
+        epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+        exoneratepath = epath;
+        epath = epath+"exonerate >/dev/null 2>/dev/null";
+        status = system(epath.c_str());
+    }
+    #endif
+
+    if(WEXITSTATUS(status) == 1 && NOISE>=0)
+        cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";
+
     return WEXITSTATUS(status) == 1;
 }
 
 bool Exonerate_reads::split_sugar_string(const string& row,hit *h)
 {
-
     string method; string lname; int lst; int len; char lstr; string rname; int rst; int ren; char rstr; int score;
 
     istringstream str(row);
@@ -56,7 +85,33 @@ bool Exonerate_reads::split_sugar_string(const string& row,hit *h)
 void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, bool is_local)
 {
 
+    ofstream q_output;
+    ofstream t_output;
+
+    string tmp_dir = this->get_temp_dir();
+
     int r = rand();
+    while(true)
+    {
+
+        stringstream q_name;
+        stringstream t_name;
+
+        q_name <<tmp_dir<<"q"<<r<<".fas";
+        t_name <<tmp_dir<<"t"<<r<<".fas";
+
+        ifstream q_file(q_name.str().c_str());
+        ifstream t_file(t_name.str().c_str());
+
+        if(!q_file && !t_file)
+        {
+            q_output.open( q_name.str().c_str(), (ios::out) );
+            t_output.open( t_name.str().c_str(), (ios::out) );
+
+            break;
+        }
+        r = rand();
+    }
 
     char ic = 'X';
     if(DNA)
@@ -92,17 +147,11 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
     }
 
-    stringstream q_name;
-    q_name <<"q"<<r<<".fas";
 
-    ofstream q_output( q_name.str().c_str(), (ios::out));
     q_output<<">left"<<endl<<left<<endl;
     q_output.close();
 
-    stringstream t_name;
-    t_name <<"t"<<r<<".fas";
 
-    ofstream t_output( t_name.str().c_str(), (ios::out));
     t_output<<">right"<<endl<<right<<endl;
     t_output.close();
 
@@ -110,7 +159,20 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
     // exonerate command for local alignment
 
     stringstream command;
-    command << "exonerate -q q"<<r<<".fas -t t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
+    command<<exoneratepath<<"exonerate  ";
+
+//    #if defined (__CYGWIN__)
+//    char path[200];
+//    int length = readlink("/proc/self/exe",path,200-1);
+	
+//    string epath = string(path).substr(0,length);
+//    epath.replace(epath.rfind("prank"),string("prank").size(),string("exonerate.exe "));
+//    command<<epath;
+ 
+//    # else
+//    command<<"exonerate  ";
+//    #endif
+    command << " -q "+tmp_dir+"q"<<r<<".fas -t "+tmp_dir+"t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
 
     FILE *fpipe;
     if ( !(fpipe = (FILE*)popen(command.str().c_str(),"r")) )
@@ -215,7 +277,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
             if(float(iter1->score/(iter1->t_end - iter1->t_start)) <
                     float(iter2->score/(iter2->t_end - iter2->t_start)))
             {
-                iter1->score *= float((iter1->t_end - iter1->t_start -overlap))/float((iter1->t_end - iter1->t_start));
+                iter1->score *= int ( float((iter1->t_end - iter1->t_start -overlap))/float((iter1->t_end - iter1->t_start)) );
 
                 iter1->t_end-=overlap;
                 iter1->q_end-=overlap;
@@ -234,7 +296,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
             }
             else
             {
-                iter2->score *= float((iter2->t_end - iter2->t_start -overlap))/float((iter2->t_end - iter2->t_start));
+                iter2->score *= int( float((iter2->t_end - iter2->t_start -overlap))/float((iter2->t_end - iter2->t_start)) );
 
                 iter2->t_start+=overlap;
                 iter2->q_start+=overlap;
@@ -260,7 +322,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
             if(float(iter1->score/(iter1->q_end - iter1->q_start)) <
                     float(iter2->score/(iter2->q_end - iter2->q_start)))
             {
-                iter1->score *= float((iter1->t_end - iter1->t_start -overlap))/float((iter1->t_end - iter1->t_start));
+                iter1->score *= int( float((iter1->t_end - iter1->t_start -overlap))/float((iter1->t_end - iter1->t_start)) );
 
                 iter1->t_end-=overlap;
                 iter1->q_end-=overlap;
@@ -279,7 +341,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
             }
             else
             {
-                iter2->score *= float((iter2->t_end - iter2->t_start -overlap))/float((iter2->t_end - iter2->t_start));
+                iter2->score *= int( float((iter2->t_end - iter2->t_start -overlap))/float((iter2->t_end - iter2->t_start)) );
 
                 iter2->t_start+=overlap;
                 iter2->q_start+=overlap;
@@ -308,11 +370,14 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
 void Exonerate_reads::delete_files(int r)
 {
+
+    string tmp_dir = this->get_temp_dir();
+
     stringstream q_name;
-    q_name <<"q"<<r<<".fas";
+    q_name <<tmp_dir<<"q"<<r<<".fas";
 
     stringstream t_name;
-    t_name <<"t"<<r<<".fas";
+    t_name <<tmp_dir<<"t"<<r<<".fas";
 
     if ( remove( q_name.str().c_str() ) != 0 )
         perror( "Error deleting file" );

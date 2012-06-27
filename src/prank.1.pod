@@ -60,9 +60,21 @@ Output alignment xml-file.
 
 Output alignment guidetree.
 
+=item B<-showanc>
+
+Output ancestral sequences.
+
 =item B<-noanchors>
 
 Do not use Exonerate anchoring. (Exonerate to be installed separately.)
+
+=item B<-nomafft>
+
+Do not use MAFFT for guide tree. (MAFFT to be installed separately.)
+
+=item B<-njtree>
+
+Estimate tree from an input alignment (and realign).
 
 =item B<-shortnames>
 
@@ -71,6 +83,28 @@ Truncate names at first space character.
 =item B<-quiet>
 
 Reduce output.
+
+=back
+
+=head2 ALIGNMENT MERGE
+
+=over 8
+
+=item B<-d1=I<alignment_file>>
+
+The first input alignment file in FASTA format.
+
+=item B<-d2=I<alignment_file>>
+
+The second input alignment file in FASTA format.
+
+=item B<-t1=I<tree_file>>
+
+The tree file for the first alignment. If unset, an appriximated NJ tree is generated.
+
+=item B<-t2=I<tree_file>>
+
+The tree file for the second alignment. If unset, an appriximated NJ tree is generated.
 
 =back
 
@@ -108,7 +142,7 @@ Penalise terminal gaps normally.
 
 No missing data. Use B<-F> for terminal gaps.
 
-=item B<-e>
+=item B<-keep>
 
 Do not remove gaps from pre-aligned sequences.
 
@@ -146,9 +180,18 @@ Translate input data to protein sequencess using mt table.
 
 Do not align, just convert to a different format.
 
+=item B<-dna=I<dna_sequence_file>>
+
+DNA sequence file for backtranslation of protein alignment.
+
+
 =item B<-help>
 
 Show an extended help page with more options.
+
+=item B<-version>
+
+Show version and check for updates.
 
 =back
 
@@ -156,7 +199,7 @@ Show an extended help page with more options.
 
 B<prank> was written by Ari Loytynoja.
 
-This manual page was written by Manuel Prinz <manuel@debian.org> for the Debian
-project (and may be used by others).
+This manual page was originally written by Manuel Prinz <manuel@debian.org> for
+the Debian project (and may be used by others).
 
 =cut

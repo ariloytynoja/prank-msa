@@ -48,12 +48,10 @@ public:
     void setCharString(std::vector<std::string>* sns,std::vector<std::string>* sqs);
     void getCharStrings(std::vector<std::string>* sqs);
 
-    void setAnnotation(std::map<std::string,FlMatrix*>* annotation);
-
     void getThisAlignmentPostProbAt(double* p,int i);
     void getLowestAlignmentPostProbAt(double* p,int i);
 
-    void alignSequences(int );
+    void alignSequences( );
     void alignThisNode( );
     void readAlignment();
     void readThisNode();
@@ -74,6 +72,7 @@ public:
     void setSiteLength(int l);
     void setSiteIndex(int site,int index);
 
+    void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getCharactersAt(std::vector<std::string>* col,int i);
 

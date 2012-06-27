@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 111130;
+    version = 120626;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -121,6 +121,18 @@ void readArguments(int argc, char *argv[])
             {
                 seqfile = string(argv[i]).substr(3);
             }
+            else if (s.substr(0,4)=="-d1=")
+            {
+                seqfile1 = string(argv[i]).substr(4);
+                MERGE = true;
+                PARTLYALIGNED = true;
+            }
+            else if (s.substr(0,4)=="-d2=")
+            {
+                seqfile2 = string(argv[i]).substr(4);
+                MERGE = true;
+                PARTLYALIGNED = true;
+            }
 
             // guide tree file
             else if (s.substr(0,3)=="-t=")
@@ -128,11 +140,25 @@ void readArguments(int argc, char *argv[])
                 treefile = string(argv[i]).substr(3);
                 TWICE = false;
             }
+            else if (s.substr(0,4)=="-t1=")
+            {
+                treefile1 = string(argv[i]).substr(4);
+            }
+            else if (s.substr(0,4)=="-t2=")
+            {
+                treefile2 = string(argv[i]).substr(4);
+            }
 
             // alignment output file
             else if (s.substr(0,3)=="-o=")
             {
                 outfile = string(argv[i]).substr(3);
+            }
+
+            // alignment output file
+            else if (s.substr(0,5)=="-tmp=")
+            {
+                tempdir = string(argv[i]).substr(5);
             }
 
             // structure model file
@@ -163,6 +189,10 @@ void readArguments(int argc, char *argv[])
             {
                 PREALIGNED = true;
             }
+            else if (s=="-keep")
+            {
+                PREALIGNED = true;
+            }
 
             // backtranslate existing protein alignment to DNA
             else if (s.substr(0,5)=="-dna=")
@@ -172,6 +202,13 @@ void readArguments(int argc, char *argv[])
             }
 
             /********* more input/output: **********/
+
+            // do not estimate guide tree from mafft alignment
+            else if (s=="-nomafft")
+            {
+                MAFFTALIGNMENT = false;
+            }
+
 
             // estimate guide tree from input alignment (before realignment)
             else if (s=="-njtree")
@@ -212,7 +249,7 @@ void readArguments(int argc, char *argv[])
             }
 
             // write reconstructed ancestral seqs
-            else if (s=="-writeancseq")
+            else if (s=="-showanc")
             {
                 WRITEANCSEQ = true;
             }
@@ -403,13 +440,6 @@ void readArguments(int argc, char *argv[])
                 NXis1 = false;
             }
 
-            // priors file (not really working)
-            else if (s.substr(0,3)=="-p=")
-            {
-                annofile = string(argv[i]).substr(3);
-                PRIORS= true;
-            }
-
 
             /********* more model: pairwise alignment for guide tree **********/
 
@@ -513,21 +543,15 @@ void readArguments(int argc, char *argv[])
             /********* technical: anchoring **********/
 
             // use anchors
-            else if (s.substr(0,3)=="-a")
-            {
-                ANCHORS = true;
-            }
-
-            // use anchors
-            else if (s=="-noanchors" || s.substr(0,5)=="-noa")
+            else if (s=="-noanchors" || s=="-noa")
             {
                 EXONERATE = false;
             }
 
-            // maximum anchor distance
-            else if (s.substr(0,6)=="-maxd=")
+            // anchor skip distance
+            else if (s.substr(0,12)=="-anchorskip=")
             {
-                maxAnchDist = atoi(string(argv[i]).substr(6).c_str());
+                anchSkipDist = atoi(string(argv[i]).substr(12).c_str());
             }
 
             // minimum anchor distance
@@ -596,24 +620,6 @@ void readArguments(int argc, char *argv[])
             }
 
 
-            /********* pairwise genomic alignment **********/
-
-            // ``good'' paarmeters for pw genomic alignment
-            else if (s=="-pwgenomic")
-            {
-                treefile="dummy";
-                PWGENOMIC = true;
-                gapRate = 0.1;
-                gapExt = 0.9;
-                TWICE = false;
-            }
-
-            // parameters for pw genomic alignment
-            else if (s.substr(0,15)=="-pwgenomicdist=")
-            {
-                pwgendist = atof(string(argv[i]).substr(15).c_str());
-            }
-
             /************************************************/
 
             else
@@ -625,7 +631,7 @@ void readArguments(int argc, char *argv[])
         }
     }
 
-    if (seqfile=="")
+    if (seqfile=="" && (seqfile1=="" || seqfile2==""))
     {
         printHelp(false);
         exit(0);
@@ -649,18 +655,18 @@ void readArguments(int argc, char *argv[])
     {
         DOTS=false;
 
-        cout<<endl<<"Note: option '+F' is by default not selected.";
+        cout<<endl<<"Note: by default option '+F' is not selected.";
         if (argc==2 && seqfile!="")
-            cout<<" You can select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
+            cout<<" Select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
         else
-            cout<<" You can select it by adding flag \"+F\"."<<endl;
+            cout<<" Select it by adding flag \"+F\"."<<endl;
     }
 
     // options don't work together
     if (PREALIGNED)
         FOREVER=false;
 
-    if (format!=8 && format!=11 && format!=12 && format!=17 && format!=18)
+    if (format!=8 && format!=11 && format!=12 && format!=17 && format!=18 && format!=19)
         format = 8;
 
 }
@@ -678,27 +684,37 @@ void printHelp(bool complete)
         cout<<"  -tree=\"tree_string\" [tree in newick format; in double quotes]"<<endl;
     cout<<"  -o=output_file [default: 'output']"<<endl;
     cout<<"  -f=output_format ['fasta' (default), 'phylipi', 'phylips', 'paml', 'nexus']"<<endl;
-    if (complete)
-    {
-        cout<<"  -f=output_format_number [default: 8] (deprecated; use format names)"<<endl;
-        cout<<"     8. Pearson/Fasta"<<endl;
-        cout<<"    11. Phylip sequential"<<endl;
-        cout<<"    12. Phylip interleaved"<<endl;
-        cout<<"    17. PAUP/NEXUS"<<endl;
-        cout<<"    18. PAML"<<endl;
-    }
+//    if (complete)
+//    {
+//        cout<<"  -f=output_format_number [default: 8] (deprecated; use format names)"<<endl;
+//        cout<<"     8. Pearson/Fasta"<<endl;
+//        cout<<"    11. Phylip sequential"<<endl;
+//        cout<<"    12. Phylip interleaved"<<endl;
+//        cout<<"    17. PAUP/NEXUS"<<endl;
+//        cout<<"    18. PAML"<<endl;
+//    }
     cout<<"  -showxml [output xml-files]"<<endl;
     cout<<"  -showtree [output dnd-files]"<<endl;
-    cout<<"  -shortnames [truncate names at first space]"<<endl;
-    cout<<"  -noanchors [no Exonerate anchoring ()]"<<endl;
+    cout<<"  -showanc [output ancestral sequences]"<<endl;
+    cout<<"  -noanchors [no Exonerate anchoring]"<<endl;
+    cout<<"  -nomafft [no MAFFT guide tree]"<<endl;
     cout<<"  -support [compute posterior support]"<<endl;
+    cout<<"  -njtree [estimate tree from input alignment (and realign)]"<<endl;
     cout<<"  -quiet"<<endl;
+    if (complete)
+    {
+        cout<<"\n alignment merge parameters:"<<endl;
+        cout<<"  -d1=sequence_file_1 (in FASTA format)"<<endl;
+        cout<<"  -d2=sequence_file-2 (in FASTA format)"<<endl;
+        cout<<"  -t1=tree_file_1 [if not provided, generate NJ tree]"<<endl;
+        cout<<"  -t2=tree_file_2 [if not provided, generate NJ tree]"<<endl;
+    }
     cout<<"\n model parameters:"<<endl;
-    cout<<"  +F [force insertions to be always skipped]"<<endl;
-    cout<<"  -F [equivalent]"<<endl;
+    cout<<"  +F or -F [force insertions to be always skipped]"<<endl;
     if (complete)
         cout<<"  -dots [show insertion gaps as dots]"<<endl;
-    cout<<"  -m=model_file [default: HKY2/WAG]"<<endl;
+    if (complete)
+        cout<<"  -m=model_file [default: HKY2/WAG]"<<endl;
     cout<<"  -gaprate=# [gap opening rate; default: dna "<<dnaGapRate<<" / prot "<<protGapRate<<"]"<<endl;
     cout<<"  -gapext=# [gap extension probability; default: dna "<<dnaGapExt<<" / prot "<<protGapExt<<"]"<<endl;
     if (complete)
@@ -712,7 +728,7 @@ void printHelp(bool complete)
     cout<<"  -termgap [penalise terminal gaps normally]"<<endl;
     cout<<"  -nomissing [no missing data, use -F for terminal gaps ]"<<endl;
     cout<<"\n other parameters:"<<endl;
-    cout<<"  -e [pre-aligned sequences; do not remove gaps]"<<endl;
+    cout<<"  -keep [keep alignment \"as is\" (e.g. for ancestor inference)]"<<endl;
     if (complete)
         cout<<"  -pwdist=# [expected pairwise distance for computing guidetree; default: dna "<<pwDnaDist<<" / prot "<<pwProtDist<<"]"<<endl;
     cout<<"  -once [run only once; default: twice if no guidetree given]"<<endl;
@@ -724,13 +740,13 @@ void printHelp(bool complete)
     cout<<"  -uselogs [slower but should work for a greater number of sequences]"<<endl;
     if (complete)
     {
-        cout<<"  -writeanc [output ancestral sequences]"<<endl;
-        cout<<"  -printnodes [output each node; mostly for debugging]"<<endl;
-        cout<<"  -matresize=# [matrix resizing multiplier]"<<endl;
-        cout<<"  -matinitsize=# [matrix initial size multiplier]"<<endl;
-        cout<<"  -longseq [save space in pairwise alignments]"<<endl;
-        cout<<"  -pwgenomic [do pairwise alignment, no guidetree]"<<endl;
-        cout<<"  -pwgenomicdist=# [distance for pairwise alignment; default: "<<pwgendist<<"]"<<endl;
+//        cout<<"  -writeanc [output ancestral sequences (old format)]"<<endl;
+//        cout<<"  -printnodes [output each node; mostly for debugging]"<<endl;
+//        cout<<"  -matresize=# [matrix resizing multiplier]"<<endl;
+//        cout<<"  -matinitsize=# [matrix initial size multiplier]"<<endl;
+//        cout<<"  -longseq [save space in pairwise alignments]"<<endl;
+        cout<<"  -shortnames [truncate names at first space]"<<endl;
+        cout<<"  -anchorskip=# [min. sequence length for anchoring; default "<<anchSkipDist<<"]"<<endl;
         cout<<"  -scalebranches=# [scale branch lengths; default: dna "<<dnaBranchScalingFactor<<" / prot "<<protBranchScalingFactor<<"]"<<endl;
         cout<<"  -fixedbranches=# [use fixed branch lengths]"<<endl;
         cout<<"  -maxbranches=# [set maximum branch length]"<<endl;
@@ -739,10 +755,14 @@ void printHelp(bool complete)
     }
     cout<<"  -translate [translate to protein]"<<endl;
     cout<<"  -mttranslate [translate to protein using mt table]"<<endl;
-    cout<<"  -maxpairdist=# [maximum pairwise distance for matrix computation]"<<endl;
+//    if (complete)
+//        cout<<"  -maxpairdist=# [maximum pairwise distance for matrix computation]"<<endl;
 
     cout<<"\n other:"<<endl;
     cout<<"  -convert [no alignment, just convert to another format]"<<endl;
+    if (complete)
+        cout<<"  -dna=dna_sequence_file [DNA sequence file for backtranslation of protein alignment]"<<endl;
+    cout<<"  -version [check for updates]"<<endl;
     cout<<"\n  -help [show more options]"<<endl;
 
     cout<<""<<endl;
@@ -766,6 +786,8 @@ int parseFormat(string Format)
         return 17;
     else if (format == "paml")
         return 18;
+    else if (format == "raxml")
+        return 19;
     else
     {
         cout<<"Warning: output format not recognized, using FASTA.\n";

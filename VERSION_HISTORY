@@ -1,3 +1,10 @@
+v.120626
+- Guide tree estimation from a MAFFT alignment
+- Merge of two pre-defined alignments
+- Support for Exonerate and MAFFT on Windows
+- Clean up of some code
+
+
 v.111130
 - Exonerate anchoring now also for guidetree computation. Experimental!
 

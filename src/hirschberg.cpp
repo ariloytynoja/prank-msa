@@ -23,7 +23,6 @@
 #include <fstream>
 #include <sstream>
 #include "config.h"
-#include "chaosanchors.h"
 #include "exonerate_reads.h"
 #include "hirschberg.h"
 
@@ -451,85 +450,8 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
     }
 
 
-    if (ANCHORS)
+    if (EXONERATE)
     {
-
-        defineBegin();
-
-        if (NOISE>0)
-            cout<<"lengths: "<<sl1<<" and "<<sl2<<" ("<<anchSkipDist<<")"<<endl;
-
-        if (sl1>anchSkipDist && sl2>anchSkipDist)
-        {
-
-            ChaosAnchors *ca = new ChaosAnchors(seq1->getMLsequence(),seq2->getMLsequence());
-            anchors = ca->getAnchors(&nanch);
-
-            if (NOISE>0)
-                cout<<"anchors done: "<<nanch<<endl;
-
-            if (nanch>0)
-            {
-                for (int i=nanch-1; i>=0; i--)
-                {
-
-                    if ( SKIPGAPANCH && ( seq1->hasNeighborGaps(anchors->g(0,i)) || seq2->hasNeighborGaps(anchors->g(1,i)) ) )
-                    {
-                        if (NOISE>0)
-                            cout<<"drop anchor "<<anchors->g(0,i)<<","<<anchors->g(1,i)<<" [gap]"<<endl;
-
-                        nanch--;
-                        continue;
-                    }
-
-                    defineSite(i);
-
-                    if (NOISE>0)
-                    {
-                        cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
-                        cout<<" anc: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
-                    }
-
-                    if (end->lInd1() - beg->lInd1() > matrixSize)
-                    {
-                        cleanUp();
-                        initialiseMatrices(end->lInd1() - beg->lInd1());
-                    }
-
-                    divideSeq();
-                }
-            }
-
-            if (NOISE>0)
-            {
-                cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
-                cout<<" end: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;
-            }
-
-            defineEnd();
-
-            if (seq1->length()+1-beg->lInd1() > matrixSize)
-            {
-                if (nanch>0)
-                    cleanUp();
-                initialiseMatrices(seq1->length() + 1 - beg->lInd1());
-            }
-
-            delete ca;
-
-        }
-        else
-        {
-            initialiseMatrices(sl1+1);
-            defineEnd();
-        }
-
-        divideSeq();
-
-    }
-    else if (EXONERATE)
-    {
-
         defineBegin();
 
         if (NOISE>0)
@@ -540,10 +462,7 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
 
             vector<hit> exonerate_hits;
             Exonerate_reads er;
-            if (er.test_executable())
-            {
-                er.local_alignment(seq1->getMLsequence(),seq2->getMLsequence(),&exonerate_hits, true);
-            }
+            er.local_alignment(seq1->getMLsequence(),seq2->getMLsequence(),&exonerate_hits, true);
 
             vector<pair<int,int> > anchor_pairs;
 

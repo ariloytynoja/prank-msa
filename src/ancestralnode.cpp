@@ -161,12 +161,12 @@ void AncestralNode::partlyAlignSequences()
  * Recursions for full probability
  *  - FullBand is either exact or within a band and needs max l1*k space
  */
-void AncestralNode::alignSequences(int aMethod)
+void AncestralNode::alignSequences()
 {
 //    cout<<endl<<nodeName+": children "+lChild->getNodeName()+" and "+rChild->getNodeName()<<endl;
 
-    lChild->alignSequences(aMethod);
-    rChild->alignSequences(aMethod);
+    lChild->alignSequences();
+    rChild->alignSequences();
     this->alignThisNode();
 }
 
@@ -184,13 +184,6 @@ void AncestralNode::alignThisNode()
 
     PhyloMatchScore *pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
     int time1 = time(0);
-
-    if (HARDANCHORS)
-    {
-        printChildAlignment(lChild,outfile+".left_ach");
-        printChildAlignment(rChild,outfile+".right_ach");
-        tmpNodeName = nodeName;
-    }
 
     Hirschberg* hp = new Hirschberg();
     hp->alignSeqs(lChild->getSequence(),rChild->getSequence(),pms);
@@ -712,12 +705,6 @@ void AncestralNode::getCharStrings(vector<string>* sqs)
     rChild->getCharStrings(sqs);
 }
 
-void AncestralNode::setAnnotation(map<string,FlMatrix*>* annotation)
-{
-    lChild->setAnnotation(annotation);
-    rChild->setAnnotation(annotation);
-}
-
 
 void AncestralNode::getThisAlignmentPostProbAt(double* p,int i)
 {
@@ -1093,6 +1080,123 @@ void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
 
         lChild->getAncCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i));
         rChild->getAncCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
+
+        if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) )   /*e090626*/
+        {
+            if (CODON)
+            {
+                col->push_back("---");
+            }
+            else
+            {
+                col->push_back("-");
+            }
+        }
+        else
+        {
+            string alpha = hmm->getAlphabet();
+            int sAlpha = alpha.length();
+
+            int nState = hmm->getNStates();
+            int maxState = -1;
+            float maxProb = -HUGE_VAL;
+            int j,k;
+
+            FOR(k,nState)
+            {
+                if (this->getSequence()->stateProbAt(k,i)>maxProb)
+                {
+                    maxProb = this->getSequence()->stateProbAt(k,i);
+                    maxState = k;
+                }
+            }
+
+            if (LOGVALUES)
+            {
+                float ms = -HUGE_VAL;
+
+                int mi = -1;
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,i,maxState)>= ms)
+                    {
+                        ms = this->getSequence()->mlCharProbAt(j,i,maxState);
+                        mi = j;
+                    }
+                }
+
+                if (mi>=0)
+                {
+                    if (CODON)
+                    {
+                        col->push_back(alpha.substr(mi*3,3));
+                    }
+                    else
+                    {
+                        col->push_back(string(1,alpha.at(mi)));
+                    }
+                }
+                else
+                {
+                    cout<<"impossible index: site "<<i<<", "<<mi<<endl;
+                }
+
+            }
+            else
+            {
+                float ms = 0;
+
+                int mi = -1;
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,i,maxState) >= ms)
+                    {
+                        ms = this->getSequence()->mlCharProbAt(j,i,maxState);
+                        mi = j;
+                    }
+                }
+                if (mi>=0)
+                {
+                    if (CODON)
+                    {
+                        col->push_back(alpha.substr(mi*3,3));
+                    }
+                    else
+                    {
+                        col->push_back(string(1,alpha.at(mi)));
+                    }
+                }
+                else
+                {
+                    cout<<"impossible index: site "<<i<<", "<<mi<<endl;
+                }
+            }
+        }
+    }
+}
+
+void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns)
+{
+    if (i<0)
+    {
+        for (int j=0; j<getInternalNodeNumber()+getTerminalNodeNumber(); j++)
+        {
+            if (CODON)
+            {
+                col->push_back("---");
+            }
+            else
+            {
+                col->push_back("-");
+            }
+        }
+
+    }
+    else
+    {
+
+        lChild->getAllCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i));
+        rChild->getAllCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
 
         if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) )   /*e090626*/
         {

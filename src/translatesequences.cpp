@@ -92,8 +92,8 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
             switch (c)
             {
             case '-':
-                seq.erase(ci);
-                ci--;
+//                seq.erase(ci);
+//                ci--;
                 break;
             default:
                 // Remove characters not in full alphabet

@@ -75,7 +75,7 @@ TerminalNode::TerminalNode(string s,float l)
 }
 
 
-void TerminalNode::alignSequences(int )
+void TerminalNode::alignSequences()
 {
     return;
 }
@@ -110,7 +110,7 @@ void TerminalNode::setCharString(vector<string>* sns,vector<string>* sqs)
 {
     int index = atoi(nodeName.c_str());
     this->setNodeName(sns->at(index));
-//     charString = sqs->at(index);
+
     seq = new TerminalSequence(&sqs->at(index));
     charString = *seq->getMLsequence();
     if (NOISE>1)
@@ -156,16 +156,6 @@ void TerminalNode::getCharStrings(vector<string>* sqs)
     sqs->push_back(charString);
 }
 
-void TerminalNode::setAnnotation(map<string,FlMatrix*>* annotation)
-{
-    map<string,FlMatrix*>::iterator smi;
-    smi = annotation->find(nodeName);
-    if (smi!=annotation->end())
-    {
-        seq->setAnnotation(smi->second);
-    }
-
-}
 
 void TerminalNode::getLowestAlignmentPostProbAt(double* ,int )
 {

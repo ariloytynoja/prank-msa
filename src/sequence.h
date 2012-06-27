@@ -32,8 +32,6 @@
 #include "dbmatrix.h"
 #include "intmatrix.h"
 
-extern bool PRIORS;
-
 class Sequence
 {
 
@@ -46,7 +44,6 @@ protected:
     bool terminal;    // is/not terminal
     int sAlpha;
 
-    bool hasPrior;
     int i,j,k;
 public:
     ~Sequence();

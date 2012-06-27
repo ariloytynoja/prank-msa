@@ -27,7 +27,6 @@
 class TerminalSequence : public Sequence
 {
     IntMatrix* seqvec;    // shortcut for unambiguous terminal seqs: profile is useless!
-    FlMatrix* priorProb;
 
     bool isGap(int )
     {
@@ -146,12 +145,6 @@ public:
     bool bwdChildGapEnds(int )
     {
         return false;
-    }
-
-    void setAnnotation(FlMatrix* annotation)
-    {
-        priorProb = annotation;
-        hasPrior = true;
     }
 };
 

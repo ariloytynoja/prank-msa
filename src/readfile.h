@@ -58,6 +58,7 @@ public:
 
     bool dnaSeqs();
     void countDnaFreqs(float* freqs);
+    void countDnaFreqs(float* freqs,vector<string> *pseqs);
     bool isRna;
 };
 

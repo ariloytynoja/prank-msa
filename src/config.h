@@ -35,19 +35,28 @@ using namespace std;
 extern int NOISE;
 
 extern string seqfile;
+extern string seqfile1;
+extern string seqfile2;
 extern string treefile;
+extern string treefile1;
+extern string treefile2;
 extern string outfile;
+extern string tempdir;
+extern string mafftpath;
+extern string exoneratepath;
 
 extern string hmmname;
 extern HMModel *hmm;
 extern bool HASHMM;
 
+extern bool MERGE;
 extern bool TREESTRING;
 extern bool PARTLYALIGNED;
 extern bool PREALIGNED;
 
 extern string dnafile;
 
+extern bool MAFFTALIGNMENT;
 extern bool TREEFROMALIGNMENT;
 
 extern int format;
@@ -101,9 +110,6 @@ extern bool MTTABLE;
 
 extern bool NXis1;
 
-extern string annofile;
-extern bool PRIORS;
-
 extern float pwDist;
 extern float pwDnaDist;
 extern float pwGapRate;
@@ -137,11 +143,9 @@ extern int FBW;
 
 extern bool SKIPINS;
 
-extern bool ANCHORS;
 extern bool EXONERATE;
 
 extern int initialAnchDist;
-extern int maxAnchDist;
 extern int minAnchDist;
 extern int anchSkipDist;
 extern int anchDropDist;
@@ -155,13 +159,7 @@ extern float initialMatrixSize;
 extern bool PWMATRIXMAXSIZE;
 extern float pwInitialMatrixSize;
 
-extern bool PWGENOMIC;
-extern float pwgendist;
-
 extern int fOnNode;
-
-extern std::string anchorfile;
-extern bool HARDANCHORS;
 
 extern double sumLogs(double a, double b);
 extern std::string itos(int i);

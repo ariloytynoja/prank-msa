@@ -29,8 +29,8 @@ class GuideTree
 {
     std::string tree;
 public:
-    GuideTree(std::vector<std::string>* seqs,std::vector<std::string>* names,IntMatrix* substScores);
-    GuideTree(std::vector<std::string>* seqs,std::vector<std::string>* names,bool idDna);
+    void computeTree(std::vector<std::string>* seqs,std::vector<std::string>* names,IntMatrix* substScores);
+    void computeTree(std::vector<std::string>* seqs,std::vector<std::string>* names,bool idDna);
 
     ~GuideTree();
     std::string getTree()

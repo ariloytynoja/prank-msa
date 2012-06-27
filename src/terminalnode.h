@@ -46,9 +46,7 @@ public:
     void setCharString(std::vector<std::string>* sns,std::vector<std::string>* sqs);
     void getCharStrings(std::vector<std::string>* sqs);
 
-    void setAnnotation(std::map<std::string,FlMatrix*>* annotation);
-
-    void alignSequences(int aMethod);
+    void alignSequences();
 
     void getCleanNewick(std::string* tree);
     void getLowestAlignmentPostProbAt(double*,int);
@@ -68,6 +66,7 @@ public:
     void setSiteLength(int ) {}
     void setSiteIndex(int ,int ) {}
 
+    void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns) { this->getCharactersAt(col,i); }
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getCharactersAt(std::vector<std::string>* col,int i);
 
