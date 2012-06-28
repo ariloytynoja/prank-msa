@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include "config.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -111,6 +112,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
             {
                 names->push_back(name);
                 sequence = this->remove_whitespaces(sequence);
+                transform( sequence.begin(), sequence.end(), sequence.begin(), (int(*)(int))toupper );
                 sequences->push_back(sequence);
                 name = "";
                 sequence = "";
@@ -129,6 +131,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
     {
         names->push_back(name);
         sequence = this->remove_whitespaces(sequence);
+        transform( sequence.begin(), sequence.end(), sequence.begin(), (int(*)(int))toupper );
         sequences->push_back(sequence);
     }
 

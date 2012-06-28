@@ -51,7 +51,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         this->showInfo();
 
     Exonerate_reads er;
-    if (EXONERATE && !er.test_executable())
+    if (!CONVERT && EXONERATE && !er.test_executable())
     {
         cout<<"The executable for Exonerate not found. Fast alignment anchoring is not used.\n";
         EXONERATE = false;

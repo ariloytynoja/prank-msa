@@ -127,18 +127,23 @@ private:
                 exit(-1);
             }
 
-            ofstream seqout((outfile+".fas").c_str());
-            vector<string>::iterator ir;
-            vector<string>::iterator nr = protNames.begin();
-            for (ir=codons.begin(); ir!=codons.end(); ir++,nr++)
-            {
-                seqout<<">"<<*nr<<endl;
-                string seq = *ir;
-                for (unsigned int i=0; i<seq.length(); i+=60)
-                {
-                    seqout<<seq.substr(i,60)<<endl;
-                }
-            }
+            WriteFile wfa;
+            string file = outfile+formatExtension(format);
+            wfa.writeSeqs(file.c_str(),&protNames,&codons,format);
+
+//            ofstream seqout((outfile+".fas").c_str());
+//            vector<string>::iterator ir;
+//            vector<string>::iterator nr = protNames.begin();
+//            for (ir=codons.begin(); ir!=codons.end(); ir++,nr++)
+//            {
+//                seqout<<">"<<*nr<<endl;
+//                string seq = *ir;
+//                for (unsigned int i=0; i<seq.length(); i+=60)
+//                {
+//                    seqout<<seq.substr(i,60)<<endl;
+//                }
+//            }
+
             exit(0);
 
         }
@@ -560,7 +565,7 @@ private:
                         exit(0);
                     }
                     gt.computeTree(sequences,names,isDna);
-                    TWICE = false;
+//                    TWICE = false;
 
                 }
                 else
