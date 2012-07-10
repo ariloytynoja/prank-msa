@@ -6,6 +6,10 @@
 #include "config.h"
 #include <algorithm>
 
+#if defined (__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
 using namespace std;
 
 Mafft_alignment::Mafft_alignment()
@@ -27,17 +31,32 @@ bool Mafft_alignment::test_executable()
 
     # else
     int status = system("mafft -h >/dev/null 2>/dev/null");
+
     if(WEXITSTATUS(status) == 1)
         return true;
 
     char path[200];
-    int length = readlink("/proc/self/exe",path,200-1);
-    string epath = string(path).substr(0,length);
+    string epath;
+
+    #if defined (__APPLE__)
+    uint32_t size = sizeof(path);
+    _NSGetExecutablePath(path, &size);
+    epath = string(path);
     epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+    //epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
+
+    #else
+    int length = readlink("/proc/self/exe",path,200-1);
+    epath = string(path).substr(0,length);
+    epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+
+    #endif
+
     mafftpath = epath;
     epath = epath+"mafft -h >/dev/null 2>/dev/null";
     status = system(epath.c_str());
     return WEXITSTATUS(status) == 1;
+
     #endif
 }
 

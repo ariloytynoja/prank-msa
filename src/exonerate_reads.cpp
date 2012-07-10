@@ -10,6 +10,10 @@
 #include "config.h"
 #include "translatesequences.h"
 
+#if defined (__APPLE__)
+#include <mach-o/dyld.h>
+#endif
+
 using namespace std;
 
 
@@ -33,15 +37,28 @@ bool Exonerate_reads::test_executable()
     epath = epath+"exonerate.exe > /dev/null 2>/dev/null";
     status = system(epath.c_str());
 
-    # else
+    #else
     status = system("exonerate  >/dev/null 2>/dev/null");
 
     if(WEXITSTATUS(status) != 1)
     {
         char path[200];
-        int length = readlink("/proc/self/exe",path,200-1);
-        string epath = string(path).substr(0,length);
+        string epath;
+
+        #if defined (__APPLE__)
+        uint32_t size = sizeof(path);
+        _NSGetExecutablePath(path, &size);
+        epath = string(path);
         epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+        epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
+
+        #else
+        int length = readlink("/proc/self/exe",path,200-1);
+        epath = string(path).substr(0,length);
+        epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+
+        #endif
+        
         exoneratepath = epath;
         epath = epath+"exonerate >/dev/null 2>/dev/null";
         status = system(epath.c_str());
@@ -173,7 +190,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 //    command<<"exonerate  ";
 //    #endif
     command << " -q "+tmp_dir+"q"<<r<<".fas -t "+tmp_dir+"t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
-
+    
     FILE *fpipe;
     if ( !(fpipe = (FILE*)popen(command.str().c_str(),"r")) )
     {
