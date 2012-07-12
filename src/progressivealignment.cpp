@@ -94,8 +94,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     string tree;
     this->getGuideTree(&names,&sequences,&tree,isDna);
 
-
     vector<string>::iterator si = sequences.begin();
+
     int longest = 0; int slongest = 0;
     for (; si!=sequences.end(); si++)
     {
@@ -110,7 +110,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     sites->setASize(hmm->getASize());
     sites->setNState(hmm->getNStates());
     sites->setMatrices(longest,slongest);
-
 
     map<string,TreeNode*> nodes;
 

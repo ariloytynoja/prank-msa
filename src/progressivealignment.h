@@ -131,19 +131,6 @@ private:
             string file = outfile+formatExtension(format);
             wfa.writeSeqs(file.c_str(),&protNames,&codons,format);
 
-//            ofstream seqout((outfile+".fas").c_str());
-//            vector<string>::iterator ir;
-//            vector<string>::iterator nr = protNames.begin();
-//            for (ir=codons.begin(); ir!=codons.end(); ir++,nr++)
-//            {
-//                seqout<<">"<<*nr<<endl;
-//                string seq = *ir;
-//                for (unsigned int i=0; i<seq.length(); i+=60)
-//                {
-//                    seqout<<seq.substr(i,60)<<endl;
-//                }
-//            }
-
             exit(0);
 
         }
@@ -534,7 +521,6 @@ private:
                 ss<<"("<<tree1<<":"<<defaultBranchLength/2<<","<<tree2<<":"<<defaultBranchLength/2<<");";
                 *tree = ss.str();
 
-//                cout<<tree1<<"\n"<<tree2<<"\n"<<*tree<<"\n";
             }
 
 
@@ -557,16 +543,31 @@ private:
                 {
                     if(NOISE>=0)
                         cout<<"Using MAFFT for guide tree inference. Use option '-nomafft' to disable.\n";
-                    ma.align_sequences(names,sequences);
 
-                    if(!this->sequencesAligned(sequences))
+                    vector<string> tmp_seqs;
+                    vector<string>::iterator si = sequences->begin();
+
+                    for(;si!=sequences->end();si++)
+                        tmp_seqs.push_back(*si);
+
+                    this->removeGaps(&tmp_seqs);
+
+                    bool tmp_isDna = isDna;
+
+                    if(isDna && CODON)
+                    {
+                        this->translateSequences(names,&tmp_seqs,&tmp_isDna);
+                        tmp_isDna = false;
+                    }
+
+                    ma.align_sequences(names,&tmp_seqs);
+
+                    if(!this->sequencesAligned(&tmp_seqs))
                     {
                         cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
                         exit(0);
                     }
-                    gt.computeTree(sequences,names,isDna);
-//                    TWICE = false;
-
+                    gt.computeTree(&tmp_seqs,names,tmp_isDna);
                 }
                 else
                     gt.computeTree(sequences,names,substScores);
@@ -634,7 +635,6 @@ private:
         }
         else
         {
-
             // protein model
             if (isDna)
             {
