@@ -43,7 +43,9 @@ SOURCES += writefile.cpp \
     exonerate_reads.cpp \
     mafft_alignment.cpp
 OTHER_FILES += \  
-    ../VERSION_HISTORY
+    ../VERSION_HISTORY \
+    prank.1.pod \
+    Makefile.no_Qt
 HEADERS += writefile.h \
     treenode.h \
     translatesequences.h \
@@ -80,6 +82,8 @@ HEADERS += writefile.h \
 
 
 INCLUDEPATH += /usr/include
+
+
 
 
 
