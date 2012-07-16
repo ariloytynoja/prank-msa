@@ -1096,6 +1096,8 @@ void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
         {
             string alpha = hmm->getAlphabet();
             int sAlpha = alpha.length();
+            if (CODON)
+                sAlpha /= 3;
 
             int nState = hmm->getNStates();
             int maxState = -1;
@@ -1196,7 +1198,6 @@ void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns)
     {
 
         lChild->getAllCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i));
-        rChild->getAllCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
 
         if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) )   /*e090626*/
         {
@@ -1213,6 +1214,8 @@ void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns)
         {
             string alpha = hmm->getAlphabet();
             int sAlpha = alpha.length();
+            if(CODON)
+                sAlpha /= 3;
 
             int nState = hmm->getNStates();
             int maxState = -1;
@@ -1289,6 +1292,7 @@ void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns)
                 }
             }
         }
+        rChild->getAllCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
     }
 }
 

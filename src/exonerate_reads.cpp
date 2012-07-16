@@ -38,7 +38,7 @@ bool Exonerate_reads::test_executable()
     status = system(epath.c_str());
 
     #else
-    status = system("exonerate  >/dev/null 2>/dev/null");
+    status = system("`exonerate  >/dev/null 2>/dev/null`");
 
     if(WEXITSTATUS(status) != 1)
     {
@@ -156,8 +156,8 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
         vector<string> sequences;
         sequences.push_back(left);
         sequences.push_back(right);
-
-        ts.translateProtein(&names,&sequences);
+        std::map<std::string,std::string> dnaSeqs;
+        ts.translateProtein(&names,&sequences,&dnaSeqs);
 
         left = sequences.at(0);
         right = sequences.at(1);

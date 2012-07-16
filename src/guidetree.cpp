@@ -87,7 +87,8 @@ void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntM
     if (isDna && TRANSLATE)
     {
         TranslateSequences *trseq = new TranslateSequences();
-        if (!trseq->translateProtein(names,seqs))
+        std::map<std::string,std::string> dnaSeqs;
+        if (!trseq->translateProtein(names,seqs,&dnaSeqs))
         {
             cout<<"Translation failed. Exiting."<<endl<<endl;
             delete trseq;

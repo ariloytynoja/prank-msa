@@ -73,12 +73,13 @@ TranslateSequences::~TranslateSequences()
 }
 
 
-bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *sequences)
+bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *sequences,map<string,string> *dnaSequences)
 {
 
     vector<string>::iterator nit = names->begin();
     vector<string>::iterator sit = sequences->begin();
-    dnaSeqs.clear();
+//    dnaSeqs.clear();
+    dnaSequences->clear();
     bool replaced = false;
     string full_alphabet = "ACGTN";
 
@@ -124,7 +125,8 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
 
     for (; sit!=sequences->end(); sit++,nit++)
     {
-        dnaSeqs.insert(make_pair(*nit,*sit));
+//        dnaSeqs.insert(make_pair(*nit,*sit));
+        dnaSequences->insert(make_pair(*nit,*sit));
         string tmp ="";
         for (unsigned int j=0; j<sit->length(); j+=3)
         {
@@ -139,7 +141,7 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
     return true;
 }
 
-bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vector<std::string> *protein,std::vector<std::string> *dna)
+bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vector<std::string> *protein,std::vector<std::string> *dna,map<string,string> *dnaSequences)
 {
 
     vector<string>::iterator nit = names->begin();
@@ -148,7 +150,8 @@ bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vecto
     for (; pit!=protein->end(); pit++,nit++)
     {
 
-        string dnaSeq = dnaSeqs.find(*nit)->second;
+//        string dnaSeq = dnaSeqs.find(*nit)->second;
+        string dnaSeq = dnaSequences->find(*nit)->second;
 
         string nuc = "";
 

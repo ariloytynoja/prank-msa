@@ -289,28 +289,27 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
     }
     else
     {
-
         WriteFile wfa;
         TranslateSequences trseq;
         string file = outfile+".pep."+itos(iteration)+formatExtension(format);
         wfa.writeSeqs(file.c_str(),nms,seqs,format,false,root,false);
 
-        printXml(root,iteration,false);
+        if (WRITEXML)
+            printXml(root,iteration,false);
 
-        vector<string> dnaSeqs;
-        if (!trseq.translateDNA(nms,seqs,&dnaSeqs))
+        vector<string> dSeqs;
+        if (!trseq.translateDNA(nms,seqs,&dSeqs,&dnaSeqs))
         {
             cout<<"Backtranslation failed. Exiting."<<endl;
             exit(-1);
         }
 
-
         file = outfile+".nuc."+itos(iteration)+formatExtension(format);
-        wfa.writeSeqs(file.c_str(),nms,&dnaSeqs,format,true,root,true);
+        wfa.writeSeqs(file.c_str(),nms,&dSeqs,format,true,root,true);
 
         if (WRITEXML)
             printXml(root,iteration,true);
-    }
+   }
 
      if (WRITEANC || WRITEANCSEQ)
         printAncestral(root,nms,seqs,iteration);
@@ -395,6 +394,7 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
     {
         root->setSiteIndex(i,i);
     }
+
     root->outputXml(&seqout,&anc_seqs,translate);
     seqout<<"</nodes>"<<endl;
 
@@ -504,8 +504,7 @@ void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignmen
         vector<string> dna;
 
         TranslateSequences trseq;
-
-        if (!trseq.translateDNA(&names,&prot,&dna))
+        if (!trseq.translateDNA(&names,&prot,&dna,&dnaSeqs))
         {
             cout<<"Backtranslation failed. Exiting."<<endl;
             exit(-1);
@@ -560,9 +559,14 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nm
         for (; ni!=anms.end(); j++,ni++)
         {
             ancSeq<<">"<<*ni<<endl;
-            for (int i=0; i<l; i++)
+
+            int sl = l;
+            if(CODON)
+                sl *= 3;
+
+            for (int i=0; i<sl; i++)
             {
-                ancSeq<<alignment[j*l+i];
+                ancSeq<<alignment[j*sl+i];
             }
             ancSeq<<endl;
         }
@@ -676,9 +680,10 @@ void ProgressiveAlignment::getAncestralAlignmentMatrix(AncestralNode *root,char*
 void ProgressiveAlignment::getFullAlignmentMatrix(AncestralNode *root,char* alignment)
 {
     vector<string> col;
-    int n = root->getInternalNodeNumber()+root->getTerminalNodeNumber();
     int l = root->getSequence()->length();
-
+    int sl = l;
+    if(CODON)
+        sl *= 3;
     int i;
     FOR(i,l)
     {
@@ -693,13 +698,13 @@ void ProgressiveAlignment::getFullAlignmentMatrix(AncestralNode *root,char* alig
         {
             if (CODON)
             {
-                alignment[j*l*3+i*3] = cb->at(0);
-                alignment[j*l*3+i*3+1] = cb->at(1);
-                alignment[j*l*3+i*3+2] = cb->at(2);
+                alignment[j*sl+i*3] = cb->at(0);
+                alignment[j*sl+i*3+1] = cb->at(1);
+                alignment[j*sl+i*3+2] = cb->at(2);
             }
             else
             {
-                alignment[j*l+i] = cb->at(0);
+                alignment[j*sl+i] = cb->at(0);
             }
             j++;
         }

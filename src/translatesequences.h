@@ -30,16 +30,18 @@
 
 class TranslateSequences
 {
-    std::map<std::string,std::string> dnaSeqs;
+//    std::map<std::string,std::string> dnaSeqs;
     std::map<std::string,std::string> codonToAa;
     std::map<std::string,std::string> aaToCodon;
 public:
     TranslateSequences();
 
     ~TranslateSequences();
-    bool translateProtein(std::vector<std::string> *names,std::vector<std::string> *sequences);
-    bool translateDNA(std::vector<std::string> *names,std::vector<std::string> *protein,std::vector<std::string> *dna);
+    bool translateProtein(std::vector<std::string> *names,std::vector<std::string> *sequences,std::map<std::string,std::string> *dnaSequences);
+    bool translateDNA(std::vector<std::string> *names,std::vector<std::string> *protein,std::vector<std::string> *dna,std::map<std::string,std::string> *dnaSequences);
 
+//    std::map<std::string,std::string> getDnaSeqs() {return dnaSeqs; }
+//    void setDnaSeqs(std::map<std::string,std::string> ds) {dnaSeqs = ds; }
 };
 
 #endif

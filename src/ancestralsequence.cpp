@@ -72,7 +72,7 @@ AncestralSequence::AncestralSequence()
     string alpha = hmm->getAlphabet();
     sAlpha = alpha.length();
     if (CODON)
-        sAlpha = 61;
+        sAlpha /= 3;
 
     int nState = hmm->getNStates();
 

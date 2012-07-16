@@ -54,6 +54,8 @@ public:
     std::string formatExtension(int format);
 private:
 
+    std::map<std::string,std::string> dnaSeqs;
+
     /********************************************/
 
     void showInfo()
@@ -101,12 +103,13 @@ private:
                 cout<<"Not DNA in "<<dnafile<<". Exiting."<<endl;
                 exit(-1);
             }
-            if (!trseq.translateProtein(&dnaNames,&dnaSequences))
+            if (!trseq.translateProtein(&dnaNames,&dnaSequences,&dnaSeqs))
             {
                 cout<<"Translation of DNA sequences to protein failed. Exiting."<<endl<<endl;
                 exit(-1);
             }
         }
+
 
         ns = rfa.readFile(seqfile.c_str());
         if (ns>0)
@@ -121,7 +124,7 @@ private:
             }
 
             vector<string> codons;
-            if (!trseq.translateDNA(&protNames,&protSequences,&codons))
+            if (!trseq.translateDNA(&protNames,&protSequences,&codons,&dnaSeqs))
             {
                 cout<<"Backtranslation of protein sequences to DNA failed. Exiting."<<endl;
                 exit(-1);
@@ -320,7 +323,8 @@ private:
         else if (isDna && TRANSLATE)
         {
             TranslateSequences trseq;
-            if (!trseq.translateProtein(names,sequences))
+
+            if (!trseq.translateProtein(names,sequences,&dnaSeqs))
             {
                 cout<<"Translation to protein failed. Exiting."<<endl<<endl;
 
@@ -373,7 +377,8 @@ private:
     void translateSequences(vector<string> *names,vector<string> *sequences,bool *isDna)
     {
         TranslateSequences trseq;
-        if (!trseq.translateProtein(names,sequences))
+
+        if (!trseq.translateProtein(names,sequences,&dnaSeqs))
         {
             cout<<"Failed to translate DNA sequences to protein. Exiting."<<endl<<endl;
             exit(-1);
