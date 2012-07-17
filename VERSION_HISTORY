@@ -1,4 +1,8 @@
 v.120716
+- All input data now converted to upper-case.
+
+
+v.120716
 - Fixed the translated alignment (been broken in recent clean up)
 - Fixed the output order of ancestral sequences
 

@@ -38,7 +38,6 @@ TerminalSequence::~TerminalSequence()
 TerminalSequence::TerminalSequence(string* s)
         : Sequence()
 {
-
     terminal = true;
 
     string alpha = hmm->getAlphabet();
@@ -61,6 +60,7 @@ TerminalSequence::TerminalSequence(string* s)
             cout<<"codon sequence length is not multiple of three!"<<endl;
             exit(0);
         }
+
         for (int i=0; i<183; i+=3)
         {
             codons.insert(make_pair(alpha.substr(i,3),i/3));

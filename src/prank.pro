@@ -45,7 +45,8 @@ SOURCES += writefile.cpp \
 OTHER_FILES += \  
     ../VERSION_HISTORY \
     prank.1.pod \
-    Makefile.no_Qt
+    Makefile.no_Qt \
+    Makefile
 HEADERS += writefile.h \
     treenode.h \
     translatesequences.h \

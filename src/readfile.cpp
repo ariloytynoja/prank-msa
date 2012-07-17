@@ -170,6 +170,11 @@ int ReadFile::readFile(const char* inputfile)
     set<string> nameset;
     for (int i=0; i<(int)seqs.size(); i++)
     {
+
+        string temp = seqs.at(i);
+        transform( temp.begin(), temp.end(), temp.begin(), (int(*)(int))toupper );
+        seqs.at(i) = temp;
+
         if ((int)seqs.at(i).length()<1)
         {
             cout<<"Failed to read sequence "<<names.at(i)<<". Exiting.\n\n";
