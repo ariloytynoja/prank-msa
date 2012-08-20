@@ -125,6 +125,7 @@ extern float protBranchScalingFactor;
 
 extern float defaultBranchLength;
 extern float fixedBranchLength;
+extern float mergeBranchLength;
 extern bool FIXEDBRANCH;
 extern bool MAXBRANCH;
 extern bool REALBRANCHES;

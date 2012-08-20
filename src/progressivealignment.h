@@ -544,6 +544,12 @@ private:
                     exit(0);
                 }
 
+                float dist = defaultBranchLength;
+                if(mergeBranchLength>0)
+                    dist = mergeBranchLength;
+
+                dist /= 2;
+
                 if(tree1.at(tree1.size()-1)==';')
                     tree1.erase(tree1.size()-1);
 
@@ -554,7 +560,7 @@ private:
                     cout<<"GuideTree; time "<<(time(0)-time1)<<"s"<<endl;
 
                 stringstream ss;
-                ss<<"("<<tree1<<":"<<defaultBranchLength/2<<","<<tree2<<":"<<defaultBranchLength/2<<");";
+                ss<<"("<<tree1<<":"<<dist<<","<<tree2<<":"<<dist<<");";
                 *tree = ss.str();
 
             }
@@ -627,6 +633,12 @@ private:
 
             else if(MERGE)
             {
+                float dist = defaultBranchLength;
+                if(mergeBranchLength>0)
+                    dist = mergeBranchLength;
+
+                dist /= 2;
+
                 string tree1 = rn.readFile(treefile1.c_str());
                 string tree2 = rn.readFile(treefile2.c_str());
 
@@ -637,7 +649,7 @@ private:
                     tree2.erase(tree2.size()-1);
 
                 stringstream ss;
-                ss<<"("<<tree1<<":"<<defaultBranchLength/2<<","<<tree2<<":"<<defaultBranchLength/2<<");";
+                ss<<"("<<tree1<<":"<<dist<<","<<tree2<<":"<<dist<<");";
                 *tree = ss.str();
 
 //                cout<<tree1<<"\n"<<tree2<<"\n"<<*tree<<endl;

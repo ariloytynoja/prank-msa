@@ -470,6 +470,12 @@ void readArguments(int argc, char *argv[])
                 FIXEDBRANCH = true;
             }
 
+            // set merge branch length
+            else if (s.substr(0,11)=="-mergedist=")
+            {
+                mergeBranchLength = atof(string(argv[i]).substr(11).c_str());;
+            }
+
             // set branch lengths
             else if (s.substr(0,13)=="-maxbranches=")
             {
@@ -708,6 +714,7 @@ void printHelp(bool complete)
         cout<<"  -d2=sequence_file-2 (in FASTA format)"<<endl;
         cout<<"  -t1=tree_file_1 [if not provided, generate NJ tree]"<<endl;
         cout<<"  -t2=tree_file_2 [if not provided, generate NJ tree]"<<endl;
+        cout<<"  -mergedist=# [default: "<<defaultBranchLength<<"]"<<endl;
     }
     cout<<"\n model parameters:"<<endl;
     cout<<"  +F or -F [force insertions to be always skipped]"<<endl;
