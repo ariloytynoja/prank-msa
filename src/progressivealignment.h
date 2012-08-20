@@ -73,13 +73,22 @@ private:
             }
             else
             {
-                cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
-                if (treefile!="" & hmmname!="")
-                    cout<<"Using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'.\n";
-                else if (treefile!="")
-                    cout<<"Using alignment guidetree '"<<treefile<<"'.\n";
-                else if (hmmname!="")
-                    cout<<"Using alignment model '"<<hmmname<<"'.\n";
+                if(MERGE)
+                {
+                    cout<<endl<<"PRANK: merging alignments in '"<<seqfile1<<"' and '"<<seqfile2<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                    if (treefile1!="" & treefile2!="")
+                        cout<<"Using alignment guidetrees '"<<treefile1<<"'' and '"<<treefile2<<"'.\n";
+                }
+                else
+                {
+                    cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                    if (treefile!="" & hmmname!="")
+                        cout<<"Using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'.\n";
+                    else if (treefile!="")
+                        cout<<"Using alignment guidetree '"<<treefile<<"'.\n";
+                    else if (hmmname!="")
+                        cout<<"Using alignment model '"<<hmmname<<"'.\n";
+                }
                 cout<<endl;
             }
         }
@@ -497,15 +506,37 @@ private:
 
                     gt.computeTree(&sequences1,&names1,isDna);
                     tree1 = gt.getTree();
-                    Node* n1 = new Node(tree1);
-                    tree1=n1->rootedTree();
-                    delete n1;
+                    if(sequences1.size()==1)
+                    {
+                        if(tree1.at(0)=='(')
+                            tree1.erase(0,1);
+
+                        if(tree1.at(tree1.size()-2)==')')
+                            tree1.erase(tree1.size()-2,1);
+                    }
+                    else if(sequences1.size()>2)
+                    {
+                        Node* n1 = new Node(tree1);
+                        tree1=n1->rootedTree();
+                        delete n1;
+                    }
 
                     gt.computeTree(&sequences2,&names2,isDna);
                     tree2 = gt.getTree();
-                    Node* n2 = new Node(tree2);
-                    tree2=n2->rootedTree();
-                    delete n2;
+                    if(sequences2.size()==1)
+                    {
+                        if(tree2.at(0)=='(')
+                            tree2.erase(0,1);
+
+                        if(tree2.at(tree2.size()-2)==')')
+                            tree2.erase(tree2.size()-2,1);
+                    }
+                    else if(sequences2.size()>2)
+                    {
+                        Node* n2 = new Node(tree2);
+                        tree2=n2->rootedTree();
+                        delete n2;
+                    }
                 }
                 else
                 {

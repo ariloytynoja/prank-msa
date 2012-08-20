@@ -37,6 +37,17 @@ void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntM
     if(isDna)
         full_alphabet = "ACGTURYMKSWHBVDN";
 
+    if(sequences->size()==1 && names->size()==1)
+    {
+
+        tree = "("+names->at(0)+");";
+
+        if (NOISE>=0)
+            cout<<"Generating dummy guidetree for one sequence."<<endl;
+
+        return;
+    }
+
     if (NOISE>=0)
         cout<<"Generating approximate guidetree."<<endl;
 
@@ -279,6 +290,16 @@ void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntM
 
 void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDna)
 {
+
+    if(seqs->size()==1 && names->size()==1)
+    {
+        tree = "("+names->at(0)+");";
+
+        if (NOISE>=0)
+            cout<<"Generating dummy guidetree for one sequence."<<endl;
+
+        return;
+    }
 
     int ns = seqs->size();
     FlMatrix* distance = new FlMatrix(ns,ns,"pw distances");
