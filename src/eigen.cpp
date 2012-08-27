@@ -1,7 +1,24 @@
+/***************************************************************************
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 
 /*
- * This stuff comes from Ziheng Yang's PAML
- */
+  Copyright (C) by Ziheng Yang except where otherwise stated.
+  The code is adapted from Ziheng Yang's software package PAML 3.14.
+*/
 
 #include "eigen.h"
 extern int NOISE;
@@ -347,6 +364,10 @@ int Eigen::EigenTridagQLImplicit(double d[], double e[], int n, double z[])
 }
 
 #undef SIGN
+
+/*
+  Copyright (C) by Simon Whelan.
+*/
 
 void Eigen::computePMatrix(int n, double* pMat, double* U, double* V, double* Root, double time)
 {

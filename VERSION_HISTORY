@@ -1,3 +1,7 @@
+v.120827
+- All files now under the GPL licence.
+
+
 v.120814
 - Can now also merge "alignments" of one sequence
 - New option '-mergedist=#' to define the distance for two alignments
