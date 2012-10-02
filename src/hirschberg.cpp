@@ -472,10 +472,17 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
                 if (NOISE>0)
                     cout<<"e "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
 
-                for (int j=0; j+h.q_start<h.q_end; j+=10)
+                if(h.q_start < h.q_end && h.t_start < h.t_end)
                 {
-                    if (j+h.q_start>5 && j+h.t_start>5)
-                        anchor_pairs.push_back(make_pair(j+h.q_start,j+h.t_start));
+                    for (int j=0; j+h.q_start<h.q_end; j+=10)
+                    {
+                        if (j+h.q_start>5 && j+h.t_start>5)
+                            anchor_pairs.push_back(make_pair(j+h.q_start,j+h.t_start));
+                    }
+                }
+                else
+                {
+                    cout<<"\nAlignment anchoring indicates a reverse match: check the input data.\n";
                 }
             }
 
