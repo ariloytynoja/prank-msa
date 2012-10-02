@@ -129,7 +129,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
     if (PREALIGNED)
     {
-        if (TREEFROMALIGNMENT || PRINTTREE)
+        if (PRINTTREE)
             this->printNewickTree(root,outfile+".0.dnd");
 
         ReadAlignment ra;
@@ -147,6 +147,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
     else if (PARTLYALIGNED)
     {
+        if (PRINTTREE)
+            this->printNewickTree(root,outfile+".0.dnd");
+
         ReadAlignment ra;
         ra.initialiseMatrices(longest+2);
 

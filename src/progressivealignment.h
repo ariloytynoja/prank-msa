@@ -544,11 +544,43 @@ private:
                     exit(0);
                 }
 
+
+                float dist1 = -1; float dist2 = -1;
+
+                string merge_tree = "";
+
+                if (TREESTRING)
+                    merge_tree = treefile;
+                else if(treefile!="")
+                    merge_tree = rn.readFile(treefile.c_str());
+
+                if(merge_tree != "")
+                {
+                    char p,c1,c2,co1,cm,c3,c4,co2;
+                    string end;
+
+                    stringstream merge_ss(merge_tree);
+                    merge_ss >> p >> c1 >> c2  >> co1 >> dist1 >> cm >> c3  >> c4  >> co2 >> dist2 >> end;
+
+                    if(c2=='2' && c4=='1')
+                    {
+                        float tmp = dist1;
+                        dist1 = dist2;
+                        dist2 = tmp;
+                    }
+                }
+
                 float dist = defaultBranchLength;
                 if(mergeBranchLength>0)
                     dist = mergeBranchLength;
 
                 dist /= 2;
+
+                if(dist1<0 || dist2<0)
+                {
+                    dist1 = dist;
+                    dist2 = dist;
+                }
 
                 if(tree1.at(tree1.size()-1)==';')
                     tree1.erase(tree1.size()-1);
@@ -560,9 +592,10 @@ private:
                     cout<<"GuideTree; time "<<(time(0)-time1)<<"s"<<endl;
 
                 stringstream ss;
-                ss<<"("<<tree1<<":"<<dist<<","<<tree2<<":"<<dist<<");";
+                ss<<"("<<tree1<<":"<<dist1<<","<<tree2<<":"<<dist2<<");";
                 *tree = ss.str();
 
+//                cout<<ss.str()<<endl;
             }
 
 
@@ -628,16 +661,47 @@ private:
         }
         else
         {
-            if (TREESTRING)
+            if (TREESTRING && !MERGE)
                 *tree = treefile;
 
             else if(MERGE)
             {
+
+                float dist1 = -1; float dist2 = -1;
+                string merge_tree = "";
+
+                if (TREESTRING)
+                    merge_tree = treefile;
+                else if(treefile!="")
+                    merge_tree = rn.readFile(treefile.c_str());
+
+                if(merge_tree != "")
+                {
+                    char p,c1,c2,co1,cm,c3,c4,co2;
+                    string end;
+
+                    stringstream merge_ss(merge_tree);
+                    merge_ss >> p >> c1 >> c2  >> co1 >> dist1 >> cm >> c3  >> c4  >> co2 >> dist2 >> end;
+
+                    if(c2=='2' && c4=='1')
+                    {
+                        float tmp = dist1;
+                        dist1 = dist2;
+                        dist2 = tmp;
+                    }
+                }
+
                 float dist = defaultBranchLength;
                 if(mergeBranchLength>0)
                     dist = mergeBranchLength;
 
                 dist /= 2;
+
+                if(dist1<0 || dist2<0)
+                {
+                    dist1 = dist;
+                    dist2 = dist;
+                }
 
                 string tree1 = rn.readFile(treefile1.c_str());
                 string tree2 = rn.readFile(treefile2.c_str());
@@ -649,7 +713,7 @@ private:
                     tree2.erase(tree2.size()-1);
 
                 stringstream ss;
-                ss<<"("<<tree1<<":"<<dist<<","<<tree2<<":"<<dist<<");";
+                ss<<"("<<tree1<<":"<<dist1<<","<<tree2<<":"<<dist2<<");";
                 *tree = ss.str();
 
 //                cout<<tree1<<"\n"<<tree2<<"\n"<<*tree<<endl;
