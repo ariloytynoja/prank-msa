@@ -387,18 +387,21 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
     }
     nms.clear();
 
-    // internal nodes
-    map<string,string> anc_seqs;
-    this->getAncestralAlignmentSeqs(root,&anc_seqs);
-
-
-    root->setSiteLength(l);
-    for (int i=0; i<l; i++)
+    if (!(TRANSLATE && translate))
     {
-        root->setSiteIndex(i,i);
-    }
+        // internal nodes
+        map<string,string> anc_seqs;
+        this->getAncestralAlignmentSeqs(root,&anc_seqs);
 
-    root->outputXml(&seqout,&anc_seqs,translate);
+
+        root->setSiteLength(l);
+        for (int i=0; i<l; i++)
+        {
+            root->setSiteIndex(i,i);
+        }
+
+        root->outputXml(&seqout,&anc_seqs,translate);
+    }
     seqout<<"</nodes>"<<endl;
 
     if(nState>1 || DOPOST)
@@ -721,9 +724,9 @@ void ProgressiveAlignment::getAncestralAlignmentSeqs(AncestralNode *root,map<str
 
     char* anc_alignment;
     if (CODON)
-        anc_alignment = new char[n*l*3];
-    else
-        anc_alignment = new char[n*l];
+        l*=3;
+
+    anc_alignment = new char[n*l];
 
     this->getAncestralAlignmentMatrix(root,anc_alignment);
 
