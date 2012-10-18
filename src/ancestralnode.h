@@ -73,9 +73,9 @@ public:
     void setSiteLength(int l);
     void setSiteIndex(int site,int index);
 
-    void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
-    void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
-    void getCharactersAt(std::vector<std::string>* col,int i);
+    void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns,bool parentPermIns);
+    void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns,bool parentPermIns);
+    void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
 
     void setPermanentInsertion(int i);
     void printChildAlignment(TreeNode *node,std::string filename);

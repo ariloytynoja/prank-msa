@@ -1,3 +1,7 @@
+v.121018
+- Ancestral sequences can differently indicate insertions and deletions.
+
+
 v.121002
 - Alignment merge now accepts trees such as "(t1:#.#,t2:#.#);".
   Provided with "-t=filename" or "-tree=tree-string".

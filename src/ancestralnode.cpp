@@ -1058,38 +1058,68 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
     fclose(ancPro);
 }
 
-void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
+void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns,bool parentPermIns)
 {
     if (i<0)
     {
-        for (int j=0; j<getInternalNodeNumber(); j++)
+        if (DOTS && parentPermIns)
         {
-            if (CODON)
+            for (int j=0; j<getInternalNodeNumber(); j++)
             {
-                col->push_back("---");
-            }
-            else
-            {
-                col->push_back("-");
+                if (CODON)
+                {
+                    col->push_back("...");
+                }
+                else
+                {
+                    col->push_back(".");
+                }
             }
         }
-
+        else
+        {
+            for (int j=0; j<getInternalNodeNumber(); j++)
+            {
+                if (CODON)
+                {
+                    col->push_back("---");
+                }
+                else
+                {
+                    col->push_back("-");
+                }
+            }
+        }
     }
     else
     {
 
-        lChild->getAncCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i));
-        rChild->getAncCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
+        lChild->getAncCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i),this->getSequence()->isPermInsertion(i));
+        rChild->getAncCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i),this->getSequence()->isPermInsertion(i));
 
         if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) )   /*e090626*/
         {
-            if (CODON)
+            if (DOTS && this->getSequence()->isPermInsertion(i))
             {
-                col->push_back("---");
+                if (CODON)
+                {
+                    col->push_back("...");
+                }
+                else
+                {
+                    col->push_back(".");
+                }
             }
             else
             {
-                col->push_back("-");
+                if (CODON)
+                {
+                    col->push_back("---");
+                }
+                else
+                {
+                    col->push_back("-");
+                }
             }
         }
         else
@@ -1177,37 +1207,67 @@ void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns)
     }
 }
 
-void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns)
+void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns, bool parentPermIns)
 {
     if (i<0)
     {
-        for (int j=0; j<getInternalNodeNumber()+getTerminalNodeNumber(); j++)
+        if (DOTS && parentPermIns)
         {
-            if (CODON)
+            for (int j=0; j<getInternalNodeNumber()+getTerminalNodeNumber(); j++)
             {
-                col->push_back("---");
-            }
-            else
-            {
-                col->push_back("-");
+                if (CODON)
+                {
+                    col->push_back("...");
+                }
+                else
+                {
+                    col->push_back(".");
+                }
             }
         }
-
+        else
+        {
+            for (int j=0; j<getInternalNodeNumber()+getTerminalNodeNumber(); j++)
+            {
+                if (CODON)
+                {
+                    col->push_back("---");
+                }
+                else
+                {
+                    col->push_back("-");
+                }
+            }
+        }
     }
     else
     {
 
-        lChild->getAllCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i));
+        lChild->getAllCharactersAt(col,seq->getLIndex(i),this->getSequence()->isInsertion(i),this->getSequence()->isPermInsertion(i));
 
         if (this->getSequence()->isInsertion(i) || ( parentIns && this->getSequence()->isGap(i) ) )   /*e090626*/
         {
-            if (CODON)
+            if (DOTS && this->getSequence()->isPermInsertion(i))
             {
-                col->push_back("---");
+                if (CODON)
+                {
+                    col->push_back("...");
+                }
+                else
+                {
+                    col->push_back(".");
+                }
             }
             else
             {
-                col->push_back("-");
+                if (CODON)
+                {
+                    col->push_back("---");
+                }
+                else
+                {
+                    col->push_back("-");
+                }
             }
         }
         else
@@ -1292,11 +1352,11 @@ void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns)
                 }
             }
         }
-        rChild->getAllCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i));
+        rChild->getAllCharactersAt(col,seq->getRIndex(i),this->getSequence()->isInsertion(i),this->getSequence()->isPermInsertion(i));
     }
 }
 
-void AncestralNode::getCharactersAt(vector<string>* col,int i)
+void AncestralNode::getCharactersAt(vector<string>* col,int i, bool parentPermIns)
 {
     if (seq->getLIndex(i)<0)
     {

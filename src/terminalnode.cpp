@@ -222,17 +222,31 @@ void TerminalNode::getAncCharactersAt(vector<string>* ,int ,bool )
     return;
 }
 
-void TerminalNode::getCharactersAt(vector<string>* col,int i)
+void TerminalNode::getCharactersAt(vector<string>* col,int i, bool parentPermIns)
 {
     if (i<0)
     {
-        if (CODON)
+        if(DOTS && parentPermIns)
         {
-            col->push_back("---");
+            if (CODON)
+            {
+                col->push_back("...");
+            }
+            else
+            {
+                col->push_back(".");
+            }
         }
         else
         {
-            col->push_back("-");
+            if (CODON)
+            {
+                col->push_back("---");
+            }
+            else
+            {
+                col->push_back("-");
+            }
         }
     }
     else if (i<getSequence()->length())

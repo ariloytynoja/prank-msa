@@ -658,7 +658,7 @@ void ProgressiveAlignment::getAncestralAlignmentMatrix(AncestralNode *root,char*
     {
 
         col.clear();
-        root->getAncCharactersAt(&col,i,0);
+        root->getAncCharactersAt(&col,i,0,root->getSequence()->isPermInsertion(i));
         vector<string>::iterator cb = col.begin();
         vector<string>::iterator ce = col.end();
 
@@ -692,7 +692,7 @@ void ProgressiveAlignment::getFullAlignmentMatrix(AncestralNode *root,char* alig
     {
 
         col.clear();
-        root->getAllCharactersAt(&col,i,0);
+        root->getAllCharactersAt(&col,i,0,root->getSequence()->isPermInsertion(i));
         vector<string>::iterator cb = col.begin();
         vector<string>::iterator ce = col.end();
 

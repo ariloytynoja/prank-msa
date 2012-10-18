@@ -180,9 +180,9 @@ public:
         return rn;
     }
 
-    virtual void getCharactersAt(std::vector<std::string>* ,int ) {}
-    virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool ) {}
-    virtual void getAllCharactersAt(std::vector<std::string>* ,int ,bool ) {}
+    virtual void getCharactersAt(std::vector<std::string>* ,int,bool t=false ) {}
+    virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool,bool ) {}
+    virtual void getAllCharactersAt(std::vector<std::string>* ,int ,bool, bool ) {}
 
     virtual void setSiteLength(int ) {}
     virtual void setSiteIndex(int ,int ) {}

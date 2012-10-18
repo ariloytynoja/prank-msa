@@ -66,9 +66,9 @@ public:
     void setSiteLength(int ) {}
     void setSiteIndex(int ,int ) {}
 
-    void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns) { this->getCharactersAt(col,i); }
+    void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns,bool parentPermIns) { this->getCharactersAt(col,i,parentPermIns); }
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
-    void getCharactersAt(std::vector<std::string>* col,int i);
+    void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
 
 };
 
