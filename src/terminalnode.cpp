@@ -67,6 +67,8 @@ TerminalNode::TerminalNode(string s,float l)
     seq = 0;
     siteLength = 0;
 
+    realignNode = false;
+
     groupName = "null";
     nodeName = s;
 
@@ -140,7 +142,7 @@ void TerminalNode::setCharString(vector<string>* sns,vector<string>* sqs,int* co
         if (seqname==nodeName)
         {
             if (NOISE>1)
-                cout<<(*ni)<<"\n"<<(*si)<<endl;
+                cout<<"set: "<<(*ni)<<"\n"<<(*si)<<endl;
 
             seq = new TerminalSequence(&(*si));
             charString = *seq->getMLsequence();

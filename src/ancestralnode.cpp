@@ -67,11 +67,27 @@ AncestralNode::AncestralNode(string s)
     siteLength = 0;
     branchLength = 0;
 
+    realignNode = false;
+
     rooted = true;
     ln = s.substr(0,s.find(","));
     rn = s.substr(s.find(",")+1);
     ld = defaultBranchLength;
     rd = defaultBranchLength;
+    LRealign = false;
+    RRealign = false;
+
+    if(ln.find("[&&NHX:XN=realign]") != string::npos)
+    {
+        ln = ln.substr(0,ln.find("[&&NHX:XN=realign]"));
+        LRealign = true;
+    }
+
+    if(rn.find("[&&NHX:XN=realign]") != string::npos)
+    {
+        rn = rn.substr(0,rn.find("[&&NHX:XN=realign]"));
+        RRealign = true;
+    }
 
     if(ln.find(":") != string::npos)
     {
@@ -101,7 +117,7 @@ AncestralNode::AncestralNode(string s)
         rInternal = false;
         rChild = new TerminalNode(rn,rd);
     }
-
+//    cout<<ln<<" : "<<ld<<" , "<<rn<<" : "<<rd<<endl;
     ld *= branchScalingFactor;
 
     if (MAXBRANCH)
@@ -152,6 +168,24 @@ void AncestralNode::partlyAlignSequences()
     else
     {
         this->alignThisNode();
+    }
+}
+
+void AncestralNode::updateAlignedSequences()
+{
+
+    lChild->updateAlignedSequences();
+    rChild->updateAlignedSequences();
+
+    if (this->realignNode)
+    {
+        this->alignThisNode();
+    }
+    else
+    {
+        FOREVER = false;
+        this->readThisNode();
+        FOREVER = FOREVER_FOR_PA;
     }
 }
 
@@ -440,7 +474,7 @@ void AncestralNode::readThisNode()
     Sequence *seq2 = rChild->getSequence();
 
     if (NOISE>1)
-        cout<<*(seq1->getGappedSeq())<<endl<<*(seq2->getGappedSeq())<<endl;
+        cout<<"seq1: "<<*(seq1->getGappedSeq())<<endl<<"seq2: "<<*(seq2->getGappedSeq())<<endl;
 
     string* ancSeq = new string();
     int i;

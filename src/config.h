@@ -53,6 +53,7 @@ extern bool MERGE;
 extern bool TREESTRING;
 extern bool PARTLYALIGNED;
 extern bool PREALIGNED;
+extern bool UPDATE;
 
 extern string dnafile;
 

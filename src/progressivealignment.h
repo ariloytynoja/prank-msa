@@ -772,13 +772,12 @@ private:
             }
         }
 
-
         Node* n = new Node(*tree);
         n->mark_sequences(names);
         int treeleaves = 0;
         int treematches = 0;
         n->countMatchingLeaves(&treeleaves,&treematches);
-
+//        cout<<treeleaves<<" "<<treematches<<endl;
         if (treeleaves!=treematches)
         {
             if (PRUNETREE)

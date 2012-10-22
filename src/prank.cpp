@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 121002;
+    version = 121018;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -192,6 +192,12 @@ void readArguments(int argc, char *argv[])
             else if (s=="-keep")
             {
                 PREALIGNED = true;
+            }
+
+
+            else if (s=="-update")
+            {
+                UPDATE = true;
             }
 
             // backtranslate existing protein alignment to DNA

@@ -57,6 +57,17 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
     string::iterator b = s.begin();
     string::iterator e = s.end();
 
+    for (unsigned int i = 0; i < s.size(); i++)
+    {
+      if(s[i] == ' ')
+      {
+        s.erase(s.begin() + i);
+        i--;
+      }
+    }
+
+//    cout<<s<<endl;
+
     int open=0;
     int end=0;
     int comma = 0;
@@ -164,6 +175,15 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                     {
                         tn->setRChild(nodes->find(tn->getRName())->second);
                         nodes->find(tn->getRName())->second->setBranchLength(tn->getRightBrL());
+                    }
+
+                    if(tn->LRealign){
+                        tn->getLChild()->realignNode = true;
+                        tn->realignNode = true;
+                    }
+                    if(tn->RRealign){
+                        tn->getRChild()->realignNode = true;
+                        tn->realignNode = true;
                     }
 
                     nodes->insert(make_pair(tc,tn));

@@ -50,7 +50,7 @@ TerminalSequence::TerminalSequence(string* s)
 
     map<string,int> codons;
 
-    if (PREALIGNED || PARTLYALIGNED)
+    if (PREALIGNED || PARTLYALIGNED || UPDATE)
         gappedseq = *s;
 
     if (CODON)

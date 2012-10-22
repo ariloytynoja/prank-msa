@@ -72,9 +72,14 @@ public:
     virtual void alignSequences() {}
     virtual void readAlignment() {}
     virtual void partlyAlignSequences() {}
+    virtual void updateAlignedSequences() {}
 
     virtual int getTerminalNodeNumber() = 0;
     virtual int getInternalNodeNumber() = 0;
+
+    bool realignNode;
+    bool LRealign;
+    bool RRealign;
 
     virtual std::string getGroupName()
     {
@@ -169,6 +174,15 @@ public:
     void setRChild(TreeNode* tn)
     {
         rChild = tn;
+    }
+
+    TreeNode* getLChild()
+    {
+        return lChild;    // get child nodes
+    }
+    TreeNode* getRChild()
+    {
+        return rChild;    // get child nodes
     }
 
     std::string getLName()

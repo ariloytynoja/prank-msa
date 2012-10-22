@@ -69,6 +69,8 @@ bool PARTLYALIGNED = false;
 
 bool PREALIGNED = false;
 
+bool UPDATE = false;
+
 // DNA sequence data file for backtranslation
 string dnafile = "";
 

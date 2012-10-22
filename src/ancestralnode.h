@@ -58,6 +58,7 @@ public:
     void readThisNode();
 
     void partlyAlignSequences();
+    void updateAlignedSequences();
 
     void getCleanNewick(std::string* tree);
     void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple);

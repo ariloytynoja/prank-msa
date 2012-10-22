@@ -168,6 +168,29 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         hir.cleanUp();
     }
 
+    else if (UPDATE)
+    {
+        if (PRINTTREE)
+            this->printNewickTree(root,outfile+".0.dnd");
+
+        ReadAlignment ra;
+        ra.initialiseMatrices(longest+2);
+
+        Hirschberg hir;
+        hir.initialiseMatrices((int)(((float)longest+2)*initialMatrixSize));
+
+        if (NOISE>=0)
+            cout<<"Updating partially aligned alignment."<<endl;
+
+        root->setTotalNodes();
+        root->updateAlignedSequences();
+
+        printAlignment(root,&names,&sequences,0,isDna);
+
+        ra.cleanUp();
+        hir.cleanUp();
+    }
+
     else
     {
         Hirschberg hir;

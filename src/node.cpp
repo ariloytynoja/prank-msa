@@ -81,6 +81,20 @@ Node::Node(string t)
 
     tree = t;
 
+    for (unsigned int i = 0; i < tree.size(); i++)
+    {
+      if(tree[i] == ' ')
+      {
+        tree.erase(tree.begin() + i);
+        i--;
+      }
+    }
+
+    while(tree.find("[&&NHX:XN=realign]") != string::npos)
+    {
+        tree.erase(tree.find("[&&NHX:XN=realign]"),string("[&&NHX:XN=realign]").length());
+    }
+
     divideTree(tree,subTrees,subDistances);
 
     subDistances[0] = abs(subDistances[0]);
@@ -116,6 +130,8 @@ string Node::rootedTree()
 
 Node::Node(string t,Node* p,int branch)
 {
+//    cout<<t<<endl;
+
     tree = t;
     parent = p;
     maxLength = 0;
@@ -307,6 +323,7 @@ void Node::divideTree(string tree,string* trees,float* distance)
     {
 
         string tmp = tree.substr(0,tree.find(",",0));
+
         trees[0] = tmp;
         distance[0] = defaultBranchLength;
         if(tmp.find(":")!=string::npos)
@@ -350,6 +367,7 @@ void Node::divideTree(string tree,string* trees,float* distance)
             {
                 trees[1] = tree.substr(0,tree.find_last_of(":"));
                 tmp = tree.substr(tree.find_last_of(":")+1);
+
                 distance[1] = atof(tmp.c_str());
             }
         }
@@ -378,6 +396,7 @@ void Node::divideTree(string tree,string* trees,float* distance)
             {
                 distance[0] = 0;
                 if(tree.at(i+1) == ':') {
+
                     string tmp = tree.substr(i+2,tree.find(",",i+2));
                     distance[0] = atof(tmp.c_str());
                 }
@@ -419,7 +438,9 @@ void Node::divideTree(string tree,string* trees,float* distance)
                     distance[1] = defaultBranchLength;
                     if(tree.find(":")!=string::npos)
                     {
+
                         trees[1] = tree.substr(0,tree.find_last_of(":"));
+
                         string tmp = tree.substr(tree.find_last_of(":")+1);
                         distance[1] = atof(tmp.c_str());
                     }

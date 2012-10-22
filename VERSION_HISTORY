@@ -1,5 +1,6 @@
 v.121018
 - Ancestral sequences can differently indicate insertions and deletions.
+- Can update an alignment, recomputing nodes with tag "[&&NHX:XN=realign]"
 
 
 v.121002
