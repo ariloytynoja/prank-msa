@@ -174,15 +174,19 @@ void AncestralNode::partlyAlignSequences()
 void AncestralNode::updateAlignedSequences()
 {
 
+//    cout<<"update "<<nodeName<<endl;
+
     lChild->updateAlignedSequences();
     rChild->updateAlignedSequences();
 
     if (this->realignNode)
     {
+//        cout<<"realign "<<nodeName<<endl;
         this->alignThisNode();
     }
     else
     {
+//        cout<<"read "<<nodeName<<endl;
         FOREVER = false;
         this->readThisNode();
         FOREVER = FOREVER_FOR_PA;
@@ -313,149 +317,152 @@ void AncestralNode::alignThisNode()
         }
     }
 
-    // debugging: print each intermediate MA
     if (PRINTNODES)
-    {
-
-        int n = getTerminalNodeNumber();
-        int l = getSequence()->length();
-        int nState = hmm->getNStates();
-
-        vector<string> nms;
-        this->getTerminalNames(&nms);
-
-        vector<string> sqs;
-        for (int i=0; i<n; i++)
-        {
-            string s = "";
-            sqs.push_back(s);
-        }
-
-        vector<string>::iterator si = sqs.begin();
-
-
-        vector<string> col;
-
-        char* alignment;
-        if (CODON)
-        {
-            alignment = new char[n*l*3];
-        }
-        else
-        {
-            alignment = new char[n*l];
-        }
-
-        for (int i=0; i<l; i++)
-        {
-            col.clear();
-            this->getCharactersAt(&col,i);
-            vector<string>::iterator cb = col.begin();
-            vector<string>::iterator ce = col.end();
-
-            si = sqs.begin();
-            int j=0;
-            for (; cb!=ce; cb++,si++,j++)
-            {
-
-                *si+=*cb;
-
-                if (CODON)
-                {
-                    alignment[j*l*3+i*3] = cb->at(0);
-                    alignment[j*l*3+i*3+1] = cb->at(1);
-                    alignment[j*l*3+i*3+2] = cb->at(2);
-                }
-                else
-                {
-                    alignment[j*l+i] = cb->at(0);
-                }
-            }
-
-        }
-
-        if (CODON)
-            l*=3;
-
-
-        WriteFile* wfa = new WriteFile();
-        wfa->writeSeqs((outfile+"_"+nodeName).c_str(),&nms,&sqs,8);
-        delete wfa;
-
-        l = getSequence()->length();
-
-        if (WRITEXML)
-        {
-            ofstream seqout((outfile+"_"+nodeName+".xml").c_str());
-
-            si = nms.begin();
-
-            // header
-            seqout<<"<ms_alignment>"<<endl;
-            // tree
-            string* treeStr = new string();
-            int sInd = 1;
-            this->writeNewick(treeStr,&sInd);
-            seqout<<"<newick>"<<*treeStr<<"</newick>"<<endl;
-            delete treeStr;
-
-            // nodes
-            seqout<<"<nodes>"<<endl;
-            // terminal nodes
-
-            int ll = l;
-            if (CODON)
-                ll*=3;
-
-            for (int j=0; j<n; j++)
-            {
-                seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<(*si++)<<"\">"<<endl;
-                seqout<<"  <sequence>"<<endl<<"    ";
-                for (int i=0; i<ll; i++)
-                {
-                    seqout<<alignment[j*ll+i];
-                }
-                seqout<<endl;
-                seqout<<"  </sequence>"<<endl<<"</leaf>"<<endl;
-            }
-
-            sqs.clear();
-            nms.clear();
-
-            // internal nodes
-            this->setSiteLength(l);
-            for (int i=0; i<l; i++)
-            {
-                this->setSiteIndex(i,i);
-            }
-
-            map<string,string> anc_seqs;
-            this->outputXml(&seqout,&anc_seqs,false);
-            seqout<<"</nodes>"<<endl<<"<model>"<<endl;
-
-            // model
-            for (int k=0; k<nState; k++)
-            {
-                seqout<<"  <probability id=\""<<k+1<<"\" name=\""<<hmm->getStName(k)<<"\" ";
-                seqout<<"color=\""<<hmm->getDrawCl(k)<<"\" style=\""<<hmm->getDrawPt(k)<<"\" ";
-                seqout<<"offset=\""<<hmm->getDrawOf(k)<<"\" show=\"yes\"/>"<<endl;
-            }
-            seqout<<"  <probability id=\""<<nState+1<<"\" name=\"postprob\" color=\"gray\" ";
-            if (DOPOST)
-                seqout<<"style=\"bar\" show=\"yes\"/>"<<endl;
-            else
-                seqout<<"style=\"bar\" show=\"no\"/>"<<endl;
-            seqout<<"</model>"<<endl<<"</ms_alignment>"<<endl;
-        }
-
-        delete []alignment;
-
-    }
+        this->printDebugNodes();
 
     alignedNodes++;
 
     lChild->getSequence()->cleanSpace();
     rChild->getSequence()->cleanSpace();
+
+}
+
+void AncestralNode::printDebugNodes()
+{
+    // debugging: print each intermediate MA
+
+    int n = getTerminalNodeNumber();
+    int l = getSequence()->length();
+    int nState = hmm->getNStates();
+
+    vector<string> nms;
+    this->getTerminalNames(&nms);
+
+    vector<string> sqs;
+    for (int i=0; i<n; i++)
+    {
+        string s = "";
+        sqs.push_back(s);
+    }
+
+    vector<string>::iterator si = sqs.begin();
+
+
+    vector<string> col;
+
+    char* alignment;
+    if (CODON)
+    {
+        alignment = new char[n*l*3];
+    }
+    else
+    {
+        alignment = new char[n*l];
+    }
+
+    for (int i=0; i<l; i++)
+    {
+        col.clear();
+        this->getCharactersAt(&col,i);
+        vector<string>::iterator cb = col.begin();
+        vector<string>::iterator ce = col.end();
+
+        si = sqs.begin();
+        int j=0;
+        for (; cb!=ce; cb++,si++,j++)
+        {
+
+            *si+=*cb;
+
+            if (CODON)
+            {
+                alignment[j*l*3+i*3] = cb->at(0);
+                alignment[j*l*3+i*3+1] = cb->at(1);
+                alignment[j*l*3+i*3+2] = cb->at(2);
+            }
+            else
+            {
+                alignment[j*l+i] = cb->at(0);
+            }
+        }
+
+    }
+
+    if (CODON)
+        l*=3;
+
+
+    WriteFile* wfa = new WriteFile();
+    wfa->writeSeqs((outfile+"_"+nodeName).c_str(),&nms,&sqs,8);
+    delete wfa;
+
+    l = getSequence()->length();
+
+    if (WRITEXML)
+    {
+        ofstream seqout((outfile+"_"+nodeName+".xml").c_str());
+
+        si = nms.begin();
+
+        // header
+        seqout<<"<ms_alignment>"<<endl;
+        // tree
+        string* treeStr = new string();
+        int sInd = 1;
+        this->writeNewick(treeStr,&sInd);
+        seqout<<"<newick>"<<*treeStr<<"</newick>"<<endl;
+        delete treeStr;
+
+        // nodes
+        seqout<<"<nodes>"<<endl;
+        // terminal nodes
+
+        int ll = l;
+        if (CODON)
+            ll*=3;
+
+        for (int j=0; j<n; j++)
+        {
+            seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<(*si++)<<"\">"<<endl;
+            seqout<<"  <sequence>"<<endl<<"    ";
+            for (int i=0; i<ll; i++)
+            {
+                seqout<<alignment[j*ll+i];
+            }
+            seqout<<endl;
+            seqout<<"  </sequence>"<<endl<<"</leaf>"<<endl;
+        }
+
+        sqs.clear();
+        nms.clear();
+
+        // internal nodes
+        this->setSiteLength(l);
+        for (int i=0; i<l; i++)
+        {
+            this->setSiteIndex(i,i);
+        }
+
+        map<string,string> anc_seqs;
+        this->outputXml(&seqout,&anc_seqs,false);
+        seqout<<"</nodes>"<<endl<<"<model>"<<endl;
+
+        // model
+        for (int k=0; k<nState; k++)
+        {
+            seqout<<"  <probability id=\""<<k+1<<"\" name=\""<<hmm->getStName(k)<<"\" ";
+            seqout<<"color=\""<<hmm->getDrawCl(k)<<"\" style=\""<<hmm->getDrawPt(k)<<"\" ";
+            seqout<<"offset=\""<<hmm->getDrawOf(k)<<"\" show=\"yes\"/>"<<endl;
+        }
+        seqout<<"  <probability id=\""<<nState+1<<"\" name=\"postprob\" color=\"gray\" ";
+        if (DOPOST)
+            seqout<<"style=\"bar\" show=\"yes\"/>"<<endl;
+        else
+            seqout<<"style=\"bar\" show=\"no\"/>"<<endl;
+        seqout<<"</model>"<<endl<<"</ms_alignment>"<<endl;
+    }
+
+    delete []alignment;
 
 }
 
@@ -654,6 +661,8 @@ void AncestralNode::readThisNode()
     seq->setChildGaps(lChild->getSequence(),rChild->getSequence());
     seq->setGappedSeq(ancSeq);
 
+    if (PRINTNODES)
+        this->printDebugNodes();
 
     alignedNodes++;
 
@@ -737,6 +746,46 @@ void AncestralNode::getCharStrings(vector<string>* sqs)
 {
     lChild->getCharStrings(sqs);
     rChild->getCharStrings(sqs);
+}
+
+void AncestralNode::getAllSubtrees(set<string> *subtrees)
+{
+    getLChild()->getAllSubtrees(subtrees);
+    getRChild()->getAllSubtrees(subtrees);
+
+    string subtree;
+    this->getSubtreeBelow(&subtree);
+    subtrees->insert(subtree);
+}
+
+void AncestralNode::getSubtreeBelow(std::string *subtree)
+{
+    string leftSubtree;
+    string rightSubtree;
+
+    getLChild()->getSubtreeBelow(&leftSubtree);
+    getRChild()->getSubtreeBelow(&rightSubtree);
+
+    if(leftSubtree < rightSubtree)
+        *subtree = leftSubtree+","+rightSubtree;
+    else
+        *subtree = rightSubtree+","+leftSubtree;
+}
+
+void AncestralNode::markRealignSubtrees(set<string> *subtrees)
+{
+    if(lInternal)
+        getLChild()->markRealignSubtrees(subtrees);
+    if(rInternal)
+        getRChild()->markRealignSubtrees(subtrees);
+
+    string subtree;
+    this->getSubtreeBelow(&subtree);
+
+    if(subtrees->find(subtree) == subtrees->end())
+        realignNode = true;
+    else
+        realignNode = false;
 }
 
 

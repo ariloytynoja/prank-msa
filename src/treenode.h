@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <iostream>
 #include "sequence.h"
@@ -164,6 +165,9 @@ public:
     virtual void setCharString(std::vector<std::string>* sns,std::vector<std::string>* sqs) = 0;
     virtual void getCharStrings(std::vector<std::string>* sqs) = 0;
 
+    virtual void getAllSubtrees(std::set<std::string> *subtrees) = 0;
+    virtual void getSubtreeBelow(std::string *subtree) = 0;
+    virtual void markRealignSubtrees(std::set<std::string> *subtrees) = 0;
 
     virtual Sequence* getSequence() = 0;
 

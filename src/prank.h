@@ -44,6 +44,7 @@ string seqfile2 = "";
 
 // guide tree file
 string treefile = "";
+string oldtreefile = "";
 string treefile1 = "";
 string treefile2 = "";
 
@@ -70,6 +71,7 @@ bool PARTLYALIGNED = false;
 bool PREALIGNED = false;
 
 bool UPDATE = false;
+bool UPDATESECOND = true;
 
 // DNA sequence data file for backtranslation
 string dnafile = "";

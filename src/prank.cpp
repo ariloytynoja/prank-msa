@@ -140,6 +140,10 @@ void readArguments(int argc, char *argv[])
                 treefile = string(argv[i]).substr(3);
                 TWICE = false;
             }
+            else if (s.substr(0,6)=="-oldt=")
+            {
+                oldtreefile = string(argv[i]).substr(6);
+            }
             else if (s.substr(0,4)=="-t1=")
             {
                 treefile1 = string(argv[i]).substr(4);
@@ -194,10 +198,14 @@ void readArguments(int argc, char *argv[])
                 PREALIGNED = true;
             }
 
-
             else if (s=="-update")
             {
                 UPDATE = true;
+            }
+
+            else if (s=="-realign")
+            {
+                UPDATESECOND = false;
             }
 
             // backtranslate existing protein alignment to DNA

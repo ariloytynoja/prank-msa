@@ -469,7 +469,7 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
             for (int i=0; i<exonerate_hits.size(); i++)
             {
                 hit h = exonerate_hits.at(i);
-                if (NOISE>0)
+                if (NOISE>1)
                     cout<<"e "<<h.query<<" "<<h.node<<" "<<h.score<<" "<<h.q_start<<" "<<h.q_end<<" "<<h.q_strand<<" "<<h.t_start<<" "<<h.t_end<<" "<<h.t_strand<<"\n";
 
                 if(h.q_start < h.q_end && h.t_start < h.t_end)
@@ -491,19 +491,19 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
                 for (int i=0; i<anchor_pairs.size(); i++)
                 {
 
-                    if (NOISE>0)
+                    if (NOISE>1)
                         cout<<" ex anchor "<<anchor_pairs.at(i).first<<","<<anchor_pairs.at(i).second<<" *"<<endl;
 
                     if ( SKIPGAPANCH && ( seq1->hasNeighborGaps(anchor_pairs.at(i).first) || seq2->hasNeighborGaps(anchor_pairs.at(i).second) ) )
                     {
-                        if (NOISE>0)
+                        if (NOISE>1)
                             cout<<"drop anchor "<<anchor_pairs.at(i).first<<","<<anchor_pairs.at(i).second<<" [gap]"<<endl;
                         continue;
                     }
 
                     defineESite(anchor_pairs.at(i).first,anchor_pairs.at(i).second);
 
-                    if (NOISE>0)
+                    if (NOISE>1)
                     {
                         cout<<" beg: "<<beg->index()<<" "<<beg->lInd1()<<" "<<beg->lInd2()<<" | ";
                         cout<<" anc: "<<end->index()<<" "<<end->lInd1()<<" "<<end->lInd2()<<endl;

@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <map>
+#include <set>
 #include <fstream>
 #include <sstream>
 #include <list>
@@ -117,6 +118,21 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     rn.buildTree(tree,&nodes);
 
     AncestralNode* root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
+
+    if(oldtreefile!="")
+    {
+        string oldtree = rn.readFile(oldtreefile.c_str());
+        map<string,TreeNode*> oldnodes;
+
+        rn.buildTree(oldtree,&oldnodes);
+        AncestralNode* oldroot = static_cast<AncestralNode*>(oldnodes[rn.getRoot()]);
+
+        set<string> subtreesOld;
+        oldroot->getAllSubtrees(&subtreesOld);
+
+        root->markRealignSubtrees(&subtreesOld);
+        UPDATE = true;
+    }
 
     int nsqs = 0;
     root->setCharString(&names,&sequences,&nsqs);
@@ -221,6 +237,10 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
             printAlignment(root,&names,&sequences,1,isDna);
 
+            set<string> subtreesOld;
+            if (UPDATESECOND)
+                root->getAllSubtrees(&subtreesOld);
+
             this->getNewSequences(root,&names,&sequences);
 
             GuideTree gt;
@@ -239,9 +259,17 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
             nsqs = 0;
 
-            this->removeGaps(&sequences);
-            root->setCharString(&names,&sequences,&nsqs);
-
+            if (UPDATESECOND)
+            {
+                UPDATE = true;
+                root->setCharString(&names,&sequences,&nsqs);
+                UPDATE = false;
+            }
+            else
+            {
+                this->removeGaps(&sequences);
+                root->setCharString(&names,&sequences,&nsqs);
+            }
             root->setTotalNodes();
 
             if (PRINTTREE)
@@ -252,7 +280,23 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             if (NOISE>=0)
                 cout<<"Generating improved multiple alignment."<<endl;
 
-            root->alignSequences();
+            if (UPDATESECOND)
+            {
+                longest = sequences.at(0).length();
+
+                ReadAlignment ra;
+                ra.initialiseMatrices(longest+2);
+
+                // mark changed subtrees
+                root->markRealignSubtrees(&subtreesOld);
+                root->updateAlignedSequences();
+
+                ra.cleanUp();
+            }
+            else
+            {
+                root->alignSequences();
+            }
         }
 
         hir.cleanUp();

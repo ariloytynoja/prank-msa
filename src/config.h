@@ -38,6 +38,7 @@ extern string seqfile;
 extern string seqfile1;
 extern string seqfile2;
 extern string treefile;
+extern string oldtreefile;
 extern string treefile1;
 extern string treefile2;
 extern string outfile;
@@ -54,6 +55,7 @@ extern bool TREESTRING;
 extern bool PARTLYALIGNED;
 extern bool PREALIGNED;
 extern bool UPDATE;
+extern bool UPDATESECOND;
 
 extern string dnafile;
 

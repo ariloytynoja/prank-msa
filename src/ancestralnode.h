@@ -49,6 +49,10 @@ public:
     void setCharString(std::vector<std::string>* sns,std::vector<std::string>* sqs);
     void getCharStrings(std::vector<std::string>* sqs);
 
+    void getAllSubtrees(std::set<std::string> *subtrees);
+    void getSubtreeBelow(std::string *subtree);
+    void markRealignSubtrees(std::set<std::string> *subtrees);
+
     void getThisAlignmentPostProbAt(double* p,int i);
     void getLowestAlignmentPostProbAt(double* p,int i);
 
@@ -56,6 +60,7 @@ public:
     void alignThisNode( );
     void readAlignment();
     void readThisNode();
+    void printDebugNodes();
 
     void partlyAlignSequences();
     void updateAlignedSequences();
