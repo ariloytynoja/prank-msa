@@ -140,9 +140,9 @@ void readArguments(int argc, char *argv[])
                 treefile = string(argv[i]).substr(3);
                 TWICE = false;
             }
-            else if (s.substr(0,6)=="-oldt=")
+            else if (s.substr(0,4)=="-ot=")
             {
-                oldtreefile = string(argv[i]).substr(6);
+                oldtreefile = string(argv[i]).substr(4);
             }
             else if (s.substr(0,4)=="-t1=")
             {
@@ -418,6 +418,13 @@ void readArguments(int argc, char *argv[])
             else if (s=="-uselogs")
             {
                 LOGVALUES = true;
+                cout<<endl<<"Note: by default, log values are used. To disable, use option \"-nologs\"."<<endl;
+            }
+
+            // use log values (slightly slower)
+            else if (s=="-nologs")
+            {
+                LOGVALUES = false;
             }
 
             // seed for random number generator
@@ -679,7 +686,7 @@ void readArguments(int argc, char *argv[])
         if (argc==2 && seqfile!="")
             cout<<" Select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
         else
-            cout<<" Select it by adding flag \"+F\"."<<endl;
+            cout<<" Select it by adding option \"+F\"."<<endl;
     }
 
     // options don't work together

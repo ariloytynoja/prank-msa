@@ -110,6 +110,8 @@ AncestralSequence::AncestralSequence()
     childGapSite = new IntMatrix(seqLength,"childGapSite");     // if site was gap earlier
     insertionSite = new IntMatrix(seqLength,"insertionSite");
     permInsertionSite = new IntMatrix(seqLength,"permInsertionSite");
+    childGapSite->initialise(0);
+    insertionSite->initialise(0);
     permInsertionSite->initialise(0);
 
     int i=0;

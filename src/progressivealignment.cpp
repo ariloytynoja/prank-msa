@@ -598,7 +598,6 @@ void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignmen
 
 void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nms,vector<string> *sqs,int iteration)
 {
-
     string tree = "";
     if (WRITEANCSEQ)
     {

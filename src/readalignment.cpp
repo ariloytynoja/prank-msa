@@ -776,7 +776,9 @@ void ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
             ptZY->s(szY,k,s);
             ptZM->s(szM,k,s);
 
-
+//            cout<<s<<": ("<<j<<") "<<seq1->fwdGapStarts( j )<<" "<<seq1->fwdChildGapStarts( j )<<"; "<<seq1->fwdGapContinues( j )<<" "<<seq1->fwdChildGapContinues( j )<<"; "<<seq1->fwdGapEnds( j )<<" "<<seq1->fwdChildGapEnds( j )<<"; "<<seq1->fwdGapEndsNext( j )<<" "<<seq1->fwdChildGapEndsNext( j )<<" : ";
+//            cout     <<"("<<i<<") "<<seq2->fwdGapStarts( i )<<" "<<seq2->fwdChildGapStarts( i )<<"; "<<seq2->fwdGapContinues( i )<<" "<<seq2->fwdChildGapContinues( i )<<"; "<<seq2->fwdGapEnds( i )<<" "<<seq2->fwdChildGapEnds( i )<<"; "<<seq2->fwdGapEndsNext( i )<<" "<<seq2->fwdChildGapEndsNext( i )<<"\n";
+//            cout<<s<<": "<<move<<" : "<<mX<<" "<<mY<<" "<<mM<<"; "<<mxX<<" "<<mxM<<"; "<<myY<<" "<<myM<<"; "<<mwX<<" "<<mwM<<"; "<<mzY<<" "<<mzM<<"\n";
         }
         if (move==0)
         {
@@ -983,7 +985,7 @@ void ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
         newsite->currModelState(proc);
         newsite->currMatchState(state);
 
-//  		cout<<"ns: "<<s<<"; "<<proc<<" "<<state<<"; ("<<i<<" "<<j<<"): "<<newsite->index()<<endl;
+//        cout<<"ns: "<<s<<"; "<<proc<<" "<<state<<"; ("<<i<<" "<<j<<"): "<<newsite->index()<<endl;
         if (state==0)
         {
             newsite->cInd1(j);

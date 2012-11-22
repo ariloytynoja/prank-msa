@@ -166,7 +166,8 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
         }
     }
 
-
+    // Forward loop
+    //
     for (; cSite->index()!=1; cSite->next(),pSite->next())
     {
 
@@ -179,38 +180,38 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
         FOR(l,nState)
         {
 
-            double score;
+            double score_val;
 
             if (LOGVALUES)
             {
 
-                score=small;
+                score_val=small;
                 FOR(j,sAlpha)
                 {
-                    score = sumLogs(score,hmm->logCharBgFreq(l,j)+cSite->mlCharProb(l,j));
+                    score_val = sumLogs(score_val,hmm->logCharBgFreq(l,j)+cSite->mlCharProb(l,j));
                 }
 
             }
             else
             {
 
-                score=0;
+                score_val=0;
                 FOR(j,sAlpha)
                 {
-                    score += hmm->charBgFreq(l,j)*cSite->mlCharProb(l,j);
+                    score_val += hmm->charBgFreq(l,j)*cSite->mlCharProb(l,j);
                 }
-                score = log(score);
+                score_val = log(score_val);
             }
 
-            if (score<-100)
-                score = -100;
+            if (score_val<-100000)
+                score_val = -100000;
 
             if ((FOREVER || FOREVER_OLD) && moveTo>2)
             {
                 if (LOGVALUES)
-                    score = 0;
+                    score_val = 0;
                 else
-                    score = 1;
+                    score_val = 1;
             }
             sum=-HUGE_VAL;
 
@@ -222,15 +223,15 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
                     if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probXX(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probXX(k,l) + score_val);
                     }
                     else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probXY(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probXY(k,l) + score_val);
                     }
                     else if (moveTo==2)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probXM(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probXM(k,l) + score_val);
                     }
                     else
                     {
@@ -243,15 +244,15 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
                     if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probYX(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probYX(k,l) + score_val);
                     }
                     else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probYY(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probYY(k,l) + score_val);
                     }
                     else if (moveTo==2)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probYM(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probYM(k,l) + score_val);
                     }
                     else
                     {
@@ -264,15 +265,15 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
 
                     if (moveTo==0 || moveTo==3 || moveTo==5 || moveTo==9 || moveTo==11)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probMX(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probMX(k,l) + score_val);
                     }
                     else if (moveTo==1 || moveTo==7 || moveTo==8 || moveTo==13 || moveTo==14)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probMY(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probMY(k,l) + score_val);
                     }
                     else if (moveTo==2)
                     {
-                        sum = sumLogs(sum,prev->g(k) + hmm->probMM(k,l) + score);
+                        sum = sumLogs(sum,prev->g(k) + hmm->probMM(k,l) + score_val);
                     }
                     else
                     {
@@ -304,6 +305,10 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
             full = sumLogs(full,prev->g(k)+hmm->probMW(k));
     }
 
+    fwdScore = full;
+
+    // Backward loop
+    //
     pSite->index(1); // previous site
     pSite->prev();
     cSite->index(1); // current site
@@ -499,7 +504,6 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     }
     while (cSite->index()!=0);
 
-    fwdScore = full;
 
     full = -HUGE_VAL;
 
@@ -516,6 +520,7 @@ CharacterProbability::CharacterProbability(Sequence* sq1,Sequence* sq2)
     }
 
     bwdScore = full;
+
 
     delete score;
     delete vec1;

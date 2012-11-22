@@ -475,7 +475,9 @@ void AncestralNode::readAlignment()
 
 void AncestralNode::readThisNode()
 {
-//    cout<<"AncestralNode::readThisNode() "<<nodeName<<endl;
+    if (NOISE>1)
+        cout<<"AncestralNode::readThisNode() "<<nodeName<<endl;
+
     vector<int> path;
     Sequence *seq1 = lChild->getSequence();
     Sequence *seq2 = rChild->getSequence();
@@ -651,6 +653,7 @@ void AncestralNode::readThisNode()
     }
 
     CharacterProbability *cp = new CharacterProbability(lChild->getSequence(),rChild->getSequence());
+
 
     if (NOISE>0)
         cout<<"CharacterProbability: "<< cp->getFwdScore()<<" "<<cp->getBwdScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
