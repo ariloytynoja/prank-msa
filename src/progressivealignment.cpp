@@ -127,7 +127,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         rn.buildTree(oldtree,&oldnodes);
         AncestralNode* oldroot = static_cast<AncestralNode*>(oldnodes[rn.getRoot()]);
 
-        set<string> subtreesOld;
+        map<string,float> subtreesOld;
         oldroot->getAllSubtrees(&subtreesOld);
 
         root->markRealignSubtrees(&subtreesOld);
@@ -237,7 +237,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
             printAlignment(root,&names,&sequences,1,isDna);
 
-            set<string> subtreesOld;
+            map<string,float> subtreesOld;
             if (UPDATESECOND)
                 root->getAllSubtrees(&subtreesOld);
 

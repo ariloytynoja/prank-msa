@@ -46,9 +46,13 @@ public:
     void setCharString(std::vector<std::string>* sns,std::vector<std::string>* sqs);
     void getCharStrings(std::vector<std::string>* sqs);
 
-    void getAllSubtrees(std::set<std::string> *subtrees) {}
+    void getAllSubtrees(std::map<std::string,float> *subtrees) {}
+//    void getAllSubtrees(std::set<std::string> *subtrees) {}
     void getSubtreeBelow(std::string *subtree) { *subtree = nodeName; }
-    void markRealignSubtrees(std::set<std::string> *subtrees) {}
+    void markRealignSubtrees(std::map<std::string,float> *subtrees) {}
+//    void markRealignSubtrees(std::set<std::string> *subtrees) {}
+
+    bool anyChildNodeRealigned() { return false; }
 
     void alignSequences();
 

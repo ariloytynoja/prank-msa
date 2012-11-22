@@ -751,14 +751,17 @@ void AncestralNode::getCharStrings(vector<string>* sqs)
     rChild->getCharStrings(sqs);
 }
 
-void AncestralNode::getAllSubtrees(set<string> *subtrees)
+void AncestralNode::getAllSubtrees(map<string,float> *subtrees)
 {
     getLChild()->getAllSubtrees(subtrees);
     getRChild()->getAllSubtrees(subtrees);
 
-    string subtree;
-    this->getSubtreeBelow(&subtree);
-    subtrees->insert(subtree);
+    string subtree = "";
+    getLChild()->getSubtreeBelow(&subtree);
+    subtrees->insert(make_pair(subtree,this->getLeftBrL()));
+    subtree = "";
+    getRChild()->getSubtreeBelow(&subtree);
+    subtrees->insert(make_pair(subtree,this->getRightBrL()));
 }
 
 void AncestralNode::getSubtreeBelow(std::string *subtree)
@@ -775,20 +778,41 @@ void AncestralNode::getSubtreeBelow(std::string *subtree)
         *subtree = rightSubtree+","+leftSubtree;
 }
 
-void AncestralNode::markRealignSubtrees(set<string> *subtrees)
+void AncestralNode::markRealignSubtrees(map<string,float> *subtrees)
 {
     if(lInternal)
         getLChild()->markRealignSubtrees(subtrees);
     if(rInternal)
         getRChild()->markRealignSubtrees(subtrees);
 
-    string subtree;
-    this->getSubtreeBelow(&subtree);
+    realignNode = true;
 
-    if(subtrees->find(subtree) == subtrees->end())
-        realignNode = true;
-    else
-        realignNode = false;
+    if(getLChild()->anyChildNodeRealigned() ||
+            getRChild()->anyChildNodeRealigned())
+        return;
+
+    string subtree = "";
+    getLChild()->getSubtreeBelow(&subtree);
+
+    map<string,float>::iterator it = subtrees->find(subtree);
+    if(it != subtrees->end())
+    {
+        if( abs( (getLeftBrL() - it->second)/getLeftBrL() ) < 0.1 )
+        {
+            subtree = "";
+            getRChild()->getSubtreeBelow(&subtree);
+
+            it = subtrees->find(subtree);
+            if(it != subtrees->end())
+            {
+                if( abs( (getRightBrL() - it->second)/getRightBrL() ) < 0.1 )
+                {
+                    realignNode = false;
+                }
+
+            }
+        }
+    }
 }
 
 
