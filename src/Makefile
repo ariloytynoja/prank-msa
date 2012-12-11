@@ -31,7 +31,7 @@ DEL_DIR       = rmdir
 MOVE          = mv -f
 CHK_DIR_EXISTS= test -d
 MKDIR         = mkdir -p
-POD2MAN       = pod2man --utf8 --center "The Probabilistic Alignment Kit" -release="v.121002"
+POD2MAN       = pod2man --utf8 --center "The Probabilistic Alignment Kit" -release="v.121211"
 
 ####### Output directory
 
