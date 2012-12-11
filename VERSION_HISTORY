@@ -1,3 +1,8 @@
+v.121210
+- Fixed underflow errors affecting ancestral reconstruction of large
+  alignments.
+
+
 v.121018
 - Ancestral sequences can differently indicate insertions and deletions.
 - Can update an alignment, recomputing nodes with tag "[&&NHX:XN=realign]"

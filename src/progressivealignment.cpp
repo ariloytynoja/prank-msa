@@ -229,14 +229,13 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         root->alignSequences();
 
+        if (NOISE>=0)
+            cout<<endl;
+
+        printAlignment(root,&names,&sequences,1,isDna);
+
         if (TWICE)
         {
-
-            if (NOISE>=0)
-                cout<<endl;
-
-            printAlignment(root,&names,&sequences,1,isDna);
-
             map<string,float> subtreesOld;
             if (UPDATESECOND)
                 root->getAllSubtrees(&subtreesOld);
@@ -297,10 +296,11 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             {
                 root->alignSequences();
             }
+
+            printAlignment(root,&names,&sequences,2,isDna);
         }
 
         hir.cleanUp();
-        printAlignment(root,&names,&sequences,2,isDna);
     }
 
     sites->deleteMatrices();

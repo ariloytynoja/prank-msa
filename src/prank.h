@@ -172,7 +172,7 @@ bool TWICE = true;
 bool PRUNETREE = false;
 
 // use log values
-bool LOGVALUES = true;
+bool LOGVALUES = false;
 
 
 /********* more model: **********/

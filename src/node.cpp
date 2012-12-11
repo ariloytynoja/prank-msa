@@ -90,9 +90,11 @@ Node::Node(string t)
       }
     }
 
-    while(tree.find("[&&NHX:XN=realign]") != string::npos)
+    while(tree.find("[&&NHX:") != string::npos)
     {
-        tree.erase(tree.find("[&&NHX:XN=realign]"),string("[&&NHX:XN=realign]").length());
+        int start = tree.find("[&&NHX:");
+        int stop = tree.find("]",start);
+        tree.erase(start,stop-start+1);
     }
 
     divideTree(tree,subTrees,subDistances);

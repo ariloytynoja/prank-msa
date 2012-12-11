@@ -77,17 +77,45 @@ AncestralNode::AncestralNode(string s)
     LRealign = false;
     RRealign = false;
 
-    if(ln.find("[&&NHX:XN=realign]") != string::npos)
+    string left_tag = "";
+    string right_tag = "";
+
+    if(ln.find(":XN=realign") != string::npos)
     {
-        ln = ln.substr(0,ln.find("[&&NHX:XN=realign]"));
         LRealign = true;
+        ln = ln.substr(0,ln.find(":XN=realign"))+ln.substr(ln.find(":XN=realign")+string(":XN=realign").length());
     }
 
-    if(rn.find("[&&NHX:XN=realign]") != string::npos)
+    if(ln.find("[&&NHX]") != string::npos)
     {
-        rn = rn.substr(0,rn.find("[&&NHX:XN=realign]"));
-        RRealign = true;
+        ln = ln.substr(0,ln.find("[&&NHX]"));
     }
+
+    if(ln.find("[&&NHX:") != string::npos)
+    {
+        left_tag = ln.substr(ln.find("[&&NHX:"));
+        ln = ln.substr(0,ln.find("[&&NHX:"));
+    }
+
+    if(rn.find(":XN=realign") != string::npos)
+    {
+        RRealign = true;
+        rn = rn.substr(0,rn.find(":XN=realign"))+rn.substr(rn.find(":XN=realign")+string(":XN=realign").length());
+    }
+
+    if(rn.find("[&&NHX]") != string::npos)
+    {
+        rn = rn.substr(0,rn.find("[&&NHX]"));
+    }
+
+    if(rn.find("[&&NHX:") != string::npos)
+    {
+        right_tag = rn.substr(rn.find("[&&NHX:"));
+        rn = rn.substr(0,rn.find("[&&NHX:"));
+    }
+
+    left_nhx_tag = left_tag;
+    right_nhx_tag = right_tag;
 
     if(ln.find(":") != string::npos)
     {
@@ -988,8 +1016,10 @@ void AncestralNode::getNewickBrl(string* tree)
 {
     *tree += '(';
     lChild->getNewickBrl(tree);
+    *tree += left_nhx_tag;
     *tree += ',';
     rChild->getNewickBrl(tree);
+    *tree += right_nhx_tag;
     *tree += + ')';
     char str[10];
     sprintf(str,":%.5f",branchLength);
@@ -1017,8 +1047,10 @@ void AncestralNode::getCleanNewick(string* tree)
 {
     *tree += "(";
     this->lChild->getNewickBrl(tree);
+    *tree += left_nhx_tag;
     *tree += ",";
     this->rChild->getNewickBrl(tree);
+    *tree += right_nhx_tag;
     *tree += + ");";
     return;
 }
@@ -1403,7 +1435,7 @@ void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns,
 
             if (LOGVALUES)
             {
-                float ms = -HUGE_VAL;
+                double ms = -HUGE_VAL;
 
                 int mi = -1;
                 FOR(j,sAlpha)
@@ -1434,7 +1466,7 @@ void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns,
             }
             else
             {
-                float ms = 0;
+                double ms = 0;
 
                 int mi = -1;
                 FOR(j,sAlpha)

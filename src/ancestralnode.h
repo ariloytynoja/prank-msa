@@ -27,11 +27,13 @@
 class AncestralNode : public TreeNode
 {
     AncestralSequence* seq;
-
 public:
     AncestralNode(std::string s);
 
     ~AncestralNode();
+
+    std::string left_nhx_tag;
+    std::string right_nhx_tag;
 
     AncestralSequence* getSequence()
     {

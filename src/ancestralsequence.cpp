@@ -22,6 +22,7 @@
 #include <fstream>
 #include "ancestralsequence.h"
 #include "config.h"
+#include <float.h>
 
 using namespace std;
 
@@ -184,6 +185,7 @@ AncestralSequence::AncestralSequence()
                 {
                     t = sites->mlCharProb(k,j);
                     mlCharProb->s( t, k, j, i );
+
                     meanCharProb->a( t, j );
                     sum += t;
                 }
@@ -192,6 +194,7 @@ AncestralSequence::AncestralSequence()
 
             if (sum>0)
             {
+
                 FOR(j,sAlpha)
                 {
                     seqmat->s( meanCharProb->g(j)/sum, j, i );
@@ -273,7 +276,7 @@ AncestralSequence::AncestralSequence()
         {
             if (LOGVALUES)
             {
-                float ms = -HUGE_VAL;
+                double ms = -HUGE_VAL;
 
                 int mi = -1;
                 FOR(j,sAlpha)
@@ -295,7 +298,7 @@ AncestralSequence::AncestralSequence()
             }
             else
             {
-                float ms = 0;
+                double ms = 0;
 
                 int mi = -1;
                 FOR(j,sAlpha)
@@ -306,6 +309,7 @@ AncestralSequence::AncestralSequence()
                         mi = j;
                     }
                 }
+
                 if (mi>=0)
                 {
                     if(CODON)
@@ -315,7 +319,6 @@ AncestralSequence::AncestralSequence()
                 }
             }
         }
-
         ///////
 
         if (NOISE>1)
@@ -347,7 +350,10 @@ AncestralSequence::AncestralSequence()
         i++;
         sites->next();
     }
+
     delete meanCharProb;
+
+
 
     if (PATCHMISSING && (maxXGap > missingLimit || maxYGap > missingLimit))
     {

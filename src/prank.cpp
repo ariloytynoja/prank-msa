@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 121122;
+    version = 121210;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -408,17 +408,10 @@ void readArguments(int argc, char *argv[])
                 PRUNETREE = true;
             }
 
-            // don't use log values (slightly faster)
-            else if (s=="-nologs")
-            {
-                LOGVALUES = false;
-            }
-
             // use log values (slightly slower)
             else if (s=="-uselogs")
             {
                 LOGVALUES = true;
-                cout<<endl<<"Note: by default, log values are used. To disable, use option \"-nologs\"."<<endl;
             }
 
             // use log values (slightly slower)
