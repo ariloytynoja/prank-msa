@@ -66,7 +66,6 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
       }
     }
 
-//    cout<<s<<endl;
 
     int open=0;
     int end=0;
@@ -131,15 +130,18 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
     int count = 1;
     string r;
 
+
+    string n = "";
+
     do
     {
-
-        string n;
         r = "";
         b = s.begin();
         e = s.end();
         bool hasText = false;
         bool isOpen = false;
+
+//        cout<<s<<endl;
 
         while (b!=e)
         {
@@ -208,10 +210,24 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                 b++;
             }
         }
+
         s = r;
 
+        s+=n;
     }
     while (s.find(",")>0 && s.find(",")<s.length());
 
+    if(n.find(":XN=realign") != string::npos)
+    {
+        n = n.substr(0,n.find(":XN=realign"))+n.substr(n.find(":XN=realign")+string(":XN=realign").length());
+        nodes->find(root)->second->realignNode = true;
+    }
+
+    if(n.find("[&&NHX]") != string::npos)
+    {
+        n = n.substr(0,n.find("[&&NHX]"))+n.substr(n.find("[&&NHX]")+string("[&&NHX]").length());
+    }
+
+    nodes->find(root)->second->nhx_tag = n;
 }
 

@@ -1032,8 +1032,10 @@ void AncestralNode::getLabelledNewickBrl(string* tree)
 {
     *tree += '(';
     lChild->getLabelledNewickBrl(tree);
+    *tree += left_nhx_tag;
     *tree += ',';
     rChild->getLabelledNewickBrl(tree);
+    *tree += right_nhx_tag;
     *tree += + ')';
     *tree += nodeName;
     char str[10];
@@ -1051,7 +1053,27 @@ void AncestralNode::getCleanNewick(string* tree)
     *tree += ",";
     this->rChild->getNewickBrl(tree);
     *tree += right_nhx_tag;
-    *tree += + ");";
+    *tree += + ")";
+    *tree += this->nhx_tag;
+
+    return;
+}
+
+void AncestralNode::getLabelledNewick(string* tree)
+{
+    *tree += "(";
+    this->lChild->getLabelledNewickBrl(tree);
+    *tree += left_nhx_tag;
+    *tree += ",";
+    this->rChild->getLabelledNewickBrl(tree);
+    *tree += right_nhx_tag;
+    *tree += + ")";
+    *tree += nodeName;
+    char str[10];
+    sprintf(str,":%.5f",branchLength);
+    *tree += str;
+    *tree += this->nhx_tag;
+
     return;
 }
 

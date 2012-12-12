@@ -70,6 +70,8 @@ protected:
 public:
     virtual ~TreeNode();
 
+    std::string nhx_tag;
+
     virtual void alignSequences() {}
     virtual void readAlignment() {}
     virtual void partlyAlignSequences() {}

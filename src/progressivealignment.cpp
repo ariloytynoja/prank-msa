@@ -601,8 +601,7 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nm
     string tree = "";
     if (WRITEANCSEQ)
     {
-        root->getLabelledNewickBrl(&tree);
-        tree += ';';
+        root->getLabelledNewick(&tree);
 
 
         ofstream ancTre((outfile+"."+itos(iteration)+".anc.dnd").c_str());
