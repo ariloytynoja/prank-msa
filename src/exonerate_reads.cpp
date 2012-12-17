@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "config.h"
 #include "translatesequences.h"
+#include <unistd.h>
 
 #if defined (__APPLE__)
 #include <mach-o/dyld.h>

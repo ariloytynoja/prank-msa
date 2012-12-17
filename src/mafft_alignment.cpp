@@ -5,6 +5,7 @@
 #include <sstream>
 #include "config.h"
 #include <algorithm>
+#include <unistd.h>
 
 #if defined (__APPLE__)
 #include <mach-o/dyld.h>
