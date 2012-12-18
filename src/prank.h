@@ -171,6 +171,9 @@ bool TWICE = true;
 // prune the tree
 bool PRUNETREE = false;
 
+// prune the data
+bool PRUNEDATA = false;
+
 // use log values
 bool LOGVALUES = false;
 

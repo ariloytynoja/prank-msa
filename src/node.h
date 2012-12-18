@@ -25,6 +25,7 @@
  */
 
 #include <string>
+#include <vector>
 #include <iostream>
 #include <sstream>
 
@@ -198,6 +199,21 @@ public:
                 (*matches)++;
         }
     }
+
+    void collectUnmatchingLeaves(vector<string> *unmatching)
+    {
+        if (this->has_left_child())
+            child0->collectUnmatchingLeaves(unmatching);
+        if (this->has_right_child())
+            child1->collectUnmatchingLeaves(unmatching);
+
+        if (is_leaf())
+        {
+            if (!this->has_sequence())
+                unmatching->push_back(name);
+        }
+    }
+
 
     string print_tree()
     {

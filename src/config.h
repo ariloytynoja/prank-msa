@@ -106,6 +106,7 @@ extern bool NOTGAP;
 extern bool TERMF;
 extern bool TWICE;
 extern bool PRUNETREE;
+extern bool PRUNEDATA;
 extern bool LOGVALUES;
 
 extern bool TRANSLATE;

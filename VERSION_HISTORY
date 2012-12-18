@@ -1,3 +1,7 @@
+v.121218
+- More detailed information about unmatching names. New option "-prunedata".
+
+
 v.121212
 - Support for some NHX tags.
 

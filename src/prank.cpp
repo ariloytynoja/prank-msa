@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 121212;
+    version = 121218;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -406,6 +406,12 @@ void readArguments(int argc, char *argv[])
             else if (s=="-prunetree")
             {
                 PRUNETREE = true;
+            }
+
+            // prune the data
+            else if (s=="-prunedata")
+            {
+                PRUNEDATA = true;
             }
 
             // use log values (slightly slower)

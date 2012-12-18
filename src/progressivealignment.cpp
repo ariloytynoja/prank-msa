@@ -143,6 +143,51 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         exit(-1);
     }
 
+    if(nsqs != names.size() && !PRUNEDATA)
+    {
+        cout<<"Of the "<<names.size()<<" sequences, only "<<nsqs<<" match the tree leaves.\n"
+              "The data can be pruned to match the tree using the flag '-prunedata'. Now exiting.\n\n";
+
+        vector<string> leaf_nms;
+        root->getTerminalNames(&leaf_nms);
+
+        set<string> all_nms;
+        for(vector<string>::iterator it=leaf_nms.begin();it!=leaf_nms.end();it++)
+            all_nms.insert(*it);
+
+        if(names.size()-nsqs>10)
+        {
+            cout<<"First ten unmatched sequences are:\n";
+            int count =0;
+            for(int i=0;i<names.size();i++)
+            {
+                if(all_nms.find(names.at(i))==all_nms.end())
+                {
+                    cout<<"  "<<names.at(i)<<endl;
+                    count++;
+                }
+                if(count>=10)
+                    break;
+            }
+            cout<<"\n\n";
+        }
+        else
+        {
+            cout<<"The unmatched sequences are:\n";
+            for(int i=0;i<names.size();i++)
+            {
+                if(all_nms.find(names.at(i))==all_nms.end())
+                {
+                    cout<<"  "<<names.at(i)<<endl;
+                }
+            }
+            cout<<"\n\n";
+        }
+
+
+        exit(-1);
+    }
+
     if (PREALIGNED)
     {
         if (PRINTTREE)

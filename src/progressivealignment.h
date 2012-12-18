@@ -793,6 +793,27 @@ private:
             {
                 cout<<"The guide tree has "<<treeleaves<<" leaves but only "<<treematches<<" match with the names in the sequence data.\n"
                     "The tree can be pruned to match the data using the flag '-prunetree'. Now exiting.\n\n";
+
+                vector<string> unmatching;
+                n->collectUnmatchingLeaves(&unmatching);
+
+                if(unmatching.size()>10)
+                {
+                    cout<<"First ten unmatched tree leaves are:\n";
+                    for(int i=0;i<10;i++)
+                        cout<<"  "<<unmatching.at(i)<<endl;
+
+                    cout<<"\n\n";
+                }
+                else
+                {
+                    cout<<"The unmatched tree leaves are:\n";
+                    for(int i=0;i<unmatching.size();i++)
+                        cout<<"  "<<unmatching.at(i)<<endl;
+
+                    cout<<"\n\n";
+                }
+
                 exit(-1);
             }
         }
