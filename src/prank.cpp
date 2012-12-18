@@ -761,6 +761,7 @@ void printHelp(bool complete)
     cout<<"  -once [run only once; default: twice if no guidetree given]"<<endl;
     cout<<"  -twice [run always twice]"<<endl;
     cout<<"  -prunetree [prune guide tree branches with no sequence data]"<<endl;
+    cout<<"  -prunedata [prune sequence data with no guide tree leaves]"<<endl;
 
     if (complete)
         cout<<"  -skipins [skip insertions in posterior support]"<<endl;
