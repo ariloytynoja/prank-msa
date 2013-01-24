@@ -69,6 +69,7 @@ extern int reportLimit;
 
 extern bool WRITEANC;
 extern bool WRITEANCSEQ;
+extern bool PARSIMONYSCORE;
 extern bool PRINTNODES;
 extern bool PRINTTREE;
 extern bool WRITEXML;
@@ -96,6 +97,8 @@ extern float dnaGapRate;
 extern float dnaGapExt;
 extern float protGapRate;
 extern float protGapExt;
+
+extern int rnd_seed;
 
 extern bool CODON;
 extern bool DNA;

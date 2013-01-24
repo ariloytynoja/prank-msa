@@ -38,6 +38,11 @@ public:
     int getTerminalNodeNumber();
     int getInternalNodeNumber();
 
+    void concatenateTerminalNames(std::string *s)
+    {
+        s->append(nodeName);
+    }
+
     void getNames(std::vector<std::string>* nms);
     void getTerminalNames(std::vector<std::string>* nms);
     void getInternalNames(std::vector<std::string>* nms);
@@ -47,11 +52,11 @@ public:
     void getCharStrings(std::vector<std::string>* sqs);
 
     void getAllSubtrees(std::map<std::string,float> *subtrees) {}
-//    void getAllSubtrees(std::set<std::string> *subtrees) {}
+    void getAllSubtreesWithNodename(std::map<std::string,std::string> *subtrees) {}
     void getSubtreeBelow(std::string *subtree) { *subtree = nodeName; }
     void markRealignSubtrees(std::map<std::string,float> *subtrees) {}
-//    void markRealignSubtrees(std::set<std::string> *subtrees) {}
 
+    void getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns);
     bool anyChildNodeRealigned() { return false; }
 
     void alignSequences();
@@ -61,14 +66,21 @@ public:
     void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple);
 
     void writeNewick(std::string* tree,int* sInd);
+    void writeLabelledNewick(std::string* tree,int* sInd) {writeNewick(tree,sInd);}
     void getNewick(std::string* tree);
     void getLabelledNewickBrl(std::string* tree)
     {
         this->getNewickBrl(tree);
-    };
+    }
+
+    void getNHXBrl(std::string* tree,int *nodeNumber)
+    {
+        this->getNewickBrl(tree);
+    }
+
     void getNewickBrl(std::string* tree);
     void getNexusTree(std::string* tree, int *count);
-    void writeAncCharacters(int *parSite,int iteration);
+//    void writeAncCharacters(int *parSite,int iteration);
 
     void getMLAncestralSeqs(std::vector<std::string>* sqs,std::vector<std::string>* nms);
     void setSiteLength(int ) {}
@@ -77,6 +89,31 @@ public:
     void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns,bool parentPermIns) { this->getCharactersAt(col,i,parentPermIns); }
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
+
+    void setAncSequenceStrings(std::vector<std::string>*){}
+    void getAncSequenceStrings(std::vector<std::string>*){}
+
+    void setAncSequenceGaps(std::vector<std::string>*){}
+    void setAncSequenceStrings(std::map<std::string,std::string>*){}
+
+    void setAlignedSequenceStrings(std::vector<std::string>* aseqs)
+    {
+        alignedseqstr = aseqs->at(0);
+        aseqs->erase(aseqs->begin());
+    }
+
+    void getAlignedSequenceStrings(std::vector<std::string>* aseqs)
+    {
+        aseqs->push_back(alignedseqstr);
+    }
+
+    void fixTerminalNodenames()
+    {
+        if(nodeName.find('_') != std::string::npos)
+        {
+            nodeName = nodeName.substr(nodeName.find('_')+1);
+        }
+    }
 
 };
 

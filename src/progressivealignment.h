@@ -46,9 +46,14 @@ public:
 
     void printXml(AncestralNode *root,int iteration,bool translate);
     void getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate);
-    void printAncestral(AncestralNode *root,std::vector<std::string> *names,std::vector<std::string> *seqs,int iteration);
+    void getAlignmentMatrix(AncestralNode *root,vector<string> *aseqs,bool translate);
+    void reconstructAncestors(AncestralNode *root,bool isDna);
+    void setAlignedSequences(AncestralNode *root);
+    void printAncestral(AncestralNode *root,std::vector<std::string> *names,std::vector<std::string> *seqs,int iteration,bool isDna);
     void getAncestralAlignmentMatrix(AncestralNode *root,char* alignment);
+    void getAncestralAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getFullAlignmentMatrix(AncestralNode *root,char* alignment);
+    void getFullAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getAncestralAlignmentSeqs(AncestralNode *root,map<string,string> *anc_seqs);
     void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,int iteration, bool isDna);
     std::string formatExtension(int format);
@@ -146,7 +151,6 @@ private:
             exit(0);
 
         }
-        exit(0);
     }
 
     /********************************************/
@@ -348,7 +352,6 @@ private:
         {
             cout<<"Inconsistent options: conversion between formats failed. Exiting.\n\n";
         }
-        exit(0);
     }
 
     /********************************************/
@@ -383,7 +386,7 @@ private:
 
     /********************************************/
 
-    void translateSequences(vector<string> *names,vector<string> *sequences,bool *isDna)
+    void translateSequences(vector<string> *names,vector<string> *sequences)
     {
         TranslateSequences trseq;
 
@@ -392,7 +395,6 @@ private:
             cout<<"Failed to translate DNA sequences to protein. Exiting."<<endl<<endl;
             exit(-1);
         }
-        *isDna=false;
     }
 
     /********************************************/
@@ -594,8 +596,6 @@ private:
                 stringstream ss;
                 ss<<"("<<tree1<<":"<<dist1<<","<<tree2<<":"<<dist2<<");";
                 *tree = ss.str();
-
-//                cout<<ss.str()<<endl;
             }
 
 
@@ -631,7 +631,7 @@ private:
 
                     if(isDna && CODON)
                     {
-                        this->translateSequences(names,&tmp_seqs,&tmp_isDna);
+                        this->translateSequences(names,&tmp_seqs);
                         tmp_isDna = false;
                     }
 
@@ -642,6 +642,7 @@ private:
                         cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
                         exit(0);
                     }
+
                     gt.computeTree(&tmp_seqs,names,tmp_isDna);
                 }
                 else

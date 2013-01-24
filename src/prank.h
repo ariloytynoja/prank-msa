@@ -100,6 +100,9 @@ int reportLimit = 100;
 bool WRITEANC = false;
 bool WRITEANCSEQ = false;
 
+// compute parsimony score
+bool PARSIMONYSCORE = false;
+
 // write ancestral nodes as they are solved
 bool PRINTNODES = false;
 
@@ -148,6 +151,10 @@ float dnaGapRate = 0.025;
 float dnaGapExt = 0.75;
 float protGapRate = 0.005;
 float protGapExt = 0.5;
+
+/******* random number seed ********/
+
+int rnd_seed = -1;
 
 /********* model: other **********/
 

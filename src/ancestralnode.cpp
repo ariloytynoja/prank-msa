@@ -22,6 +22,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <ctime>
 #include "config.h"
 #include "writefile.h"
@@ -238,6 +239,14 @@ void AncestralNode::alignSequences()
 
 void AncestralNode::alignThisNode()
 {
+
+    if (rnd_seed>0)
+    {
+        string catNames = "";
+        this->concatenateTerminalNames(&catNames);
+        int h = this->hash(catNames.c_str());
+        srand(h);
+    }
 
     char prop[20];
     sprintf(prop,"(%i/%i)",alignedNodes,totalNodes-1);
@@ -503,6 +512,15 @@ void AncestralNode::readAlignment()
 
 void AncestralNode::readThisNode()
 {
+
+    if (rnd_seed>0)
+    {
+        string catNames = "";
+        this->concatenateTerminalNames(&catNames);
+        int h = this->hash(catNames.c_str());
+        srand(h);
+    }
+
     if (NOISE>1)
         cout<<"AncestralNode::readThisNode() "<<nodeName<<endl;
 
@@ -792,6 +810,19 @@ void AncestralNode::getAllSubtrees(map<string,float> *subtrees)
     subtrees->insert(make_pair(subtree,this->getRightBrL()));
 }
 
+void AncestralNode::getAllSubtreesWithNodename(map<string,string> *subtrees)
+{
+    getLChild()->getAllSubtreesWithNodename(subtrees);
+    getRChild()->getAllSubtreesWithNodename(subtrees);
+
+    string subtree = "";
+    getLChild()->getSubtreeBelow(&subtree);
+    subtrees->insert(make_pair(subtree,this->getNodeName()));
+    subtree = "";
+    getRChild()->getSubtreeBelow(&subtree);
+    subtrees->insert(make_pair(subtree,this->getNodeName()));
+}
+
 void AncestralNode::getSubtreeBelow(std::string *subtree)
 {
     string leftSubtree;
@@ -843,6 +874,148 @@ void AncestralNode::markRealignSubtrees(map<string,float> *subtrees)
     }
 }
 
+///
+int AncestralNode::computeColumnParsimonyScore()
+{
+    int totalScore = 0;
+    for(int pos=0;pos<this->getSequence()->lengthF();pos++)
+    {
+        int thisState = -1;
+
+        if(!this->getSequence()->isGap(pos))
+        {
+            int sAlpha = hmm->getAlphabet().length();
+
+            int nState = hmm->getNStates();
+            int maxState = -1;
+            float maxProb = -HUGE_VAL;
+            int j,k;
+
+            FOR(k,nState)
+            {
+                if (this->getSequence()->stateProbAt(k,pos) > maxProb)
+                {
+                    maxProb = this->getSequence()->stateProbAt(k,pos);
+                    maxState = k;
+                }
+            }
+
+            if (LOGVALUES)
+            {
+                double ms = -HUGE_VAL;
+
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,pos,maxState)>= ms)
+                    {
+                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
+                        thisState = j;
+                    }
+                }
+            }
+            else
+            {
+                double ms = 0;
+
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,pos,maxState) >= ms)
+                    {
+                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
+                        thisState = j;
+                    }
+                }
+            }
+        }
+
+        int stateChanges = 0;
+        this->getColumnParsimonyScore(&stateChanges,thisState,pos,
+                                      this->getSequence()->isInsertion(pos),this->getSequence()->isPermInsertion(pos));
+
+        cout<<pos<<" "<<stateChanges<<endl;
+        totalScore += stateChanges;
+    }
+    cout<<"total "<<totalScore<<endl;
+
+}
+
+void AncestralNode::getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns)
+{
+    int thisState = -3;
+
+    if (pos<0)
+    {
+        thisState = -1;
+
+        if(thisState != parentState)
+            (*stateChanges)++;
+    }
+    else
+    {
+        if (this->getSequence()->isInsertion(pos) || ( parentIns && this->getSequence()->isGap(pos) ) )
+        {
+            thisState = -1;
+        }
+
+        else
+        {
+
+            int sAlpha = hmm->getAlphabet().length();
+
+            int nState = hmm->getNStates();
+            int maxState = -1;
+            float maxProb = -HUGE_VAL;
+            int j,k;
+
+            FOR(k,nState)
+            {
+                if (this->getSequence()->stateProbAt(k,pos) > maxProb)
+                {
+                    maxProb = this->getSequence()->stateProbAt(k,pos);
+                    maxState = k;
+                }
+            }
+
+            if (LOGVALUES)
+            {
+                double ms = -HUGE_VAL;
+
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,pos,maxState)>= ms)
+                    {
+                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
+                        thisState = j;
+                    }
+                }
+            }
+            else
+            {
+                double ms = 0;
+
+                FOR(j,sAlpha)
+                {
+                    if (this->getSequence()->mlCharProbAt(j,pos,maxState) >= ms)
+                    {
+                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
+                        thisState = j;
+                    }
+                }
+            }
+        }
+
+        if(thisState != parentState)
+            (*stateChanges)++;
+
+        lChild->getColumnParsimonyScore(stateChanges,thisState,seq->getLIndex(pos),
+                                        this->getSequence()->isInsertion(pos),this->getSequence()->isPermInsertion(pos));
+        rChild->getColumnParsimonyScore(stateChanges,thisState,seq->getRIndex(pos),
+                                        this->getSequence()->isInsertion(pos),this->getSequence()->isPermInsertion(pos));
+
+    }
+}
+
+///
 
 void AncestralNode::getThisAlignmentPostProbAt(double* p,int i)
 {
@@ -1012,6 +1185,24 @@ void AncestralNode::writeNewick(std::string* tree,int* sInd)
     return;
 }
 
+void AncestralNode::writeLabelledNewick(std::string* tree,int* sInd)
+{
+    *tree += '(';
+    lChild->writeLabelledNewick(tree,sInd);
+    *tree += left_nhx_tag;
+    *tree += ',';
+    rChild->writeLabelledNewick(tree,sInd);
+    *tree += right_nhx_tag;
+    *tree += + ')';
+    *tree += nodeName;
+    char str[10];
+    sprintf(str,":%.5f",branchLength);
+    *tree += str;
+    *tree += this->nhx_tag;
+
+    return;
+}
+
 void AncestralNode::getNewickBrl(string* tree)
 {
     *tree += '(';
@@ -1103,6 +1294,43 @@ void AncestralNode::getNexusTree(std::string* tree, int *count)
     return;
 }
 
+void AncestralNode::getNHXBrl(std::string* tree,int *nodeNumber)
+{
+    *tree += "(";
+     this->lChild->getNHXBrl(tree,nodeNumber);
+
+    stringstream tag;
+    tag << lChild->getNodeName();
+    char b,e; int num;
+    tag >> b >> num >> e;
+    if(!isLInternal())
+        num=(*nodeNumber)++;
+    tag.clear();
+    tag.str("");
+    tag << num;
+    *tree += "[&&NHX:ND="+tag.str()+"]";
+
+    *tree += ',';
+
+    this->rChild->getNHXBrl(tree,nodeNumber);
+
+    tag.clear();
+    tag.str("");
+    tag << rChild->getNodeName();
+    tag >> b >> num >> e;
+    if(!isRInternal())
+        num=(*nodeNumber)++;
+    tag.clear();
+    tag.str("");
+    tag << num;
+    *tree += "[&&NHX:ND="+tag.str()+"]";
+
+    *tree += + ')';
+    char str[10];
+    sprintf(str,":%.5f",branchLength);
+    *tree += str;
+}
+
 void AncestralNode::getMLAncestralSeqs(vector<string>* sqs,vector<string>* nms)
 {
     lChild->getMLAncestralSeqs(sqs,nms);
@@ -1111,6 +1339,7 @@ void AncestralNode::getMLAncestralSeqs(vector<string>* sqs,vector<string>* nms)
     nms->push_back(nodeName);
 }
 
+/*
 void AncestralNode::writeAncCharacters(int *parSite,int iteration)
 {
 
@@ -1221,6 +1450,7 @@ void AncestralNode::writeAncCharacters(int *parSite,int iteration)
     fprintf(ancPro,"\n");
     fclose(ancPro);
 }
+*/
 
 void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns,bool parentPermIns)
 {
@@ -1367,6 +1597,89 @@ void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns,
                     cout<<"impossible index: site "<<i<<", "<<mi<<endl;
                 }
             }
+        }
+    }
+}
+
+string AncestralNode::getThisAncCharactersAt(int i)
+{
+    string alpha = hmm->getAlphabet();
+    int sAlpha = alpha.length();
+    if (CODON)
+        sAlpha /= 3;
+
+    int nState = hmm->getNStates();
+    int maxState = -1;
+    float maxProb = -HUGE_VAL;
+    int j,k;
+
+    FOR(k,nState)
+    {
+        if (this->getSequence()->stateProbAt(k,i)>maxProb)
+        {
+            maxProb = this->getSequence()->stateProbAt(k,i);
+            maxState = k;
+        }
+    }
+
+    if (LOGVALUES)
+    {
+        float ms = -HUGE_VAL;
+
+        int mi = -1;
+        FOR(j,sAlpha)
+        {
+            if (this->getSequence()->mlCharProbAt(j,i,maxState)>= ms)
+            {
+                ms = this->getSequence()->mlCharProbAt(j,i,maxState);
+                mi = j;
+            }
+        }
+
+        if (mi>=0)
+        {
+            if (CODON)
+            {
+                return alpha.substr(mi*3,3);
+            }
+            else
+            {
+                return string(1,alpha.at(mi));
+            }
+        }
+        else
+        {
+            cout<<"impossible index: site "<<i<<", "<<mi<<endl;
+        }
+
+    }
+    else
+    {
+        float ms = 0;
+
+        int mi = -1;
+        FOR(j,sAlpha)
+        {
+            if (this->getSequence()->mlCharProbAt(j,i,maxState) >= ms)
+            {
+                ms = this->getSequence()->mlCharProbAt(j,i,maxState);
+                mi = j;
+            }
+        }
+        if (mi>=0)
+        {
+            if (CODON)
+            {
+                return alpha.substr(mi*3,3);
+            }
+            else
+            {
+                return string(1,alpha.at(mi));
+            }
+        }
+        else
+        {
+            cout<<"impossible index: site "<<i<<", "<<mi<<endl;
         }
     }
 }

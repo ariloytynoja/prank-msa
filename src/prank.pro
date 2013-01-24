@@ -41,7 +41,8 @@ SOURCES += writefile.cpp \
     ancestralnode.cpp \
     check_version.cpp \
     exonerate_reads.cpp \
-    mafft_alignment.cpp
+    mafft_alignment.cpp \
+    bppancestors.cpp
 OTHER_FILES += \  
     ../VERSION_HISTORY \
     prank.1.pod \
@@ -79,10 +80,13 @@ HEADERS += writefile.h \
     ancestralnode.h \
     check_version.h \
     exonerate_reads.h \
-    mafft_alignment.h
+    mafft_alignment.h \
+    bppancestors.h
 
 
 INCLUDEPATH += /usr/include
+
+
 
 
 

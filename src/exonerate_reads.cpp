@@ -400,5 +400,5 @@ void Exonerate_reads::delete_files(int r)
     if ( remove( q_name.str().c_str() ) != 0 )
         perror( "Error deleting file" );
     if ( remove( t_name.str().c_str() ) != 0 )
-        perror( "Error deleting file" );
+        perror( "Error deleting file");
 }

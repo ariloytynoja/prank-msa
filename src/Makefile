@@ -12,7 +12,7 @@ CXXFLAGS      = -m64 -pipe -O3 $(DEFINES)
 INCPATH       = -I. -I/usr/include
 LINK          = g++
 LFLAGS        = -m64
-LIBS          = $(SUBLIBS)
+LIBS          = $(SUBLIBS)    
 AR            = ar cqs
 RANLIB        = 
 TAR           = tar -cf
@@ -69,8 +69,9 @@ SOURCES       = writefile.cpp \
 		ancestralsequence.cpp \
 		ancestralnode.cpp \
 		check_version.cpp \
-                exonerate_reads.cpp \
-                mafft_alignment.cpp
+		exonerate_reads.cpp \
+		mafft_alignment.cpp \
+		bppancestors.cpp 
 OBJECTS       = writefile.o \
 		treenode.o \
 		translatesequences.o \
@@ -101,9 +102,10 @@ OBJECTS       = writefile.o \
 		ancestralsequence.o \
 		ancestralnode.o \
 		check_version.o \
-                exonerate_reads.o \
-                mafft_alignment.o
-DESTDIR       =
+		exonerate_reads.o \
+		mafft_alignment.o \
+		bppancestors.o
+DESTDIR       = 
 TARGET        = prank
 
 MANPAGES      = prank.1
@@ -320,12 +322,14 @@ progressivealignment.o: progressivealignment.cpp readnewick.h \
 		config.h \
 		hmmodel.h \
 		translatesequences.h \
+		node.h \
+		mafft_alignment.h \
 		hirschberg.h \
 		phylomatchscore.h \
 		terminalsequence.h \
 		readalignment.h \
-		node.h \
-		exonerate_reads.h
+		exonerate_reads.h \
+		bppancestors.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o progressivealignment.o progressivealignment.cpp
 
 prank.o: prank.cpp progressivealignment.h \
@@ -340,7 +344,13 @@ prank.o: prank.cpp progressivealignment.h \
 		site.h \
 		boolmatrix.h \
 		ancestralsequence.h \
+		readfile.h \
+		writefile.h \
+		readnewick.h \
+		guidetree.h \
 		translatesequences.h \
+		node.h \
+		mafft_alignment.h \
 		check_version.h \
 		prank.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o prank.o prank.cpp
@@ -525,9 +535,35 @@ exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h \
 		translatesequences.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o exonerate_reads.o exonerate_reads.cpp
 
-mafft_alignment.o: mafft_alignment.cpp mafft_alignment.h
+mafft_alignment.o: mafft_alignment.cpp mafft_alignment.h \
+		config.h \
+		hmmodel.h \
+		dbmatrix.h \
+		flmatrix.h \
+		intmatrix.h \
+		ancestralnode.h \
+		treenode.h \
+		sequence.h \
+		site.h \
+		boolmatrix.h \
+		ancestralsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mafft_alignment.o mafft_alignment.cpp
 
+bppancestors.o: bppancestors.cpp bppancestors.h \
+		ancestralnode.h \
+		treenode.h \
+		sequence.h \
+		site.h \
+		intmatrix.h \
+		flmatrix.h \
+		dbmatrix.h \
+		boolmatrix.h \
+		ancestralsequence.h \
+		config.h \
+		hmmodel.h \
+		readfile.h \
+		readnewick.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bppancestors.o bppancestors.cpp
 
 ####### Manpages
 
@@ -544,3 +580,4 @@ install:   FORCE
 uninstall:   FORCE
 
 FORCE:
+

@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 121218;
+    version = 130116;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -51,8 +51,6 @@ int main(int argc, char *argv[])
 
 void readArguments(int argc, char *argv[])
 {
-    int seed = -1;
-
 
     // first see if 'noise' is defined.
     for (int i=1; i<argc; i++)
@@ -268,6 +266,12 @@ void readArguments(int argc, char *argv[])
                 WRITEANCSEQ = true;
             }
 
+            // compute parsimony score
+            else if (s=="-score")
+            {
+                PARSIMONYSCORE = true;
+            }
+
             // write ancestral nodes as they are solved
             else if (s=="-printnodes")
             {
@@ -429,7 +433,7 @@ void readArguments(int argc, char *argv[])
             // seed for random number generator
             else if (s.substr(0,6)=="-seed=")
             {
-                seed = atoi(string(argv[i]).substr(6).c_str());
+                rnd_seed = atoi(string(argv[i]).substr(6).c_str());
             }
 
 
@@ -664,8 +668,8 @@ void readArguments(int argc, char *argv[])
     }
 
     // define a seed for random numbers
-    if (seed>0)
-        srand(seed);
+    if (rnd_seed>0)
+        srand(rnd_seed);
     else
         srand(time(0));
 
@@ -710,15 +714,7 @@ void printHelp(bool complete)
         cout<<"  -tree=\"tree_string\" [tree in newick format; in double quotes]"<<endl;
     cout<<"  -o=output_file [default: 'output']"<<endl;
     cout<<"  -f=output_format ['fasta' (default), 'phylipi', 'phylips', 'paml', 'nexus']"<<endl;
-//    if (complete)
-//    {
-//        cout<<"  -f=output_format_number [default: 8] (deprecated; use format names)"<<endl;
-//        cout<<"     8. Pearson/Fasta"<<endl;
-//        cout<<"    11. Phylip sequential"<<endl;
-//        cout<<"    12. Phylip interleaved"<<endl;
-//        cout<<"    17. PAUP/NEXUS"<<endl;
-//        cout<<"    18. PAML"<<endl;
-//    }
+
     cout<<"  -showxml [output xml-files]"<<endl;
     cout<<"  -showtree [output dnd-files]"<<endl;
     cout<<"  -showanc [output ancestral sequences]"<<endl;
@@ -768,11 +764,6 @@ void printHelp(bool complete)
     cout<<"  -uselogs [slower but should work for a greater number of sequences]"<<endl;
     if (complete)
     {
-//        cout<<"  -writeanc [output ancestral sequences (old format)]"<<endl;
-//        cout<<"  -printnodes [output each node; mostly for debugging]"<<endl;
-//        cout<<"  -matresize=# [matrix resizing multiplier]"<<endl;
-//        cout<<"  -matinitsize=# [matrix initial size multiplier]"<<endl;
-//        cout<<"  -longseq [save space in pairwise alignments]"<<endl;
         cout<<"  -shortnames [truncate names at first space]"<<endl;
         cout<<"  -anchorskip=# [min. sequence length for anchoring; default "<<anchSkipDist<<"]"<<endl;
         cout<<"  -scalebranches=# [scale branch lengths; default: dna "<<dnaBranchScalingFactor<<" / prot "<<protBranchScalingFactor<<"]"<<endl;

@@ -34,6 +34,7 @@
 #include "flmatrix.h"
 
 extern float minBrL;
+extern int rnd_seed;
 
 class TreeNode
 {
@@ -60,6 +61,8 @@ protected:
 
     std::string charString;  // unaligned sequence
     Sequence* seq;
+
+    std::string alignedseqstr; // aligned sequence
 
     static int totalNodes;
     static int alignedNodes;
@@ -159,6 +162,8 @@ public:
 
     int gappedLength();
 
+    virtual void concatenateTerminalNames(std::string *s) = 0;
+
     virtual void getNames(std::vector<std::string>* nms) = 0;
     virtual void getTerminalNames(std::vector<std::string>* nms) = 0;
     virtual void getInternalNames(std::vector<std::string>* nms) = 0;
@@ -168,10 +173,11 @@ public:
     virtual void getCharStrings(std::vector<std::string>* sqs) = 0;
 
     virtual void getAllSubtrees(std::map<std::string,float> *subtrees) = 0;
-//    virtual void getAllSubtrees(std::set<std::string> *subtrees) = 0;
+    virtual void getAllSubtreesWithNodename(std::map<std::string,std::string> *subtrees) = 0;
     virtual void getSubtreeBelow(std::string *subtree) = 0;
     virtual void markRealignSubtrees(std::map<std::string,float> *subtrees) = 0;
-//    virtual void markRealignSubtrees(std::set<std::string> *subtrees) = 0;
+
+    virtual void getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns) = 0;
 
     virtual bool anyChildNodeRealigned() = 0;
 
@@ -204,6 +210,17 @@ public:
         return rn;
     }
 
+
+    int hash(const char *str)
+    {
+        unsigned hash = rnd_seed;
+        while (*str)
+        {
+            hash = hash * 101  +  *str++;
+        }
+        return hash;
+    }
+
     virtual void getCharactersAt(std::vector<std::string>* ,int,bool t=false ) {}
     virtual void getAncCharactersAt(std::vector<std::string>* ,int ,bool,bool ) {}
     virtual void getAllCharactersAt(std::vector<std::string>* ,int ,bool, bool ) {}
@@ -216,16 +233,40 @@ public:
     virtual void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple) = 0;
 
     virtual void writeNewick(std::string* ,int* ) {}
+    virtual void writeLabelledNewick(std::string* tree,int* sInd) {}
     virtual void getNewick(std::string* tree) = 0;
     virtual void getLabelledNewickBrl(std::string* tree) = 0;
     virtual void getNewickBrl(std::string* tree) = 0;
     virtual void getNexusTree(std::string* tree, int *count) = 0;
-    virtual void writeAncCharacters(int *parSite,int iteration) = 0;
+//    virtual void writeAncCharacters(int *parSite,int iteration) = 0;
+    virtual void getNHXBrl(std::string* tree,int *nodeNumber) = 0;
 
     void getCleanNewick(std::string* tree);
     virtual void getMLAncestralSeqs(std::vector<std::string>* ,std::vector<std::string>* ) {}
 
     virtual void setPermanentInsertion(int ) {}
+    virtual void setAncSequenceStrings(std::vector<std::string>*){}
+    virtual void setAncSequenceStrings(std::map<std::string,std::string>*){}
+    virtual void getAncSequenceStrings(std::vector<std::string>*){}
+    virtual void setAlignedSequenceStrings(std::vector<std::string>*){}
+    virtual void getAlignedSequenceStrings(std::vector<std::string>*){}
+
+    virtual void setAncSequenceGaps(std::vector<std::string>*){}
+
+    void getAllSequenceStrings(std::vector<std::string>* aseqs)
+    {
+        if(!isTerminal())
+            lChild->getAllSequenceStrings(aseqs);
+        aseqs->push_back(alignedseqstr);
+        if(!isTerminal())
+            rChild->getAllSequenceStrings(aseqs);
+    }
+    std::string getThisSequenceString()
+    {
+        return alignedseqstr;
+    }
+
+    virtual void fixTerminalNodenames() = 0;
 
 };
 

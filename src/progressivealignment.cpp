@@ -35,13 +35,11 @@
 #include "node.h"
 #include "exonerate_reads.h"
 #include "mafft_alignment.h"
+#include "bppancestors.h"
 
 using namespace std;
 
-ProgressiveAlignment::~ProgressiveAlignment()
-{
-
-}
+ProgressiveAlignment::~ProgressiveAlignment(){}
 
 ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string dnafile)
 {
@@ -61,8 +59,10 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     // Backtranslate predefined protein alignment to DNA and exit.
     //
     if (BACKTRANSLATE)
+    {
         this->backTranslate();
-
+        exit(0);
+    }
 
 
     // Get the sequence data
@@ -77,15 +77,19 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     // Convert predefined alignment to required format and exit.
     //
     if (CONVERT)
+    {
         this->convertSequencesOnly(&names,&sequences,&isDna);
-
+        exit(0);
+    }
 
     this->cleanupSeqNames(&names);
 
 
     if (isDna && TRANSLATE)
-        this->translateSequences(&names,&sequences,&isDna);
-
+    {
+        this->translateSequences(&names,&sequences);
+        isDna = false;
+    }
 
     this->makeSettings(isDna);
 
@@ -95,6 +99,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     string tree;
     this->getGuideTree(&names,&sequences,&tree,isDna);
 
+
+    // Find the lengths and reserve space
+    //
     vector<string>::iterator si = sequences.begin();
 
     int longest = 0; int slongest = 0;
@@ -112,6 +119,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     sites->setNState(hmm->getNStates());
     sites->setMatrices(longest,slongest);
 
+
+    // Build the tree structure and get its root
+    //
     map<string,TreeNode*> nodes;
 
     ReadNewick rn;
@@ -119,6 +129,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
     AncestralNode* root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
 
+    // If an old tree is provided, mark the shared sub-trees
+    //
     if(oldtreefile!="")
     {
         string oldtree = rn.readFile(oldtreefile.c_str());
@@ -134,6 +146,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         UPDATE = true;
     }
 
+    // Now set the sequences ...
+    //
     int nsqs = 0;
     root->setCharString(&names,&sequences,&nsqs);
 
@@ -143,6 +157,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         exit(-1);
     }
 
+    // .. and make sure that the sequence data and the tree match!
+    //
     if(nsqs != names.size() && !PRUNEDATA)
     {
         cout<<"Of the "<<names.size()<<" sequences, only "<<nsqs<<" match the tree leaves.\n"
@@ -188,8 +204,25 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         exit(-1);
     }
 
+
+    /////////////////////////////////
+    // Different alignment options //
+    /////////////////////////////////
+
+    // Prealigned data: compute ancestral sequences or convert to xml
+    //
     if (PREALIGNED)
     {
+        int len = sequences.at(0).length();
+        for(int i=1;i<sequences.size();i++)
+        {
+            if(sequences.at(i).length() != len)
+            {
+                cout<<"\nSequences don't appear to be aligned. Exiting.\n\n";
+                exit(0);
+            }
+        }
+
         if (PRINTTREE)
             this->printNewickTree(root,outfile+".0.dnd");
 
@@ -203,9 +236,17 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         root->readAlignment();
 
         printAlignment(root,&names,&sequences,0,isDna);
+
+        if(PARSIMONYSCORE)
+        {
+            int score = root->computeColumnParsimonyScore();
+        }
+
         ra.cleanUp();
     }
 
+    // Partly aligned data: just do the unaligned nodes
+    //
     else if (PARTLYALIGNED)
     {
         if (PRINTTREE)
@@ -229,6 +270,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         hir.cleanUp();
     }
 
+    // Alignment based on an old tree: re-align nodes that have changed
+    //
     else if (UPDATE)
     {
         if (PRINTTREE)
@@ -252,6 +295,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         hir.cleanUp();
     }
 
+    // Regular alignment
+    //
     else
     {
         Hirschberg hir;
@@ -278,6 +323,11 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             cout<<endl;
 
         printAlignment(root,&names,&sequences,1,isDna);
+
+        if(PARSIMONYSCORE)
+        {
+            int score = root->computeColumnParsimonyScore();
+        }
 
         if (TWICE)
         {
@@ -343,6 +393,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             }
 
             printAlignment(root,&names,&sequences,2,isDna);
+
+            if(PARSIMONYSCORE)
+                ;
         }
 
         hir.cleanUp();
@@ -352,7 +405,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     delete sites;
 
     nodes.clear();
-
     delete root;
 
 }
@@ -427,7 +479,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
    }
 
      if (WRITEANC || WRITEANCSEQ)
-        printAncestral(root,nms,seqs,iteration);
+        printAncestral(root,nms,seqs,iteration,isDna);
 
 }
 
@@ -469,7 +521,7 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
     // tree
     string* treeStr = new string();
     int sInd = 1;
-    root->writeNewick(treeStr,&sInd);
+    root->writeLabelledNewick(treeStr,&sInd);
     seqout<<"<newick>"<<*treeStr<<"</newick>"<<endl;
     delete treeStr;
 
@@ -547,6 +599,256 @@ void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool trans
 
     delete []alignment;
 
+}
+
+
+void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
+{
+
+    BppAncestors bppa;
+    if(bppa.testExecutable())
+    {
+        if(NOISE>0)
+            cout<<"Using BppAncestor to infer ancestral sequences\n";
+
+        map<string,string> aseqs;
+        string atree;
+        bppa.inferAncestors(root,&aseqs,&atree,isDna);
+
+        ReadNewick rn;
+        map<string,TreeNode*> anodes;
+        rn.buildTree(atree,&anodes);
+
+        AncestralNode* aroot = static_cast<AncestralNode*>(anodes[rn.getRoot()]);
+        aroot->fixTerminalNodenames();
+
+//        string tmp;
+//        aroot->getLabelledNewickBrl(&tmp);
+//        cout<<atree<<endl<<tmp<<endl;
+
+        map<string,string> subtrees;
+        root->getAllSubtreesWithNodename(&subtrees);
+
+        map<string,string> asubtrees;
+        aroot->getAllSubtreesWithNodename(&asubtrees);
+
+//        cout<<subtrees.size()<<" "<<asubtrees.size()<<"\n";
+
+        map<string,string> asequences;
+
+        map<string,string>::iterator oldit = subtrees.begin();
+        for(;oldit!=subtrees.end();oldit++)
+        {
+            string name = oldit->second;
+            if(name == root->getNodeName())
+                continue;
+
+            string aname = asubtrees.find(oldit->first)->second;
+
+            aname.erase(aname.begin());
+            aname.erase(aname.length()-1);
+//            cout<<name<<" "<<aname<<endl;
+            asequences.insert(asequences.begin(),pair<string,string>(name,aseqs.find(aname)->second));
+        }
+
+        root->setAncSequenceStrings(&asequences);
+
+        // BppAncestor works on unrooted trees; root needs to be done separately
+        //
+        vector<string> twoseqs;
+        twoseqs.push_back(root->getLChild()->getThisSequenceString());
+        twoseqs.push_back(root->getRChild()->getThisSequenceString());
+        vector<string> twonms;
+        twonms.push_back("left");
+        twonms.push_back("right");
+
+        stringstream tree;
+        tree << "(left:" << root->getLeftBrL()<<",right:"<<root->getRightBrL()<<");";
+
+//        //
+//        cout<<tree.str()<<endl;
+//        cout<<"l "<<twoseqs.at(0)<<endl;
+//        cout<<"r "<<twoseqs.at(1)<<endl;
+//        //
+
+        map<string,TreeNode*> twonodes;
+        rn.buildTree(tree.str(),&twonodes);
+
+        AncestralNode* tworoot = static_cast<AncestralNode*>(twonodes[rn.getRoot()]);
+        int nsqs = 0;
+        tworoot->setCharString(&twonms,&twoseqs,&nsqs);
+
+        ReadAlignment ra;
+        ra.initialiseMatrices(twoseqs.at(0).length()+2);
+
+        tworoot->setTotalNodes();
+        tworoot->readAlignment();
+
+        string rootstr;
+        for(int i=0;i<twoseqs.at(0).length();i++)
+            rootstr += tworoot->getThisAncCharactersAt(i);
+
+        root->setThisAncSequenceString(rootstr);
+
+
+        vector<string> aseqs2;
+        this->getAncestralAlignmentMatrix(root,&aseqs2);
+        root->setAncSequenceGaps(&aseqs2);
+
+    }
+    else
+    {
+        vector<string> aseqs;
+        this->getAncestralAlignmentMatrix(root,&aseqs);
+
+        root->getLChild()->setAncSequenceStrings(&aseqs);
+        root->setThisAncSequenceString(&aseqs);
+        root->getRChild()->setAncSequenceStrings(&aseqs);
+
+    }
+}
+
+void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
+{
+    vector<string> aseqs;
+    this->getAlignmentMatrix(root,&aseqs,false);
+    root->setAlignedSequenceStrings(&aseqs);
+}
+
+void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nms,vector<string> *sqs,int iteration, bool isDna)
+{
+    this->setAlignedSequences(root);
+    this->reconstructAncestors(root,isDna);
+
+    if (WRITEANCSEQ)
+    {
+         string tree = "";
+        root->getLabelledNewick(&tree);
+
+        ofstream ancTre((outfile+"."+itos(iteration)+".anc.dnd").c_str());
+        ancTre<<tree<<endl;
+        ancTre.close();
+
+        ofstream ancSeq((outfile+"."+itos(iteration)+".anc.fas").c_str());
+
+        vector<string> anms;
+        root->getNames(&anms);
+
+        vector<string> aseqs;
+        root->getAllSequenceStrings(&aseqs);
+
+        vector<string>::iterator ni = anms.begin();
+        vector<string>::iterator si = aseqs.begin();
+
+        for (; ni!=anms.end(); si++,ni++)
+            ancSeq<<">"<<*ni<<endl<<*si<<endl;
+
+/*
+        int n = root->getInternalNodeNumber()+root->getTerminalNodeNumber();
+        int l = root->getSequence()->length();
+
+        char* alignment;
+        if (CODON)
+            alignment = new char[n*l*3];
+        else
+            alignment = new char[n*l];
+
+
+        this->getFullAlignmentMatrix(root,alignment);
+
+        vector<string> anms;
+        root->getNames(&anms);
+
+        vector<string>::iterator ni = anms.begin();
+        int j=0;
+        for (; ni!=anms.end(); j++,ni++)
+        {
+            ancSeq<<">"<<*ni<<endl;
+
+            int sl = l;
+            if(CODON)
+                sl *= 3;
+
+            for (int i=0; i<sl; i++)
+            {
+                ancSeq<<alignment[j*sl+i];
+            }
+            ancSeq<<endl;
+        }
+
+        delete []alignment;
+*/
+        ancSeq.close();
+    }
+
+    /*
+    if (WRITEANC)
+    {
+        string tree = "";
+        root->getNewick(&tree);
+
+
+        vector<string> anms;
+        root->getInternalNames(&anms);
+
+        ofstream ancSeq((outfile+"."+itos(iteration)+".ancseq").c_str());
+
+        ancSeq<<"# "<<tree<<endl;
+
+        vector<string>::iterator si = sqs->begin();
+        vector<string>::iterator ni = nms->begin();
+        for (; ni!=nms->end(); si++,ni++)
+        {
+            ancSeq<<">"<<*ni<<endl;
+            ancSeq<<*si<<endl;
+        }
+
+
+        int n = root->getInternalNodeNumber();
+        int l = root->getSequence()->length();
+
+        char* alignment;
+        if (CODON)
+            alignment = new char[n*l*3];
+        else
+            alignment = new char[n*l];
+
+
+        this->getAncestralAlignmentMatrix(root,alignment);
+
+
+        ni = anms.begin();
+        int j=0;
+        for (; ni!=anms.end(); j++,ni++)
+        {
+            ancSeq<<">"<<*ni<<endl;
+            for (int i=0; i<l; i++)
+            {
+                ancSeq<<alignment[j*l+i];
+            }
+            ancSeq<<endl;
+        }
+
+        delete []alignment;
+        ancSeq.close();
+
+
+        FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"w");
+        fclose(ancPro);
+
+        int *insSite = new int[l];
+        int i;
+        FOR(i,l)
+        {
+            insSite[i]=0;
+        }
+        root->writeAncCharacters(insSite,iteration);
+
+        delete []insSite;
+
+    }
+    */
+    return;
 }
 
 void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate)
@@ -641,123 +943,74 @@ void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignmen
 
 }
 
-void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nms,vector<string> *sqs,int iteration)
+void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,vector<string> *aseqs,bool translate)
 {
-    string tree = "";
-    if (WRITEANCSEQ)
+    int n = root->getTerminalNodeNumber();
+    int l = root->getSequence()->length();
+
+
+    for (int i=0; i<n; i++)
+        aseqs->push_back(string(""));
+
+    if (!translate)
     {
-        root->getLabelledNewick(&tree);
-
-
-        ofstream ancTre((outfile+"."+itos(iteration)+".anc.dnd").c_str());
-        ancTre<<tree<<endl;
-        ancTre.close();
-
-        ofstream ancSeq((outfile+"."+itos(iteration)+".anc.fas").c_str());
-
-        int n = root->getInternalNodeNumber()+root->getTerminalNodeNumber();
-        int l = root->getSequence()->length();
-
-        char* alignment;
-        if (CODON)
-            alignment = new char[n*l*3];
-        else
-            alignment = new char[n*l];
-
-
-        this->getFullAlignmentMatrix(root,alignment);
-
-        vector<string> anms;
-        root->getNames(&anms);
-
-        vector<string>::iterator ni = anms.begin();
-        int j=0;
-        for (; ni!=anms.end(); j++,ni++)
+        vector<string> col;
+        for (int i=0; i<l; i++)
         {
-            ancSeq<<">"<<*ni<<endl;
+            col.clear();
+            root->getCharactersAt(&col,i);
+            vector<string>::iterator cb = col.begin();
+            vector<string>::iterator ce = col.end();
+            vector<string>::iterator si = aseqs->begin();
 
-            int sl = l;
-            if(CODON)
-                sl *= 3;
-
-            for (int i=0; i<sl; i++)
+            for (; cb!=ce; cb++,si++)
             {
-                ancSeq<<alignment[j*sl+i];
+                if (CODON)
+                {
+                    *si += cb->at(0);
+                    *si += cb->at(1);
+                    *si += cb->at(2);
+                }
+                else
+                {
+                    *si += cb->at(0);
+                }
             }
-            ancSeq<<endl;
         }
-
-        delete []alignment;
-        ancSeq.close();
-
     }
-
-    if (WRITEANC)
+    else
     {
 
-        root->getNewick(&tree);
+        vector<string> prot;
+        for (int i=0; i<n; i++)
+            prot.push_back(string(""));
 
-
-        vector<string> anms;
-        root->getInternalNames(&anms);
-
-        ofstream ancSeq((outfile+"."+itos(iteration)+".ancseq").c_str());
-
-        ancSeq<<"# "<<tree<<endl;
-
-        vector<string>::iterator si = sqs->begin();
-        vector<string>::iterator ni = nms->begin();
-        for (; ni!=nms->end(); si++,ni++)
+        vector<string> col;
+        for (int i=0; i<l; i++)
         {
-            ancSeq<<">"<<*ni<<endl;
-            ancSeq<<*si<<endl;
-        }
+            col.clear();
+            root->getCharactersAt(&col,i);
+            vector<string>::iterator cb = col.begin();
+            vector<string>::iterator ce = col.end();
+            vector<string>::iterator si = prot.begin();
 
-
-        int n = root->getInternalNodeNumber();
-        int l = root->getSequence()->length();
-
-        char* alignment;
-        if (CODON)
-            alignment = new char[n*l*3];
-        else
-            alignment = new char[n*l];
-
-
-        this->getAncestralAlignmentMatrix(root,alignment);
-
-
-        ni = anms.begin();
-        int j=0;
-        for (; ni!=anms.end(); j++,ni++)
-        {
-            ancSeq<<">"<<*ni<<endl;
-            for (int i=0; i<l; i++)
+            for (; cb!=ce; cb++,si++)
             {
-                ancSeq<<alignment[j*l+i];
+                *si += cb->at(0);
             }
-            ancSeq<<endl;
         }
 
-        delete []alignment;
-        ancSeq.close();
+        vector<string> names;
+        root->getTerminalNames(&names);
 
-
-        FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"w");
-        fclose(ancPro);
-
-        int *insSite = new int[l];
-        int i;
-        FOR(i,l)
+        TranslateSequences trseq;
+        if (!trseq.translateDNA(&names,&prot,aseqs,&dnaSeqs))
         {
-            insSite[i]=0;
+            cout<<"Backtranslation failed. Exiting."<<endl;
+            exit(-1);
         }
-        root->writeAncCharacters(insSite,iteration);
-
-        delete []insSite;
-
     }
-    return;
+
 }
 
 void ProgressiveAlignment::getAncestralAlignmentMatrix(AncestralNode *root,char* alignment)
@@ -793,6 +1046,42 @@ void ProgressiveAlignment::getAncestralAlignmentMatrix(AncestralNode *root,char*
     }
 }
 
+void ProgressiveAlignment::getAncestralAlignmentMatrix(AncestralNode *root,vector<string> *aseqs)
+{
+    vector<string> col;
+    int n = root->getInternalNodeNumber();
+    int l = root->getSequence()->length();
+
+    int i;
+    FOR(i,n)
+            aseqs->push_back(string(""));
+
+    FOR(i,l)
+    {
+
+        col.clear();
+        root->getAncCharactersAt(&col,i,0,root->getSequence()->isPermInsertion(i));
+
+        vector<string>::iterator cb = col.begin();
+        vector<string>::iterator ce = col.end();
+        vector<string>::iterator si = aseqs->begin();
+
+        for (; cb!=ce; cb++,si++)
+        {
+            if (CODON)
+            {
+                *si += cb->at(0);
+                *si += cb->at(1);
+                *si += cb->at(2);
+            }
+            else
+            {
+                *si += cb->at(0);
+            }
+        }
+    }
+}
+
 void ProgressiveAlignment::getFullAlignmentMatrix(AncestralNode *root,char* alignment)
 {
     vector<string> col;
@@ -823,6 +1112,46 @@ void ProgressiveAlignment::getFullAlignmentMatrix(AncestralNode *root,char* alig
                 alignment[j*sl+i] = cb->at(0);
             }
             j++;
+        }
+    }
+}
+
+
+void ProgressiveAlignment::getFullAlignmentMatrix(AncestralNode *root,vector<string> *aseqs)
+{
+    vector<string> col;
+    int l = root->getSequence()->length();
+    int sl = l;
+    if(CODON)
+        sl *= 3;
+
+    int n = root->getInternalNodeNumber()+root->getTerminalNodeNumber();
+
+    int i;
+    FOR(i,n)
+        aseqs->push_back(string(""));
+
+    FOR(i,l)
+    {
+
+        col.clear();
+        root->getAllCharactersAt(&col,i,0,root->getSequence()->isPermInsertion(i));
+        vector<string>::iterator cb = col.begin();
+        vector<string>::iterator ce = col.end();
+        vector<string>::iterator si = aseqs->begin();
+
+        for (; cb!=ce; cb++)
+        {
+            if (CODON)
+            {
+                *si += cb->at(0);
+                *si += cb->at(1);
+                *si += cb->at(2);
+            }
+            else
+            {
+                *si += cb->at(0);
+            }
         }
     }
 }
