@@ -135,9 +135,10 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
 
     vector<string> col;
 
+    bool tmpDOTS = DOTS;
+    DOTS = false;
     for (int i=0; i<l; i++)
     {
-
         col.clear();
         root->getCharactersAt(&col,i);
         vector<string>::iterator cb = col.begin();
@@ -149,6 +150,7 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
             *si+=*cb;
         }
     }
+    DOTS = tmpDOTS;
 
     vector<string>::iterator si = sequences.begin();
     vector<string>::iterator ni = names.begin();
@@ -161,8 +163,6 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
 
 
     string tree = "";
-//    root->getNewickBrl(&tree);
-//    tree+=";";
 
     int nodeNum = root->getTerminalNodeNumber();
     root->getNHXBrl(&tree,&nodeNum);
@@ -212,6 +212,9 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     }
     pclose(fpipe);
 
+    /*
+    // This is not needed with the fixed bppancestor
+    //
     command << " output.tree_ids.file="<<m_name.str();
 
     if ( !(fpipe = (FILE*)popen(command.str().c_str(),"r")) )
@@ -225,6 +228,7 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
             cout<<"BppAncestor: "+string(line);
     }
     pclose(fpipe);
+    */
 
     ReadFile rf;
     rf.readFile(o_name.str().c_str());
@@ -232,13 +236,16 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     vector<string> n = rf.getNames();
 
     for(int i=0;i<n.size();i++)
-        aseqs->insert(aseqs->begin(),pair<string,string>(n.at(i),s.at(i)));
+        aseqs->insert(aseqs->begin(),pair<string,string>("#"+n.at(i)+"#",s.at(i)));
 
+    /*
+    // This is not needed with the fixed bppancestor
+    //
     ReadNewick rn;
     *atree = rn.readFile(m_name.str().c_str());
+    */
 
-//    exit(0);
-//    this->delete_files(r);
+    this->delete_files(r);
 
 }
 
@@ -256,8 +263,8 @@ void BppAncestors::delete_files(int r)
     stringstream o_name;
     o_name <<tmp_dir<<"o"<<r<<".fas";
 
-    stringstream m_name;
-    m_name <<tmp_dir<<"m"<<r<<".tre";
+//    stringstream m_name;
+//    m_name <<tmp_dir<<"m"<<r<<".tre";
 
     if ( remove( t_name.str().c_str() ) != 0 )
         perror( "Error deleting file" );
@@ -265,7 +272,7 @@ void BppAncestors::delete_files(int r)
         perror( "Error deleting file");
     if ( remove( o_name.str().c_str() ) != 0 )
         perror( "Error deleting file");
-    if ( remove( m_name.str().c_str() ) != 0 )
-        perror( "Error deleting file");
+//    if ( remove( m_name.str().c_str() ) != 0 )
+//        perror( "Error deleting file");
 
 }

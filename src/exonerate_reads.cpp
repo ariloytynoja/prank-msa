@@ -66,7 +66,7 @@ bool Exonerate_reads::test_executable()
     }
     #endif
 
-    if(WEXITSTATUS(status) == 1 && NOISE>=0)
+    if(WEXITSTATUS(status) == 1 && NOISE>0)
         cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";
 
     return WEXITSTATUS(status) == 1;

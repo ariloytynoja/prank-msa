@@ -152,32 +152,6 @@ void TerminalNode::setCharString(vector<string>* sns,vector<string>* sqs,int* co
     }
 }
 
-
-//
-
-void TerminalNode::getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns)
-{
-    int thisState = -3;
-
-    if (pos<0)
-    {
-        if (parentPermIns)
-            thisState = -2;
-        else
-            thisState = -1;
-   }
-    else
-    {
-        thisState = this->getSequence()->charAt(pos);
-    }
-
-    if(thisState != parentState)
-        (*stateChanges)++;
-
-}
-
-//
-
 void TerminalNode::getCharStrings(vector<string>* sqs)
 {
     sqs->push_back(charString);
@@ -239,10 +213,6 @@ void TerminalNode::getMLAncestralSeqs(vector<string>* ,vector<string>* )
     return;
 }
 
-//void TerminalNode::writeAncCharacters(int *,int )
-//{
-//    return;
-//}
 
 void TerminalNode::getAncCharactersAt(vector<string>* ,int ,bool )
 {
@@ -292,3 +262,4 @@ void TerminalNode::getCharactersAt(vector<string>* col,int i, bool parentPermIns
         cout<<nodeName<<": index out of scope ("<<i<<")"<<endl;
     }
 }
+

@@ -49,7 +49,8 @@ public:
     void getAlignmentMatrix(AncestralNode *root,vector<string> *aseqs,bool translate);
     void reconstructAncestors(AncestralNode *root,bool isDna);
     void setAlignedSequences(AncestralNode *root);
-    void printAncestral(AncestralNode *root,std::vector<std::string> *names,std::vector<std::string> *seqs,int iteration,bool isDna);
+    int computeParsimonyScore(AncestralNode *root,bool isDna);
+    void printAncestral(AncestralNode *root,int iteration,bool isDna);
     void getAncestralAlignmentMatrix(AncestralNode *root,char* alignment);
     void getAncestralAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getFullAlignmentMatrix(AncestralNode *root,char* alignment);
@@ -86,7 +87,10 @@ private:
                 }
                 else
                 {
-                    cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                    if(PREALIGNED)
+                        cout<<endl<<"PRANK: reading alignment '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                    else
+                        cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
                     if (treefile!="" & hmmname!="")
                         cout<<"Using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'.\n";
                     else if (treefile!="")
@@ -616,7 +620,7 @@ private:
                 }
                 else if(MAFFTALIGNMENT && ma.test_executable())
                 {
-                    if(NOISE>=0)
+                    if(NOISE>0)
                         cout<<"Using MAFFT for guide tree inference. Use option '-nomafft' to disable.\n";
 
                     vector<string> tmp_seqs;
@@ -854,7 +858,7 @@ private:
         for (int i=0; i<root->getSequence()->length(); i++)
         {
             col.clear();
-            root->getCharactersAt(&col,i);
+            root->getCharactersAt(&col,i,false);
             vector<string>::iterator cb = col.begin();
             vector<string>::iterator ce = col.end();
 

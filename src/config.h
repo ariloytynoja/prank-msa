@@ -67,9 +67,9 @@ extern int format;
 extern bool SCREEN;
 extern int reportLimit;
 
-extern bool WRITEANC;
 extern bool WRITEANCSEQ;
 extern bool PARSIMONYSCORE;
+extern string INDELSCORE;
 extern bool PRINTNODES;
 extern bool PRINTTREE;
 extern bool WRITEXML;

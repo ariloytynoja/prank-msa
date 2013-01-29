@@ -35,13 +35,10 @@ using namespace std;
 
 TreeNode::~TreeNode()
 {
-//     cout<<"~TreeNode "<<nodeName<<endl;
 }
 
 int TreeNode::totalNodes = 0;
 int TreeNode::alignedNodes = 0;
 bool TreeNode::rooted = false;
-
-
 
 

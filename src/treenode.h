@@ -36,6 +36,28 @@
 extern float minBrL;
 extern int rnd_seed;
 
+struct parsimonyIndelEvent
+{
+    std::pair<std::string,int> endSite;
+    std::pair<std::string,int> startSite;
+    int indelType;
+    int indelLength;
+    bool isTerminal;
+};
+
+struct indelEvent
+{
+    std::string branch;
+    int realStart;
+    int realEnd;
+    int alignedStart;
+    int alignedEnd;
+    int length;
+    bool isTerminal;
+    bool isInsertion;
+};
+
+
 class TreeNode
 {
 protected:
@@ -63,6 +85,9 @@ protected:
     Sequence* seq;
 
     std::string alignedseqstr; // aligned sequence
+    std::vector<int> alignedstates;
+    int alignedStartSite;
+    int alignedEndSite;
 
     static int totalNodes;
     static int alignedNodes;
@@ -86,6 +111,8 @@ public:
     bool realignNode;
     bool LRealign;
     bool RRealign;
+
+    std::string getAlignedSeqStr() { return alignedseqstr; }
 
     virtual std::string getGroupName()
     {
@@ -177,8 +204,6 @@ public:
     virtual void getSubtreeBelow(std::string *subtree) = 0;
     virtual void markRealignSubtrees(std::map<std::string,float> *subtrees) = 0;
 
-    virtual void getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns) = 0;
-
     virtual bool anyChildNodeRealigned() = 0;
 
     virtual Sequence* getSequence() = 0;
@@ -238,7 +263,6 @@ public:
     virtual void getLabelledNewickBrl(std::string* tree) = 0;
     virtual void getNewickBrl(std::string* tree) = 0;
     virtual void getNexusTree(std::string* tree, int *count) = 0;
-//    virtual void writeAncCharacters(int *parSite,int iteration) = 0;
     virtual void getNHXBrl(std::string* tree,int *nodeNumber) = 0;
 
     void getCleanNewick(std::string* tree);
@@ -267,6 +291,58 @@ public:
     }
 
     virtual void fixTerminalNodenames() = 0;
+
+    virtual void getIndelEvents(std::vector<indelEvent> *indels) = 0;
+
+    void getColumnParsimonyScore(int position,int *stateChanges)
+    {
+        this->getColumnParsimonyScoreAt(position,stateChanges,this->alignedstates.at(position));
+    }
+
+    void getColumnParsimonyScoreAt(int position,int *stateChanges,int parentState)
+    {
+        int thisState = alignedstates.at(position);
+
+        if(thisState != parentState)
+        {
+//            std::cout<<nodeName<<" "<<parentState<<" "<<thisState<<std::endl;
+
+            if(thisState == -1 || parentState == -1)
+            {
+
+
+            }
+            else
+            {
+                (*stateChanges)++;
+            }
+        }
+
+        if(!isTerminal())
+        {
+            lChild->getColumnParsimonyScoreAt(position,stateChanges,thisState);
+            rChild->getColumnParsimonyScoreAt(position,stateChanges,thisState);
+        }
+    }
+
+    void setAlignedStates(std::map<std::string,int> *alphabet,int wordsize)
+    {
+        if(!terminal)
+        {
+            lChild->setAlignedStates(alphabet,wordsize);
+            rChild->setAlignedStates(alphabet,wordsize);
+        }
+        alignedstates.clear();
+        for(int i=0;i<alignedseqstr.length();i+=wordsize)
+        {
+            std::string c = alignedseqstr.substr(i,wordsize);
+            std::map<std::string,int>::iterator it = alphabet->find(c);
+            if(it!=alphabet->end())
+                alignedstates.push_back(it->second);
+            else
+                alignedstates.push_back(-3);
+        }
+    }
 
 };
 

@@ -63,9 +63,6 @@ public:
     void getSubtreeBelow(std::string *subtree);
     void markRealignSubtrees(std::map<std::string,float> *subtrees);
 
-    int computeColumnParsimonyScore();
-    void getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns);
-
     bool anyChildNodeRealigned()
     {
         if(getLChild()->anyChildNodeRealigned())
@@ -97,7 +94,6 @@ public:
     void getLabelledNewickBrl(std::string* tree);
     void getNewickBrl(std::string* tree);
     void getNexusTree(std::string* tree, int *count);
-//    void writeAncCharacters(int *parSite,int iteration);
 
     void getNHXBrl(std::string* tree,int *nodeNumber);
 
@@ -109,6 +105,7 @@ public:
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns,bool parentPermIns);
     std::string getThisAncCharactersAt(int i);
     void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
+    void getIndelEvents(std::vector<indelEvent> *indels);
 
     void setPermanentInsertion(int i);
     void printChildAlignment(TreeNode *node,std::string filename);
@@ -116,7 +113,6 @@ public:
     void setAncSequenceStrings(std::vector<std::string> *aseqs)
     {
         lChild->setAncSequenceStrings(aseqs);
-//        rChild->setAncSequenceStrings(aseqs);
 
         alignedseqstr = aseqs->at(0);
         aseqs->erase(aseqs->begin());
@@ -129,7 +125,8 @@ public:
         lChild->setAncSequenceStrings(aseqs);
         rChild->setAncSequenceStrings(aseqs);
 
-        alignedseqstr = aseqs->find(this->getNodeName())->second;
+        if(aseqs->find(this->getNodeName())!=aseqs->end())
+            alignedseqstr = aseqs->find(this->getNodeName())->second;
 //        std::cout<<nodeName<<" "<<alignedseqstr<<std::endl;
     }
 
@@ -148,8 +145,12 @@ public:
         aseqs->erase(aseqs->begin());
 
         for(int i=0;i<gstr.length();i++)
+        {
             if(gstr.at(i)=='-')
                 alignedseqstr.at(i) = '-';
+            if(gstr.at(i)=='.')
+                alignedseqstr.at(i) = '.';
+        }
     }
 
     void setThisAncSequenceString(std::string aseq)

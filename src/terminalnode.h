@@ -56,7 +56,6 @@ public:
     void getSubtreeBelow(std::string *subtree) { *subtree = nodeName; }
     void markRealignSubtrees(std::map<std::string,float> *subtrees) {}
 
-    void getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns);
     bool anyChildNodeRealigned() { return false; }
 
     void alignSequences();
@@ -80,7 +79,6 @@ public:
 
     void getNewickBrl(std::string* tree);
     void getNexusTree(std::string* tree, int *count);
-//    void writeAncCharacters(int *parSite,int iteration);
 
     void getMLAncestralSeqs(std::vector<std::string>* sqs,std::vector<std::string>* nms);
     void setSiteLength(int ) {}
@@ -89,6 +87,7 @@ public:
     void getAllCharactersAt(std::vector<std::string>* col,int i,bool parentIns,bool parentPermIns) { this->getCharactersAt(col,i,parentPermIns); }
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
+    void getIndelEvents(std::vector<indelEvent> *indels){}
 
     void setAncSequenceStrings(std::vector<std::string>*){}
     void getAncSequenceStrings(std::vector<std::string>*){}

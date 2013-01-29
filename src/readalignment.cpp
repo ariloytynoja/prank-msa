@@ -49,12 +49,10 @@ void ReadAlignment::cleanUp()
     delete vX;
     delete vY;
     delete vM;
-
     delete xX;
     delete xM;
     delete yY;
     delete yM;
-
     delete wX;
     delete wM;
     delete zY;

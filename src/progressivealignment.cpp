@@ -237,11 +237,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         printAlignment(root,&names,&sequences,0,isDna);
 
-        if(PARSIMONYSCORE)
-        {
-            int score = root->computeColumnParsimonyScore();
-        }
-
         ra.cleanUp();
     }
 
@@ -319,18 +314,16 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         root->alignSequences();
 
-        if (NOISE>=0)
-            cout<<endl;
-
         printAlignment(root,&names,&sequences,1,isDna);
-
-        if(PARSIMONYSCORE)
-        {
-            int score = root->computeColumnParsimonyScore();
-        }
 
         if (TWICE)
         {
+            if(PARSIMONYSCORE)
+            {
+                int score = this->computeParsimonyScore(root,isDna);
+                cout<<"\nParsimony score: "<<score<<endl;
+            }
+
             map<string,float> subtreesOld;
             if (UPDATESECOND)
                 root->getAllSubtrees(&subtreesOld);
@@ -394,11 +387,15 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
             printAlignment(root,&names,&sequences,2,isDna);
 
-            if(PARSIMONYSCORE)
-                ;
         }
 
         hir.cleanUp();
+    }
+
+    if(PARSIMONYSCORE)
+    {
+        int score = this->computeParsimonyScore(root,isDna);
+        cout<<"\nParsimony score: "<<score<<endl;
     }
 
     sites->deleteMatrices();
@@ -445,14 +442,12 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
     if (!TRANSLATE)
     {
-
         WriteFile wfa;
         string file = outfile+"."+itos(iteration)+formatExtension(format);
         wfa.writeSeqs(file.c_str(),nms,seqs,format,isDna,root,false);
 
         if (WRITEXML)
             printXml(root,iteration,false);
-
     }
     else
     {
@@ -476,10 +471,10 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
         if (WRITEXML)
             printXml(root,iteration,true);
-   }
+    }
 
-     if (WRITEANC || WRITEANCSEQ)
-        printAncestral(root,nms,seqs,iteration,isDna);
+    if (WRITEANCSEQ)
+        printAncestral(root,iteration,isDna);
 
 }
 
@@ -616,23 +611,21 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
         bppa.inferAncestors(root,&aseqs,&atree,isDna);
 
         ReadNewick rn;
+        /*
+        // This is not needed with the fixed bppancestor
+        //
         map<string,TreeNode*> anodes;
         rn.buildTree(atree,&anodes);
 
         AncestralNode* aroot = static_cast<AncestralNode*>(anodes[rn.getRoot()]);
         aroot->fixTerminalNodenames();
 
-//        string tmp;
-//        aroot->getLabelledNewickBrl(&tmp);
-//        cout<<atree<<endl<<tmp<<endl;
 
         map<string,string> subtrees;
         root->getAllSubtreesWithNodename(&subtrees);
 
         map<string,string> asubtrees;
         aroot->getAllSubtreesWithNodename(&asubtrees);
-
-//        cout<<subtrees.size()<<" "<<asubtrees.size()<<"\n";
 
         map<string,string> asequences;
 
@@ -647,11 +640,13 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
 
             aname.erase(aname.begin());
             aname.erase(aname.length()-1);
-//            cout<<name<<" "<<aname<<endl;
             asequences.insert(asequences.begin(),pair<string,string>(name,aseqs.find(aname)->second));
         }
 
         root->setAncSequenceStrings(&asequences);
+        */
+
+        root->setAncSequenceStrings(&aseqs);
 
         // BppAncestor works on unrooted trees; root needs to be done separately
         //
@@ -665,14 +660,20 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
         stringstream tree;
         tree << "(left:" << root->getLeftBrL()<<",right:"<<root->getRightBrL()<<");";
 
-//        //
-//        cout<<tree.str()<<endl;
-//        cout<<"l "<<twoseqs.at(0)<<endl;
-//        cout<<"r "<<twoseqs.at(1)<<endl;
-//        //
-
         map<string,TreeNode*> twonodes;
         rn.buildTree(tree.str(),&twonodes);
+
+        bool tmpPREALIGNED = PREALIGNED;
+        PREALIGNED = true;
+
+        bool tmpFOREVER = FOREVER;
+        FOREVER = false;
+
+        bool tmpSCREEN = SCREEN;
+//        SCREEN = false;
+
+        int tmpNOISE = NOISE;
+//        NOISE = -1;
 
         AncestralNode* tworoot = static_cast<AncestralNode*>(twonodes[rn.getRoot()]);
         int nsqs = 0;
@@ -684,16 +685,23 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
         tworoot->setTotalNodes();
         tworoot->readAlignment();
 
+        FOREVER = tmpFOREVER;
+        PREALIGNED = tmpPREALIGNED;
+        NOISE = tmpNOISE;
+        SCREEN = tmpSCREEN;
+
         string rootstr;
         for(int i=0;i<twoseqs.at(0).length();i++)
             rootstr += tworoot->getThisAncCharactersAt(i);
 
         root->setThisAncSequenceString(rootstr);
 
-
         vector<string> aseqs2;
         this->getAncestralAlignmentMatrix(root,&aseqs2);
         root->setAncSequenceGaps(&aseqs2);
+
+        if(NOISE>1)
+            cout<<"BppAncestor done\n";
 
     }
     else
@@ -715,140 +723,145 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
     root->setAlignedSequenceStrings(&aseqs);
 }
 
-void ProgressiveAlignment::printAncestral(AncestralNode *root,vector<string> *nms,vector<string> *sqs,int iteration, bool isDna)
+int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna)
+{
+
+    this->setAlignedSequences(root);
+    this->reconstructAncestors(root,isDna);
+
+    string alpha = hmm->getFullAlphabet();
+    int sAlpha = alpha.length();
+
+    map<string,int> alphabet;
+
+    int wordsize = 1;
+    if(CODON)
+    {
+        for(int i=0;i<sAlpha;i++)
+            alphabet.insert(alphabet.begin(),pair<string,int>(alpha.substr(i*3,3),i));
+
+        alphabet.insert(alphabet.begin(),pair<string,int>("---",-1));
+        alphabet.insert(alphabet.begin(),pair<string,int>("...",-1));
+        wordsize = 3;
+    }
+    else
+    {
+        for(int i=0;i<sAlpha;i++)
+            alphabet.insert(alphabet.begin(),pair<string,int>(alpha.substr(i,1),i));
+
+        alphabet.insert(alphabet.begin(),pair<string,int>("-",-1));
+        alphabet.insert(alphabet.begin(),pair<string,int>(".",-1));
+    }
+
+    root->setAlignedStates(&alphabet,wordsize);
+
+    vector<indelEvent> indels;
+    root->getIndelEvents(&indels);
+
+//    cout<<indels.size()<<" indels\n";
+//    for(int i=0;i<indels.size();i++)
+//    {
+//        cout<<indels.at(i).branch<<" "
+//            <<indels.at(i).alignedStart<<" "
+//           <<indels.at(i).alignedEnd<<" ("
+//          <<indels.at(i).realStart<<" "
+//          <<indels.at(i).realEnd<<") "
+//          <<indels.at(i).isInsertion<<"; "
+//            <<indels.at(i).isTerminal<<"\n";
+//    }
+
+
+    int substScore = 0;
+    for(int i=0;i<root->getSequence()->length();i++)
+    {
+        int thisScore = 0;
+        root->getColumnParsimonyScore(i,&thisScore);
+        substScore += thisScore;
+    }
+
+    int score = substScore;
+
+    int insCount = 0;
+    int delCount = 0;
+    int idLength = 0;
+
+    int idscore_1 = 10;
+    int idscore_2 = 15;
+    int idscore_3 = 20;
+    int idscore_4 = 25;
+
+    if(INDELSCORE != "")
+    {
+        char c;
+        stringstream ids(INDELSCORE);
+        ids>>idscore_1>>c>>idscore_2>>c>>idscore_3>>c>>idscore_4;
+    }
+
+    if(NOISE>0)
+        cout<<"Using indel scores:\n  "<<idscore_1<<" for length 1\n  "<<idscore_2<<" for length 2\n  "<<idscore_3<<" for length 3\n  "<<idscore_4<<" for longer than 3\n";
+
+    vector<indelEvent>::iterator ite = indels.begin();
+    for(;ite!=indels.end();ite++)
+    {
+        if(ite->isInsertion)
+            insCount++;
+        else
+            delCount++;
+
+        if(NOTGAP && ite->isTerminal)
+        {
+            score += idscore_1;
+//            cout<<ite->branch<<" "<<ite->alignedStart<<" "<<ite->alignedEnd<<"\n";
+        }
+        else
+        {
+            if(ite->length == 1)
+                score += idscore_1;
+            else if(ite->length == 2)
+                score += idscore_2;
+            else if(ite->length == 3)
+                score += idscore_3;
+            else
+                score += idscore_4;
+        }
+        idLength += ite->length;
+    }
+
+    if(NOISE>0)
+        cout<<"\nInferred events: "<<substScore<<" subst, "<<insCount<<" ins, "<<delCount<<" dels\n";
+
+    return score;
+
+}
+
+void ProgressiveAlignment::printAncestral(AncestralNode *root,int iteration, bool isDna)
 {
     this->setAlignedSequences(root);
     this->reconstructAncestors(root,isDna);
 
-    if (WRITEANCSEQ)
-    {
-         string tree = "";
-        root->getLabelledNewick(&tree);
+    string tree = "";
+    root->getLabelledNewick(&tree);
 
-        ofstream ancTre((outfile+"."+itos(iteration)+".anc.dnd").c_str());
-        ancTre<<tree<<endl;
-        ancTre.close();
+    ofstream ancTre((outfile+"."+itos(iteration)+".anc.dnd").c_str());
+    ancTre<<tree<<endl;
+    ancTre.close();
 
-        ofstream ancSeq((outfile+"."+itos(iteration)+".anc.fas").c_str());
+    ofstream ancSeq((outfile+"."+itos(iteration)+".anc.fas").c_str());
 
-        vector<string> anms;
-        root->getNames(&anms);
+    vector<string> anms;
+    root->getNames(&anms);
 
-        vector<string> aseqs;
-        root->getAllSequenceStrings(&aseqs);
-
-        vector<string>::iterator ni = anms.begin();
-        vector<string>::iterator si = aseqs.begin();
-
-        for (; ni!=anms.end(); si++,ni++)
-            ancSeq<<">"<<*ni<<endl<<*si<<endl;
-
-/*
-        int n = root->getInternalNodeNumber()+root->getTerminalNodeNumber();
-        int l = root->getSequence()->length();
-
-        char* alignment;
-        if (CODON)
-            alignment = new char[n*l*3];
-        else
-            alignment = new char[n*l];
+    vector<string> aseqs;
+    root->getAllSequenceStrings(&aseqs);
 
 
-        this->getFullAlignmentMatrix(root,alignment);
+    vector<string>::iterator ni = anms.begin();
+    vector<string>::iterator si = aseqs.begin();
 
-        vector<string> anms;
-        root->getNames(&anms);
+    for (; ni!=anms.end(); si++,ni++)
+        ancSeq<<">"<<*ni<<endl<<*si<<endl;
 
-        vector<string>::iterator ni = anms.begin();
-        int j=0;
-        for (; ni!=anms.end(); j++,ni++)
-        {
-            ancSeq<<">"<<*ni<<endl;
-
-            int sl = l;
-            if(CODON)
-                sl *= 3;
-
-            for (int i=0; i<sl; i++)
-            {
-                ancSeq<<alignment[j*sl+i];
-            }
-            ancSeq<<endl;
-        }
-
-        delete []alignment;
-*/
-        ancSeq.close();
-    }
-
-    /*
-    if (WRITEANC)
-    {
-        string tree = "";
-        root->getNewick(&tree);
-
-
-        vector<string> anms;
-        root->getInternalNames(&anms);
-
-        ofstream ancSeq((outfile+"."+itos(iteration)+".ancseq").c_str());
-
-        ancSeq<<"# "<<tree<<endl;
-
-        vector<string>::iterator si = sqs->begin();
-        vector<string>::iterator ni = nms->begin();
-        for (; ni!=nms->end(); si++,ni++)
-        {
-            ancSeq<<">"<<*ni<<endl;
-            ancSeq<<*si<<endl;
-        }
-
-
-        int n = root->getInternalNodeNumber();
-        int l = root->getSequence()->length();
-
-        char* alignment;
-        if (CODON)
-            alignment = new char[n*l*3];
-        else
-            alignment = new char[n*l];
-
-
-        this->getAncestralAlignmentMatrix(root,alignment);
-
-
-        ni = anms.begin();
-        int j=0;
-        for (; ni!=anms.end(); j++,ni++)
-        {
-            ancSeq<<">"<<*ni<<endl;
-            for (int i=0; i<l; i++)
-            {
-                ancSeq<<alignment[j*l+i];
-            }
-            ancSeq<<endl;
-        }
-
-        delete []alignment;
-        ancSeq.close();
-
-
-        FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"w");
-        fclose(ancPro);
-
-        int *insSite = new int[l];
-        int i;
-        FOR(i,l)
-        {
-            insSite[i]=0;
-        }
-        root->writeAncCharacters(insSite,iteration);
-
-        delete []insSite;
-
-    }
-    */
-    return;
+   return;
 }
 
 void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate)
@@ -886,7 +899,6 @@ void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignmen
     }
     else
     {
-
         char *tmp = new char[n*l];
 
         vector<string> col;

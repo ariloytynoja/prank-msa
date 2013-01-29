@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 130116;
+    version = 130129;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -255,21 +255,21 @@ void readArguments(int argc, char *argv[])
             }
 
             // write reconstructed ancestral seqs
-            else if (s=="-writeanc")
-            {
-                WRITEANC = true;
-            }
-
-            // write reconstructed ancestral seqs
             else if (s=="-showanc")
             {
                 WRITEANCSEQ = true;
             }
 
             // compute parsimony score
-            else if (s=="-score")
+            else if (s=="-noscore")
             {
-                PARSIMONYSCORE = true;
+                PARSIMONYSCORE = false;
+            }
+
+            // parsimony score for indels
+            else if (s.substr(0,12)=="-indelscore=")
+            {
+                INDELSCORE = string(argv[i]).substr(12);
             }
 
             // write ancestral nodes as they are solved
@@ -718,8 +718,11 @@ void printHelp(bool complete)
     cout<<"  -showxml [output xml-files]"<<endl;
     cout<<"  -showtree [output dnd-files]"<<endl;
     cout<<"  -showanc [output ancestral sequences]"<<endl;
-    cout<<"  -noanchors [no Exonerate anchoring]"<<endl;
-    cout<<"  -nomafft [no MAFFT guide tree]"<<endl;
+    if (complete)
+    {
+        cout<<"  -noanchors [no Exonerate anchoring]"<<endl;
+        cout<<"  -nomafft [no MAFFT guide tree]"<<endl;
+    }
     cout<<"  -support [compute posterior support]"<<endl;
     cout<<"  -njtree [estimate tree from input alignment (and realign)]"<<endl;
     cout<<"  -quiet"<<endl;
@@ -745,6 +748,7 @@ void printHelp(bool complete)
         cout<<"  -dnafreqs=#,#,#,# [ACGT; default: empirical]"<<endl;
         cout<<"  -kappa=# [ts/tv rate ratio; default:"<<kappa<<"]"<<endl;
         cout<<"  -rho=# [pur/pyr rate ratio; default:"<<rho<<"]"<<endl;
+        cout<<"  -indelscore=#,#,#,# [1,2,3,>3; indel penalties for alignment score]"<<endl;
     }
     cout<<"  -codon [for coding DNA: use empirical codon model]"<<endl;
     cout<<"  -DNA / -protein [no autodetection: use dna or protein model]"<<endl;

@@ -97,11 +97,11 @@ bool SCREEN = true;
 int reportLimit = 100;
 
 // write reconstructed ancestral seqs
-bool WRITEANC = false;
 bool WRITEANCSEQ = false;
 
 // compute parsimony score
-bool PARSIMONYSCORE = false;
+bool PARSIMONYSCORE = true;
+string INDELSCORE = "";
 
 // write ancestral nodes as they are solved
 bool PRINTNODES = false;

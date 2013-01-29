@@ -874,149 +874,6 @@ void AncestralNode::markRealignSubtrees(map<string,float> *subtrees)
     }
 }
 
-///
-int AncestralNode::computeColumnParsimonyScore()
-{
-    int totalScore = 0;
-    for(int pos=0;pos<this->getSequence()->lengthF();pos++)
-    {
-        int thisState = -1;
-
-        if(!this->getSequence()->isGap(pos))
-        {
-            int sAlpha = hmm->getAlphabet().length();
-
-            int nState = hmm->getNStates();
-            int maxState = -1;
-            float maxProb = -HUGE_VAL;
-            int j,k;
-
-            FOR(k,nState)
-            {
-                if (this->getSequence()->stateProbAt(k,pos) > maxProb)
-                {
-                    maxProb = this->getSequence()->stateProbAt(k,pos);
-                    maxState = k;
-                }
-            }
-
-            if (LOGVALUES)
-            {
-                double ms = -HUGE_VAL;
-
-                FOR(j,sAlpha)
-                {
-                    if (this->getSequence()->mlCharProbAt(j,pos,maxState)>= ms)
-                    {
-                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
-                        thisState = j;
-                    }
-                }
-            }
-            else
-            {
-                double ms = 0;
-
-                FOR(j,sAlpha)
-                {
-                    if (this->getSequence()->mlCharProbAt(j,pos,maxState) >= ms)
-                    {
-                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
-                        thisState = j;
-                    }
-                }
-            }
-        }
-
-        int stateChanges = 0;
-        this->getColumnParsimonyScore(&stateChanges,thisState,pos,
-                                      this->getSequence()->isInsertion(pos),this->getSequence()->isPermInsertion(pos));
-
-        cout<<pos<<" "<<stateChanges<<endl;
-        totalScore += stateChanges;
-    }
-    cout<<"total "<<totalScore<<endl;
-
-}
-
-void AncestralNode::getColumnParsimonyScore(int *stateChanges,int parentState,int pos,bool parentIns, bool parentPermIns)
-{
-    int thisState = -3;
-
-    if (pos<0)
-    {
-        thisState = -1;
-
-        if(thisState != parentState)
-            (*stateChanges)++;
-    }
-    else
-    {
-        if (this->getSequence()->isInsertion(pos) || ( parentIns && this->getSequence()->isGap(pos) ) )
-        {
-            thisState = -1;
-        }
-
-        else
-        {
-
-            int sAlpha = hmm->getAlphabet().length();
-
-            int nState = hmm->getNStates();
-            int maxState = -1;
-            float maxProb = -HUGE_VAL;
-            int j,k;
-
-            FOR(k,nState)
-            {
-                if (this->getSequence()->stateProbAt(k,pos) > maxProb)
-                {
-                    maxProb = this->getSequence()->stateProbAt(k,pos);
-                    maxState = k;
-                }
-            }
-
-            if (LOGVALUES)
-            {
-                double ms = -HUGE_VAL;
-
-                FOR(j,sAlpha)
-                {
-                    if (this->getSequence()->mlCharProbAt(j,pos,maxState)>= ms)
-                    {
-                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
-                        thisState = j;
-                    }
-                }
-            }
-            else
-            {
-                double ms = 0;
-
-                FOR(j,sAlpha)
-                {
-                    if (this->getSequence()->mlCharProbAt(j,pos,maxState) >= ms)
-                    {
-                        ms = this->getSequence()->mlCharProbAt(j,pos,maxState);
-                        thisState = j;
-                    }
-                }
-            }
-        }
-
-        if(thisState != parentState)
-            (*stateChanges)++;
-
-        lChild->getColumnParsimonyScore(stateChanges,thisState,seq->getLIndex(pos),
-                                        this->getSequence()->isInsertion(pos),this->getSequence()->isPermInsertion(pos));
-        rChild->getColumnParsimonyScore(stateChanges,thisState,seq->getRIndex(pos),
-                                        this->getSequence()->isInsertion(pos),this->getSequence()->isPermInsertion(pos));
-
-    }
-}
-
-///
-
 void AncestralNode::getThisAlignmentPostProbAt(double* p,int i)
 {
     if (i>=0)
@@ -1339,118 +1196,6 @@ void AncestralNode::getMLAncestralSeqs(vector<string>* sqs,vector<string>* nms)
     nms->push_back(nodeName);
 }
 
-/*
-void AncestralNode::writeAncCharacters(int *parSite,int iteration)
-{
-
-    int *insSite = new int[siteLength];
-    int h;
-    FOR(h,siteLength)
-    {
-        insSite[h]=0;
-        int i = siteIndex[h];
-        if (i>=0)
-        {
-            insSite[h] = this->getSequence()->isInsertion(i);
-        }
-    }
-
-    lChild->writeAncCharacters(insSite,iteration);
-    rChild->writeAncCharacters(insSite,iteration);
-
-    delete []insSite;
-
-    FILE *ancPro = fopen((outfile+"."+itos(iteration)+".ancprof").c_str(),"a");
-
-    fprintf(ancPro,"## %s ##\n",nodeName.c_str());
-    string alpha = hmm->getAlphabet();
-    int sAlpha = alpha.length();
-
-    int nState = hmm->getNStates();
-    int maxState = -1;
-    float maxProb = -HUGE_VAL;
-    int j,k;
-
-
-    FOR(h,siteLength)
-    {
-        int i = siteIndex[h];
-
-        if (i<0)
-        {
-            fprintf(ancPro,"- %i (-1) ;",h+1);
-            FOR(k,nState)
-            {
-                FOR(j,sAlpha-1)
-                {
-                    fprintf(ancPro," 0,");
-                }
-                fprintf(ancPro," 0;");
-            }
-        }
-        else
-        {
-
-            if (this->getSequence()->isInsertion(i))
-            {
-                fprintf(ancPro,"+ %i",h+1);
-            }
-            else if (this->getSequence()->isGap(i) && parSite[h])
-            {
-                fprintf(ancPro,"* %i",h+1);
-            }
-            else
-            {
-                fprintf(ancPro,"  %i",h+1);
-            }
-
-            FOR(k,nState)
-            {
-                if (this->getSequence()->stateProbAt(k,i)>maxProb)
-                {
-                    maxProb = this->getSequence()->stateProbAt(k,i);
-                    maxState = k;
-                }
-            }
-
-            fprintf(ancPro," (%i) ;",maxState+1);
-
-
-            FOR(k,nState)
-            {
-                double sum = 0;
-
-                FOR(j,sAlpha)
-                {
-                    double t = this->getSequence()->mlCharProbAt(j,i,k);
-                    if (LOGVALUES)
-                        sum += exp(t);
-                    else
-                        sum += t;
-                }
-
-                FOR(j,sAlpha-1)
-                {
-                    double t = this->getSequence()->mlCharProbAt(j,i,k);
-                    if (LOGVALUES)
-                        fprintf(ancPro," %.3f,",exp(t)/sum);
-                    else
-                        fprintf(ancPro," %.3f,",t/sum);
-                }
-                double t = this->getSequence()->mlCharProbAt(sAlpha-1,i,k);
-
-                if (LOGVALUES)
-                    fprintf(ancPro," %.3f;",exp(t)/sum);
-                else
-                    fprintf(ancPro," %.3f;",t/sum);
-            }
-        }
-        fprintf(ancPro,"\n");
-    }
-    fprintf(ancPro,"\n");
-    fclose(ancPro);
-}
-*/
 
 void AncestralNode::getAncCharactersAt(vector<string>* col,int i,bool parentIns,bool parentPermIns)
 {
@@ -1907,8 +1652,6 @@ void AncestralNode::getCharactersAt(vector<string>* col,int i, bool parentPermIn
     }
 }
 
-
-
 void AncestralNode::setSiteLength(int l)
 {
     lChild->setSiteLength(l);
@@ -2012,3 +1755,220 @@ void AncestralNode::printChildAlignment(TreeNode *node,string filename)
     delete []alignment;
 
 }
+
+void AncestralNode::getIndelEvents(std::vector<indelEvent> *indels)
+{
+    if(lInternal)
+        lChild->getIndelEvents(indels);
+    if(rInternal)
+        rChild->getIndelEvents(indels);
+
+    string parent = this->alignedseqstr;
+    string child = lChild->getAlignedSeqStr();
+
+    vector<int> index;
+    for(int i=0;i<parent.length();i++)
+    {
+        if(parent.at(i)!='-' && parent.at(i)!='.' || child.at(i)!='-' && child.at(i)!='.')
+            index.push_back(i);
+    }
+
+    string::iterator pi = parent.begin();
+    string::iterator ci = child.begin();
+
+    for(;pi!=parent.end();)
+    {
+        if( (*pi=='-' || *pi=='.') && (*ci=='-' || *ci=='.') )
+        {
+            parent.erase(pi);
+            child.erase(ci);
+        }
+        else
+        {
+            pi++;
+            ci++;
+        }
+    }
+
+    int iStart = -1;
+    int dStart = -1;
+    int i=0;
+    for(;i<parent.length();i++)
+    {
+        if( (parent.at(i)=='-' || parent.at(i)=='.') && iStart<0 )
+        {
+            iStart = i;
+        }
+        else if(parent.at(i)!='-' && parent.at(i)!='.' && iStart>=0 )
+        {
+            indelEvent event;
+            event.realStart = iStart;
+            event.realEnd = i-1;
+            event.alignedStart = index.at(event.realStart);
+            event.alignedEnd = index.at(event.realEnd);
+            event.branch = lChild->getNodeName();
+            event.isInsertion = true;
+            event.isTerminal = false;
+            if(iStart==0)
+                event.isTerminal = true;
+            event.length = i-iStart;
+            indels->push_back(event);
+
+            iStart = -1;
+        }
+
+        if( (child.at(i)=='-' || child.at(i)=='.') && dStart<0)
+            dStart = i;
+        else if( child.at(i)!='-' && child.at(i)!='.' && dStart>=0)
+        {
+            indelEvent event;
+            event.realStart = dStart;
+            event.realEnd = i-1;
+            event.alignedStart = index.at(event.realStart);
+            event.alignedEnd = index.at(event.realEnd);
+            event.branch = lChild->getNodeName();
+            event.isInsertion = false;
+            event.isTerminal = false;
+            if(dStart==0)
+                event.isTerminal = true;
+            event.length = i-dStart;
+            indels->push_back(event);
+
+            dStart = -1;
+        }
+    }
+    if(iStart>=0 )
+    {
+        indelEvent event;
+        event.realStart = iStart;
+        event.realEnd = i-1;
+        event.alignedStart = index.at(event.realStart);
+        event.alignedEnd = index.at(event.realEnd);
+        event.branch = lChild->getNodeName();
+        event.isInsertion = true;
+        event.isTerminal = true;
+        event.length = i-iStart;
+        indels->push_back(event);
+    }
+
+    if(dStart>=0)
+    {
+        indelEvent event;
+        event.realStart = dStart;
+        event.realEnd = i-1;
+        event.alignedStart = index.at(event.realStart);
+        event.alignedEnd = index.at(event.realEnd);
+        event.branch = lChild->getNodeName();
+        event.isInsertion = false;
+        event.isTerminal = true;
+        event.length = i-dStart;
+        indels->push_back(event);
+    }
+
+    ////////////////////
+
+    parent = this->alignedseqstr;
+    child = rChild->getAlignedSeqStr();
+
+    index.clear();
+    for(int i=0;i<parent.length();i++)
+    {
+        if(parent.at(i)!='-' && parent.at(i)!='.' || child.at(i)!='-' && child.at(i)!='.')
+            index.push_back(i);
+    }
+
+    pi = parent.begin();
+    ci = child.begin();
+
+    for(;pi!=parent.end();)
+    {
+        if( (*pi=='-' || *pi=='.') && (*ci=='-' || *ci=='.') )
+        {
+            parent.erase(pi);
+            child.erase(ci);
+        }
+        else
+        {
+            pi++;
+            ci++;
+        }
+    }
+
+    iStart = -1;
+    dStart = -1;
+    i=0;
+    for(;i<parent.length();i++)
+    {
+        if( (parent.at(i)=='-' || parent.at(i)=='.') && iStart<0 )
+        {
+            iStart = i;
+        }
+        else if(parent.at(i)!='-' && parent.at(i)!='.' && iStart>=0 )
+        {
+            indelEvent event;
+            event.realStart = iStart;
+            event.realEnd = i-1;
+            event.alignedStart = index.at(event.realStart);
+            event.alignedEnd = index.at(event.realEnd);
+            event.branch = rChild->getNodeName();
+            event.isInsertion = true;
+            event.isTerminal = false;
+            if(iStart==0)
+                event.isTerminal = true;
+            event.length = i-iStart;
+            indels->push_back(event);
+
+            iStart = -1;
+        }
+
+        if( (child.at(i)=='-' || child.at(i)=='.') && dStart<0)
+            dStart = i;
+        else if( child.at(i)!='-' && child.at(i)!='.' && dStart>=0)
+        {
+            indelEvent event;
+            event.realStart = dStart;
+            event.realEnd = i-1;
+            event.alignedStart = index.at(event.realStart);
+            event.alignedEnd = index.at(event.realEnd);
+            event.branch = rChild->getNodeName();
+            event.isInsertion = false;
+            event.isTerminal = false;
+            if(dStart==0)
+                event.isTerminal = true;
+            event.length = i-dStart;
+            indels->push_back(event);
+
+            dStart = -1;
+        }
+    }
+
+    if(iStart>=0 )
+    {
+        indelEvent event;
+        event.realStart = iStart;
+        event.realEnd = i-1;
+        event.alignedStart = index.at(event.realStart);
+        event.alignedEnd = index.at(event.realEnd);
+        event.branch = rChild->getNodeName();
+        event.isInsertion = true;
+        event.isTerminal = true;
+        event.length = i-iStart;
+        indels->push_back(event);
+    }
+
+    if(dStart>=0)
+    {
+        indelEvent event;
+        event.realStart = dStart;
+        event.realEnd = i-1;
+        event.alignedStart = index.at(event.realStart);
+        event.alignedEnd = index.at(event.realEnd);
+        event.branch = rChild->getNodeName();
+        event.isInsertion = false;
+        event.isTerminal = true;
+        event.length = i-dStart;
+        indels->push_back(event);
+    }
+
+}
+
