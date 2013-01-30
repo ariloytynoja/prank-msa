@@ -72,6 +72,7 @@ bool PREALIGNED = false;
 
 bool UPDATE = false;
 bool UPDATESECOND = true;
+float updateTolerance = 0.1;
 
 // DNA sequence data file for backtranslation
 string dnafile = "";
@@ -98,6 +99,12 @@ int reportLimit = 100;
 
 // write reconstructed ancestral seqs
 bool WRITEANCSEQ = false;
+
+// write iterations
+bool WRITEITER = false;
+
+// write evolutionary events
+bool LISTEVENTS = false;
 
 // compute parsimony score
 bool PARSIMONYSCORE = true;
@@ -172,8 +179,8 @@ bool NOTGAP = true;
 // terminal gaps considered as normal gaps
 bool TERMF = false;
 
-// run once/twice
-bool TWICE = true;
+// run iterations
+int iterations = 5;
 
 // prune the tree
 bool PRUNETREE = false;

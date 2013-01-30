@@ -58,7 +58,8 @@ TerminalNode::TerminalNode(string s,float l)
 
     if (l<minBrL)
     {
-        cout<<"Branch length <"<<minBrL<<". Set to "<<minBrL<<"."<<endl;
+        if(NOISE>0)
+            cout<<"Branch length <"<<minBrL<<". Set to "<<minBrL<<"."<<endl;
         l=minBrL;
     }
 

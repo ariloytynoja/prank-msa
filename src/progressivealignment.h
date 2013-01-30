@@ -37,6 +37,9 @@
 #include "translatesequences.h"
 #include "node.h"
 #include "mafft_alignment.h"
+#include "exonerate_reads.h"
+#include "bppancestors.h"
+
 
 class ProgressiveAlignment
 {
@@ -44,19 +47,22 @@ public:
     ProgressiveAlignment(std::string treefile,std::string seqfile,std::string dnafile);
     ~ProgressiveAlignment();
 
-    void printXml(AncestralNode *root,int iteration,bool translate);
     void getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate);
     void getAlignmentMatrix(AncestralNode *root,vector<string> *aseqs,bool translate);
-    void reconstructAncestors(AncestralNode *root,bool isDna);
-    void setAlignedSequences(AncestralNode *root);
-    int computeParsimonyScore(AncestralNode *root,bool isDna);
-    void printAncestral(AncestralNode *root,int iteration,bool isDna);
+
     void getAncestralAlignmentMatrix(AncestralNode *root,char* alignment);
     void getAncestralAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getFullAlignmentMatrix(AncestralNode *root,char* alignment);
     void getFullAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getAncestralAlignmentSeqs(AncestralNode *root,map<string,string> *anc_seqs);
-    void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,int iteration, bool isDna);
+
+    void reconstructAncestors(AncestralNode *root,bool isDna);
+    void setAlignedSequences(AncestralNode *root);
+    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1);
+
+    void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,int iteration, bool isDna, bool verbose=true);
+    void printAncestral(AncestralNode *root,int iteration,bool isDna, bool verbose=true);
+    void printXml(AncestralNode *root,int iteration,bool translate);
     std::string formatExtension(int format);
 private:
 
@@ -66,40 +72,171 @@ private:
 
     void showInfo()
     {
+        cout<<endl<<"PRANK v."<<version<<":\n";
+
         if (CONVERT)
         {
-            cout<<endl<<"PRANK: converting '"<<seqfile<<"' to '"<<outfile<<this->formatExtension(format)<<"'."<<endl<<endl;
+            cout<<" - converting '"<<seqfile<<"' to '"<<outfile<<this->formatExtension(format)<<"'"<<endl<<endl;
         }
         else
         {
             if (BACKTRANSLATE)
             {
-                cout<<endl<<"PRANK: creating a DNA alignment '"<<outfile<<this->formatExtension(format)
-                    <<"' based on a protein alignment '"<<seqfile<<"' and DNA sequences in '"<<dnafile<<"'."<<endl<<endl;
+                cout<<" - creating a DNA alignment '"<<outfile<<this->formatExtension(format)
+                    <<"' based on a protein alignment '"<<seqfile<<"' and DNA sequences in '"<<dnafile<<"'"<<endl<<endl;
             }
             else
             {
                 if(MERGE)
                 {
-                    cout<<endl<<"PRANK: merging alignments in '"<<seqfile1<<"' and '"<<seqfile2<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                    cout<<" - merging alignments in '"<<seqfile1<<"' and '"<<seqfile2<<"'";
                     if (treefile1!="" & treefile2!="")
-                        cout<<"Using alignment guidetrees '"<<treefile1<<"'' and '"<<treefile2<<"'.\n";
+                        cout<<"\n - using alignment guidetrees '"<<treefile1<<"'' and '"<<treefile2<<"'\n";
+                    else
+                        cout<<"\n - using inferred alignment guidetrees\n";
                 }
                 else
                 {
                     if(PREALIGNED)
-                        cout<<endl<<"PRANK: reading alignment '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                        cout<<" - reading alignment '"<<seqfile<<"'";
                     else
-                        cout<<endl<<"PRANK: aligning sequences in '"<<seqfile<<"', writing results to '"<<outfile<<".*' ("<<this->formatExtension(format)<<"/.xml/.dnd).\n";
+                        cout<<" - aligning sequences in '"<<seqfile<<"'";
                     if (treefile!="" & hmmname!="")
-                        cout<<"Using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'.\n";
+                        cout<<"\n - using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'\n";
+                    else if (treefile!="" && oldtreefile!="")
+                        cout<<"\n - using alignment guidetrees '"<<treefile<<"' (new) and '"<<oldtreefile<<"' (old)\n";
                     else if (treefile!="")
-                        cout<<"Using alignment guidetree '"<<treefile<<"'.\n";
+                        cout<<"\n - using alignment guidetree '"<<treefile<<"'\n";
                     else if (hmmname!="")
-                        cout<<"Using alignment model '"<<hmmname<<"'.\n";
+                        cout<<"\n - using alignment model '"<<hmmname<<"'\n";
+                    else
+                        cout<<"\n - using inferred alignment guidetree\n";
+                }
+                if(!FOREVER && !PREALIGNED)
+                    cout<<" - option '+F' is not used; it can be enabled with '+F'"<<endl;
+                else if(PREALIGNED)
+                    cout<<" - option '+F' is not compatible with '-keep'"<<endl;
+
+                Mafft_alignment ma;
+                bool mafftOK = ma.test_executable();
+
+                Exonerate_reads er;
+                bool exonerateOK = er.test_executable();
+
+                BppAncestors ba;
+                bool bppaOK = ba.testExecutable();
+
+                if(mafftOK || exonerateOK || bppaOK)
+                {
+                    cout<<" - using external tools:\n";
+                    if(mafftOK)
+                        cout<<"    MAFFT for initial alignment\n";
+                    if(exonerateOK)
+                        cout<<"    Exonerate for alignment anchoring\n";
+                    if(bppaOK)
+                        cout<<"    BppAncestor for ancestral state reconstruction\n";
                 }
                 cout<<endl;
             }
+        }
+    }
+
+    /********************************************/
+
+    void checkOldTree(AncestralNode *root,vector<string> *sequences)
+    {
+        // If an old tree is provided, mark the shared sub-trees
+        //
+        if(oldtreefile!="")
+        {
+            this->checkSeqsAligned(sequences);
+
+            ReadNewick rn;
+            string oldtree = rn.readFile(oldtreefile.c_str());
+            map<string,TreeNode*> oldnodes;
+
+            rn.buildTree(oldtree,&oldnodes);
+            AncestralNode* oldroot = static_cast<AncestralNode*>(oldnodes[rn.getRoot()]);
+
+            map<string,float> subtreesOld;
+            oldroot->getAllSubtrees(&subtreesOld);
+
+            root->markRealignSubtrees(&subtreesOld);
+            UPDATE = true;
+        }
+    }
+
+    /********************************************/
+
+    void checkSeqsAligned(vector<string> *sequences)
+    {
+        int len = sequences->at(0).length();
+        for(int i=1;i<sequences->size();i++)
+        {
+            if(sequences->at(i).length() != len)
+            {
+                cout<<"\nSequences don't appear to be aligned. Exiting.\n\n";
+                exit(0);
+            }
+        }
+    }
+
+    /********************************************/
+
+    void checkMatchingNames(AncestralNode *root,vector<string> *names,int nsqs)
+    {
+
+        if (nsqs!=root->getTerminalNodeNumber())
+        {
+            cout<<"Names in sequence file "<<seqfile<<" and guidetree "<<treefile<<" do not match!"<<endl;
+            exit(-1);
+        }
+
+        // .. and make sure that the sequence data and the tree match!
+        //
+        if(nsqs != names->size() && !PRUNEDATA)
+        {
+            cout<<"Of the "<<names->size()<<" sequences, only "<<nsqs<<" match the tree leaves.\n"
+                  "The data can be pruned to match the tree using the flag '-prunedata'. Now exiting.\n\n";
+
+            vector<string> leaf_nms;
+            root->getTerminalNames(&leaf_nms);
+
+            set<string> all_nms;
+            for(vector<string>::iterator it=leaf_nms.begin();it!=leaf_nms.end();it++)
+                all_nms.insert(*it);
+
+            if(names->size()-nsqs>10)
+            {
+                cout<<"First ten unmatched sequences are:\n";
+                int count =0;
+                for(int i=0;i<names->size();i++)
+                {
+                    if(all_nms.find(names->at(i))==all_nms.end())
+                    {
+                        cout<<"  "<<names->at(i)<<endl;
+                        count++;
+                    }
+                    if(count>=10)
+                        break;
+                }
+                cout<<"\n\n";
+            }
+            else
+            {
+                cout<<"The unmatched sequences are:\n";
+                for(int i=0;i<names->size();i++)
+                {
+                    if(all_nms.find(names->at(i))==all_nms.end())
+                    {
+                        cout<<"  "<<names->at(i)<<endl;
+                    }
+                }
+                cout<<"\n\n";
+            }
+
+
+            exit(-1);
         }
     }
 
@@ -327,21 +464,30 @@ private:
 
     /********************************************/
 
-    void convertSequencesOnly(vector<string> *names,vector<string> *sequences,bool *isDna)
+    void convertSequencesOnly()
     {
+
+        // Get the sequence data
+        //
+        vector<string> names;
+        vector<string> sequences;
+        bool isDna;
+
+        this->getSequenceData(&names,&sequences,&isDna);
+
         WriteFile wfa;
 
         if (!TRANSLATE)
         {
             string file = outfile+formatExtension(format);
-            wfa.writeSeqs(file.c_str(),names,sequences,format);
+            wfa.writeSeqs(file.c_str(),&names,&sequences,format);
         }
 
         else if (isDna && TRANSLATE)
         {
             TranslateSequences trseq;
 
-            if (!trseq.translateProtein(names,sequences,&dnaSeqs))
+            if (!trseq.translateProtein(&names,&sequences,&dnaSeqs))
             {
                 cout<<"Translation to protein failed. Exiting."<<endl<<endl;
 
@@ -349,13 +495,35 @@ private:
             }
 
             string file = outfile+formatExtension(format);
-            wfa.writeSeqs(file.c_str(),names,sequences,format);
+            wfa.writeSeqs(file.c_str(),&names,&sequences,format);
         }
 
         else
         {
             cout<<"Inconsistent options: conversion between formats failed. Exiting.\n\n";
         }
+    }
+
+    /********************************************/
+
+    void findLongestSeq(vector<string> *sequences,int *longest,int *slongest,Site *sites)
+    {
+        // Find the lengths and reserve space
+        //
+        vector<string>::iterator si = sequences->begin();
+
+        for (; si!=sequences->end(); si++)
+        {
+            if ((int)si->length()>*longest)
+            {
+                *slongest = *longest;
+                *longest = (int)si->length();
+            }
+        }
+
+        sites->setASize(hmm->getASize());
+        sites->setNState(hmm->getNStates());
+        sites->setMatrices(*longest,*slongest);
     }
 
     /********************************************/
@@ -609,14 +777,12 @@ private:
 
                 if (TREEFROMALIGNMENT)
                 {
-
                     if(!this->sequencesAligned(sequences))
                     {
                         cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
                         exit(0);
                     }
                     gt.computeTree(sequences,names,isDna);
-                    TWICE = false;
                 }
                 else if(MAFFTALIGNMENT && ma.test_executable())
                 {
@@ -827,8 +993,11 @@ private:
 
     /********************************************/
 
-    void printNewickTree(AncestralNode* root,string name)
+    void printNewickTree(AncestralNode* root,string name,bool verbose=false)
     {
+        if(verbose)
+            cout<<" - alignment guide tree to '"<<name<<"'.\n";
+
         string tmpTree = "";
         root->getCleanNewick(&tmpTree);
 

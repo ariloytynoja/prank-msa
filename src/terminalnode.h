@@ -71,6 +71,10 @@ public:
     {
         this->getNewickBrl(tree);
     }
+    void getLabelledNewick(std::string* tree)
+    {
+        this->getNewick(tree);
+    }
 
     void getNHXBrl(std::string* tree,int *nodeNumber)
     {
@@ -88,6 +92,7 @@ public:
     void getAncCharactersAt(std::vector<std::string>* col,int i,bool parentIns);
     void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
     void getIndelEvents(std::vector<indelEvent> *indels){}
+    void getSubstEvents(std::vector<substEvent> *substs){}
 
     void setAncSequenceStrings(std::vector<std::string>*){}
     void getAncSequenceStrings(std::vector<std::string>*){}

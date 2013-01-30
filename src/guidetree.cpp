@@ -305,7 +305,7 @@ void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDn
     FlMatrix* distance = new FlMatrix(ns,ns,"pw distances");
     distance->initialise(0);
 
-    if (NOISE>=0)
+    if (NOISE>0)
         cout<<"Computing a guidetree from a pre-defined multiple alignment."<<endl;
 
     vector<string>::iterator si = seqs->begin();

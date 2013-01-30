@@ -136,7 +136,6 @@ void readArguments(int argc, char *argv[])
             else if (s.substr(0,3)=="-t=")
             {
                 treefile = string(argv[i]).substr(3);
-                TWICE = false;
             }
             else if (s.substr(0,4)=="-ot=")
             {
@@ -177,7 +176,6 @@ void readArguments(int argc, char *argv[])
             {
                 treefile = string(argv[i]).substr(6).c_str();
                 TREESTRING = true;
-                TWICE = false;
             }
 
             // mixture of existing and new alignments for Ziheng
@@ -204,6 +202,11 @@ void readArguments(int argc, char *argv[])
             else if (s=="-realign")
             {
                 UPDATESECOND = false;
+            }
+
+            else if (s.substr(0,13)=="-updatelimit=")
+            {
+                updateTolerance = atof(s.substr(13).c_str());
             }
 
             // backtranslate existing protein alignment to DNA
@@ -258,6 +261,28 @@ void readArguments(int argc, char *argv[])
             else if (s=="-showanc")
             {
                 WRITEANCSEQ = true;
+            }
+
+            // write evolutionary events
+            else if (s=="-showevents")
+            {
+                LISTEVENTS = true;
+            }
+
+            // write all iteration
+            else if (s=="-showiter")
+            {
+                WRITEITER = true;
+            }
+
+            // write everything
+            else if (s=="-showall")
+            {
+                WRITEANCSEQ = true;
+                LISTEVENTS = true;
+                PRINTTREE = true;
+                WRITEXML = true;
+//                WRITEITER = true;
             }
 
             // compute parsimony score
@@ -397,13 +422,13 @@ void readArguments(int argc, char *argv[])
             // run once
             else if (s=="-once")
             {
-                TWICE = false;
+                iterations = 1;
             }
 
             // run twice
             else if (s=="-twice")
             {
-                TWICE = true;
+                iterations = 2;
             }
 
             // prune the tree
@@ -685,11 +710,11 @@ void readArguments(int argc, char *argv[])
     {
         DOTS=false;
 
-        cout<<endl<<"Note: by default option '+F' is not selected.";
-        if (argc==2 && seqfile!="")
-            cout<<" Select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
-        else
-            cout<<" Select it by adding option \"+F\"."<<endl;
+//        cout<<endl<<"Note: by default option '+F' is not selected.";
+//        if (argc==2 && seqfile!="")
+//            cout<<" Select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
+//        else
+//            cout<<" Select it by adding option \"+F\"."<<endl;
     }
 
     // options don't work together
@@ -718,6 +743,8 @@ void printHelp(bool complete)
     cout<<"  -showxml [output xml-files]"<<endl;
     cout<<"  -showtree [output dnd-files]"<<endl;
     cout<<"  -showanc [output ancestral sequences]"<<endl;
+    cout<<"  -showevents [output evolutioanry events]"<<endl;
+    cout<<"  -showall [output all of these]"<<endl;
     if (complete)
     {
         cout<<"  -noanchors [no Exonerate anchoring]"<<endl;

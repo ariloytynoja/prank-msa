@@ -1110,16 +1110,16 @@ void AncestralNode::getCleanNewick(string* tree)
 void AncestralNode::getLabelledNewick(string* tree)
 {
     *tree += "(";
-    this->lChild->getLabelledNewickBrl(tree);
+    this->lChild->getLabelledNewick(tree);
     *tree += left_nhx_tag;
     *tree += ",";
-    this->rChild->getLabelledNewickBrl(tree);
+    this->rChild->getLabelledNewick(tree);
     *tree += right_nhx_tag;
     *tree += + ")";
     *tree += nodeName;
     char str[10];
     sprintf(str,":%.5f",branchLength);
-    *tree += str;
+//    *tree += str;
     *tree += this->nhx_tag;
 
     return;
@@ -1870,6 +1870,9 @@ void AncestralNode::getIndelEvents(std::vector<indelEvent> *indels)
     parent = this->alignedseqstr;
     child = rChild->getAlignedSeqStr();
 
+//    cout<<endl<<nodeName<<endl<<parent<<endl;
+//    cout<<rChild->getNodeName()<<endl<<child<<endl;
+
     index.clear();
     for(int i=0;i<parent.length();i++)
     {
@@ -1972,3 +1975,84 @@ void AncestralNode::getIndelEvents(std::vector<indelEvent> *indels)
 
 }
 
+void AncestralNode::getSubstEvents(std::vector<substEvent> *substs)
+{
+    // this has to be done with states: codons doesn't work
+
+    if(lInternal)
+        lChild->getSubstEvents(substs);
+    if(rInternal)
+        rChild->getSubstEvents(substs);
+
+    vector<int> *parent = this->getAlignedStates();
+    vector<int> *child = lChild->getAlignedStates();
+
+//    cout<<parent.size()<<" "<<child.size()<<endl;
+    vector<int> index;
+    for(int i=0;i<parent->size();i++)
+    {
+        if(parent->at(i)>=0  || child->at(i)>=0)
+            index.push_back(i);
+    }
+
+//    cout<<nodeName<<" l "<<lChild->getNodeName()<<endl;
+    vector<int>::iterator it = index.begin();
+
+    int i=0;
+    for(;it!=index.end();it++)
+    {
+        if( parent->at(*it)<0  || child->at(*it)<0 )
+        {
+            continue;
+        }
+        else if(parent->at(*it) != child->at(*it) )
+        {
+            substEvent event;
+            event.realPos = i++;
+            event.alignedPos = *it;
+            event.branch = lChild->getNodeName();
+            event.pChar = parent->at(*it);
+            event.dChar = child->at(*it);
+            substs->push_back(event);
+        }
+    }
+
+    //////////////
+
+    parent = this->getAlignedStates();
+    child = rChild->getAlignedStates();
+
+    index.clear();
+    for(int i=0;i<parent->size();i++)
+    {
+        if(parent->at(i)>=0  || child->at(i)>=0)
+            index.push_back(i);
+    }
+
+//    cout<<nodeName<<" r "<<rChild->getNodeName()<<endl;
+//    cout<<this->getAlignedSeqStr()<<"\n"<<rChild->getAlignedSeqStr()<<endl;
+//    cout<<this->getAlignedStates()->size()<<"\n"<<rChild->getAlignedStates()->size()<<endl;
+
+    it = index.begin();
+
+    i=0;
+    for(;it!=index.end();it++)
+    {
+        if( parent->at(*it)<0  || child->at(*it)<0 )
+        {
+            continue;
+        }
+        else if(parent->at(*it) != child->at(*it) )
+        {
+            substEvent event;
+            event.realPos = i++;
+            event.alignedPos = *it;
+            event.branch = rChild->getNodeName();
+            event.pChar = parent->at(*it);
+            event.dChar = child->at(*it);
+            substs->push_back(event);
+        }
+    }
+//    cout<<nodeName<<" done "<<endl;
+
+}

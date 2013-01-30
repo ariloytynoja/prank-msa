@@ -85,13 +85,13 @@ public:
     void updateAlignedSequences();
 
     void getCleanNewick(std::string* tree);
-    void getLabelledNewick(std::string* tree);
     void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple);
 
     void writeNewick(std::string* tree,int* sInd);
     void writeLabelledNewick(std::string* tree,int* sInd);
     void getNewick(std::string* tree);
     void getLabelledNewickBrl(std::string* tree);
+    void getLabelledNewick(std::string* tree);
     void getNewickBrl(std::string* tree);
     void getNexusTree(std::string* tree, int *count);
 
@@ -106,6 +106,7 @@ public:
     std::string getThisAncCharactersAt(int i);
     void getCharactersAt(std::vector<std::string>* col,int i,bool parentPermIns=false);
     void getIndelEvents(std::vector<indelEvent> *indels);
+    void getSubstEvents(std::vector<substEvent> *substs);
 
     void setPermanentInsertion(int i);
     void printChildAlignment(TreeNode *node,std::string filename);

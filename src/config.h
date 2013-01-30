@@ -33,6 +33,7 @@
 using namespace std;
 
 extern int NOISE;
+extern int version;
 
 extern string seqfile;
 extern string seqfile1;
@@ -56,6 +57,7 @@ extern bool PARTLYALIGNED;
 extern bool PREALIGNED;
 extern bool UPDATE;
 extern bool UPDATESECOND;
+extern float updateTolerance;
 
 extern string dnafile;
 
@@ -68,6 +70,8 @@ extern bool SCREEN;
 extern int reportLimit;
 
 extern bool WRITEANCSEQ;
+extern bool LISTEVENTS;
+extern bool WRITEITER;
 extern bool PARSIMONYSCORE;
 extern string INDELSCORE;
 extern bool PRINTNODES;
@@ -107,7 +111,8 @@ extern bool PROTEIN;
 extern bool DOPOST;
 extern bool NOTGAP;
 extern bool TERMF;
-extern bool TWICE;
+extern int iterations;
+
 extern bool PRUNETREE;
 extern bool PRUNEDATA;
 extern bool LOGVALUES;

@@ -36,13 +36,13 @@
 extern float minBrL;
 extern int rnd_seed;
 
-struct parsimonyIndelEvent
+struct substEvent
 {
-    std::pair<std::string,int> endSite;
-    std::pair<std::string,int> startSite;
-    int indelType;
-    int indelLength;
-    bool isTerminal;
+    std::string branch;
+    int realPos;
+    int alignedPos;
+    int pChar;
+    int dChar;
 };
 
 struct indelEvent
@@ -113,6 +113,7 @@ public:
     bool RRealign;
 
     std::string getAlignedSeqStr() { return alignedseqstr; }
+    std::vector<int> *getAlignedStates() { return &alignedstates; }
 
     virtual std::string getGroupName()
     {
@@ -261,6 +262,7 @@ public:
     virtual void writeLabelledNewick(std::string* tree,int* sInd) {}
     virtual void getNewick(std::string* tree) = 0;
     virtual void getLabelledNewickBrl(std::string* tree) = 0;
+    virtual void getLabelledNewick(std::string* tree) = 0;
     virtual void getNewickBrl(std::string* tree) = 0;
     virtual void getNexusTree(std::string* tree, int *count) = 0;
     virtual void getNHXBrl(std::string* tree,int *nodeNumber) = 0;
@@ -293,6 +295,7 @@ public:
     virtual void fixTerminalNodenames() = 0;
 
     virtual void getIndelEvents(std::vector<indelEvent> *indels) = 0;
+    virtual void getSubstEvents(std::vector<substEvent> *substs) = 0;
 
     void getColumnParsimonyScore(int position,int *stateChanges)
     {
