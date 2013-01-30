@@ -189,7 +189,7 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     else
     {
         if(CODON)
-            command << " alphabet=Codon model=YN98([kappa=2, omega=0.5])";
+            command << " alphabet=Codon\\(letter=DNA,type=Standard\\) model=YN98\\(kappa=2,omega=0.5\\)";
         else
             command << " alphabet=DNA model=HKY85";
     }

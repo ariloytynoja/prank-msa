@@ -253,8 +253,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         printAlignment(root,&names,&sequences,-1,isDna,false);
 
         int bestScore = this->computeParsimonyScore(root,isDna);
-        cout<<"\nParsimony score: "<<bestScore<<endl;
+        cout<<"\nAlignment score: "<<bestScore<<endl;
 
+        thisIteration++;
         while (thisIteration<=iterations)
         {
 
@@ -327,7 +328,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             }
 
             int thisScore = this->computeParsimonyScore(root,isDna,bestScore);
-            cout<<"\nParsimony score: "<<thisScore<<endl;
+            cout<<"\nAlignment score: "<<thisScore<<endl;
 
             if(thisScore>bestScore)
             {
@@ -658,6 +659,7 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
         int tmpNOISE = NOISE;
         NOISE = -1;
 
+//        cout<<twoseqs.at(0)<<endl<<twoseqs.at(1)<<endl;
         AncestralNode* tworoot = static_cast<AncestralNode*>(twonodes[rn.getRoot()]);
         int nsqs = 0;
         tworoot->setCharString(&twonms,&twoseqs,&nsqs);
@@ -674,10 +676,14 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
         SCREEN = tmpSCREEN;
 
         string rootstr;
-        for(int i=0;i<twoseqs.at(0).length();i++)
+        int len = twoseqs.at(0).length();
+        if(CODON)
+            len /= 3;
+        for(int i=0;i<len;i++)
             rootstr += tworoot->getThisAncCharactersAt(i);
 
         root->setThisAncSequenceString(rootstr);
+
 
         vector<string> aseqs2;
         this->getAncestralAlignmentMatrix(root,&aseqs2);
@@ -720,7 +726,7 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
     int wordsize = 1;
     if(CODON)
     {
-        for(int i=0;i<sAlpha;i++)
+        for(int i=0;i<sAlpha/3;i++)
             alphabet.insert(alphabet.begin(),pair<string,int>(alpha.substr(i*3,3),i));
 
         alphabet.insert(alphabet.begin(),pair<string,int>("---",-1));
@@ -809,7 +815,7 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
 
         if(CODON)
         {
-            for(int i=0;i<sAlpha;i++)
+            for(int i=0;i<sAlpha/3;i++)
                 ralphabet.push_back(alpha.substr(i*3,3));
         }
         else

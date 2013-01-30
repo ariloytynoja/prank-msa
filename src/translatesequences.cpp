@@ -83,28 +83,53 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
     bool replaced = false;
     string full_alphabet = "ACGTN";
 
+    bool inFrame = true;
+
     for (; sit!=sequences->end(); sit++)
     {
-        string seq = *sit;
-        string::iterator ci = seq.begin();
-        for (;ci != seq.end();ci++)
+        for (unsigned int j=0; j<sit->length(); j+=3)
         {
-            char c = *ci;
-            switch (c)
+            string codon = sit->substr(j,3);
+            if (codonToAa.find(codon)==codonToAa.end())
             {
-            case '-':
-//                seq.erase(ci);
-//                ci--;
+                inFrame = false;
+                if(UPDATE || PREALIGNED)
+                    cout<<"Input alignment not in frame. Gaps removed and realignment needed.\n";
+                UPDATE = false;
+                PREALIGNED = false;
                 break;
-            default:
-                // Remove characters not in full alphabet
-                if(full_alphabet.find(c) == string::npos) {
-                    seq.erase(ci);
-                    ci--;
-                }
             }
         }
-        *sit = seq;
+        if(not inFrame)
+            break;
+    }
+
+    sit = sequences->begin();
+    for (; sit!=sequences->end(); sit++)
+    {
+        if(not inFrame)
+        {
+            string seq = *sit;
+            string::iterator ci = seq.begin();
+            for (;ci != seq.end();ci++)
+            {
+                char c = *ci;
+                switch (c)
+                {
+                case '-':
+                    seq.erase(ci);
+                    ci--;
+                    break;
+                default:
+                    // Remove characters not in full alphabet
+                    if(full_alphabet.find(c) == string::npos) {
+                        seq.erase(ci);
+                        ci--;
+                    }
+                }
+            }
+            *sit = seq;
+        }
 
         for (unsigned int j=0; j<sit->length(); j+=3)
         {
@@ -126,7 +151,16 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
     for (; sit!=sequences->end(); sit++,nit++)
     {
 //        dnaSeqs.insert(make_pair(*nit,*sit));
-        dnaSequences->insert(make_pair(*nit,*sit));
+        string seq = *sit;
+        for (string::iterator ci = seq.begin();ci != seq.end();ci++)
+        {
+            if(*ci == '-')
+            {
+                seq.erase(ci);
+                ci--;
+            }
+        }
+        dnaSequences->insert(make_pair(*nit,seq));
         string tmp ="";
         for (unsigned int j=0; j<sit->length(); j+=3)
         {

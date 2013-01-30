@@ -827,7 +827,7 @@ private:
             delete substScores;
 
             if (NOISE>0)
-                cout<<tree<<endl;
+                cout<<"tree "<<*tree<<endl;
 
         }
         else
