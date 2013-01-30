@@ -431,6 +431,12 @@ void readArguments(int argc, char *argv[])
                 iterations = 2;
             }
 
+            // run many times
+            else if (s.substr(0,9)=="-iterate=")
+            {
+                iterations = atoi(s.substr(9).c_str());
+            }
+
             // prune the tree
             else if (s=="-prunetree")
             {
