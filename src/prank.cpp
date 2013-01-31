@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     ProgressiveAlignment* pa = new ProgressiveAlignment(treefile,seqfile,dnafile);
     if (NOISE>=0)
-        cout<<endl<<"Alignment done. Total time "<<(time(0)-time1)<<"s"<<endl;
+        cout<<endl<<"Analysis done. Total time "<<(time(0)-time1)<<"s"<<endl;
 
     delete pa;
     delete hmm;
@@ -790,8 +790,8 @@ void printHelp(bool complete)
     cout<<"\n other parameters:"<<endl;
     cout<<"  -keep [keep alignment \"as is\" (e.g. for ancestor inference)]"<<endl;
     if (complete)
-        cout<<"  -pwdist=# [expected pairwise distance for computing guidetree; default: dna "<<pwDnaDist<<" / prot "<<pwProtDist<<"]"<<endl;
-    cout<<"  -once [run only once; default: twice if no guidetree given]"<<endl;
+        cout<<"  -pwdist=# [expected pairwise distance for computing guide tree; default: dna "<<pwDnaDist<<" / prot "<<pwProtDist<<"]"<<endl;
+    cout<<"  -once [run only once; default: twice if no guide tree given]"<<endl;
     cout<<"  -twice [run always twice]"<<endl;
     cout<<"  -prunetree [prune guide tree branches with no sequence data]"<<endl;
     cout<<"  -prunedata [prune sequence data with no guide tree leaves]"<<endl;

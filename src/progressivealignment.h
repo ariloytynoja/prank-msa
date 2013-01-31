@@ -39,7 +39,8 @@
 #include "mafft_alignment.h"
 #include "exonerate_reads.h"
 #include "bppancestors.h"
-
+#include "readalignment.h"
+#include "hirschberg.h"
 
 class ProgressiveAlignment
 {
@@ -47,6 +48,7 @@ public:
     ProgressiveAlignment(std::string treefile,std::string seqfile,std::string dnafile);
     ~ProgressiveAlignment();
 
+private:
     void getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate);
     void getAlignmentMatrix(AncestralNode *root,vector<string> *aseqs,bool translate);
 
@@ -56,15 +58,93 @@ public:
     void getFullAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getAncestralAlignmentSeqs(AncestralNode *root,map<string,string> *anc_seqs);
 
+    void readAlignment(AncestralNode *root,vector<string> *names,vector<string> *sequences,bool isDna,int longest,bool verbose=true,bool writeOutput=true)
+    {
+        if(!this->sequencesAligned(sequences))
+        {
+            cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
+            exit(0);
+        }
+
+        ReadAlignment ra;
+        ra.initialiseMatrices(longest+2);
+
+        if (NOISE>=0)
+            cout<<"Reading multiple alignment."<<endl;
+
+        root->setTotalNodes();
+        root->readAlignment();
+
+        if(verbose)
+            cout<<"\n\nWriting\n";
+
+        if(writeOutput)
+        {
+            if (PRINTTREE)
+                this->printNewickTree(root,outfile+".dnd",verbose);
+
+            this->printAlignment(root,names,sequences,outfile,isDna,verbose);
+        }
+
+        ra.cleanUp();
+    }
+
+    void partlyAlign(AncestralNode *root,vector<string> *names,vector<string> *sequences,bool isDna,int longest)
+    {
+        ReadAlignment ra;
+        ra.initialiseMatrices(longest+2);
+
+        Hirschberg hir;
+        hir.initialiseMatrices((int)(((float)longest+2)*initialMatrixSize));
+
+        if (NOISE>=0)
+            cout<<"Finishing partially aligned alignment."<<endl;
+
+        root->setTotalNodes();
+        root->partlyAlignSequences();
+
+        cout<<"\n\nWriting\n";
+        if (PRINTTREE)
+            this->printNewickTree(root,outfile+".dnd");
+
+        printAlignment(root,names,sequences,0,isDna);
+
+        ra.cleanUp();
+        hir.cleanUp();
+    }
+
+    void updateAlignment(AncestralNode *root,vector<string> *names,vector<string> *sequences,bool isDna,int longest)
+    {
+        ReadAlignment ra;
+        ra.initialiseMatrices(longest+2);
+
+        Hirschberg hir;
+        hir.initialiseMatrices((int)(((float)longest+2)*initialMatrixSize));
+
+        if (NOISE>=0)
+            cout<<"Updating partially aligned alignment."<<endl;
+
+        root->setTotalNodes();
+        root->updateAlignedSequences();
+
+        cout<<"\n\nWriting\n";
+        if (PRINTTREE)
+            this->printNewickTree(root,outfile+".dnd");
+
+        printAlignment(root,names,sequences,0,isDna);
+
+        ra.cleanUp();
+        hir.cleanUp();
+    }
+
     void reconstructAncestors(AncestralNode *root,bool isDna);
     void setAlignedSequences(AncestralNode *root);
     int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1);
 
-    void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,int iteration, bool isDna, bool verbose=true);
-    void printAncestral(AncestralNode *root,int iteration,bool isDna, bool verbose=true);
-    void printXml(AncestralNode *root,int iteration,bool translate);
+    void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,string filename, bool isDna, bool verbose=true);
+    void printAncestral(AncestralNode *root,string filename,bool isDna, bool verbose=true);
+    void printXml(AncestralNode *root,string filename,bool translate);
     std::string formatExtension(int format);
-private:
 
     std::map<std::string,std::string> dnaSeqs;
 
@@ -72,7 +152,7 @@ private:
 
     void showInfo()
     {
-        cout<<endl<<"PRANK v."<<version<<":\n";
+        cout<<endl<<"-----------------\n"<<" PRANK v."<<version<<":\n"<<"-----------------\n\n"<<"Input for the analysis\n";
 
         if (CONVERT)
         {
@@ -91,9 +171,9 @@ private:
                 {
                     cout<<" - merging alignments in '"<<seqfile1<<"' and '"<<seqfile2<<"'";
                     if (treefile1!="" & treefile2!="")
-                        cout<<"\n - using alignment guidetrees '"<<treefile1<<"'' and '"<<treefile2<<"'\n";
+                        cout<<"\n - using alignment guide trees '"<<treefile1<<"'' and '"<<treefile2<<"'\n";
                     else
-                        cout<<"\n - using inferred alignment guidetrees\n";
+                        cout<<"\n - using inferred alignment guide trees\n";
                 }
                 else
                 {
@@ -102,15 +182,15 @@ private:
                     else
                         cout<<" - aligning sequences in '"<<seqfile<<"'";
                     if (treefile!="" & hmmname!="")
-                        cout<<"\n - using alignment guidetree '"<<treefile<<"'' and model '"<<hmmname<<"'\n";
+                        cout<<"\n - using alignment guide tree '"<<treefile<<"'' and model '"<<hmmname<<"'\n";
                     else if (treefile!="" && oldtreefile!="")
-                        cout<<"\n - using alignment guidetrees '"<<treefile<<"' (new) and '"<<oldtreefile<<"' (old)\n";
+                        cout<<"\n - using alignment guide trees '"<<treefile<<"' (new) and '"<<oldtreefile<<"' (old)\n";
                     else if (treefile!="")
-                        cout<<"\n - using alignment guidetree '"<<treefile<<"'\n";
+                        cout<<"\n - using alignment guide tree '"<<treefile<<"'\n";
                     else if (hmmname!="")
                         cout<<"\n - using alignment model '"<<hmmname<<"'\n";
                     else
-                        cout<<"\n - using inferred alignment guidetree\n";
+                        cout<<"\n - using inferred alignment guide tree\n";
                 }
                 if(!FOREVER && !PREALIGNED)
                     cout<<" - option '+F' is not used; it can be enabled with '+F'"<<endl;
@@ -128,7 +208,7 @@ private:
 
                 if(mafftOK || exonerateOK || bppaOK)
                 {
-                    cout<<" - using external tools:\n";
+                    cout<<" - external tools available:\n";
                     if(mafftOK)
                         cout<<"    MAFFT for initial alignment\n";
                     if(exonerateOK)
@@ -149,7 +229,13 @@ private:
         //
         if(oldtreefile!="")
         {
-            this->checkSeqsAligned(sequences);
+            if(!this->sequencesAligned(sequences))
+            {
+                cout<<"Sequences don't seem to be aligned. Realignment needed.\n";
+                UPDATE = false;
+
+                return;
+            }
 
             ReadNewick rn;
             string oldtree = rn.readFile(oldtreefile.c_str());
@@ -168,27 +254,12 @@ private:
 
     /********************************************/
 
-    void checkSeqsAligned(vector<string> *sequences)
-    {
-        int len = sequences->at(0).length();
-        for(int i=1;i<sequences->size();i++)
-        {
-            if(sequences->at(i).length() != len)
-            {
-                cout<<"\nSequences don't appear to be aligned. Exiting.\n\n";
-                exit(0);
-            }
-        }
-    }
-
-    /********************************************/
-
     void checkMatchingNames(AncestralNode *root,vector<string> *names,int nsqs)
     {
 
         if (nsqs!=root->getTerminalNodeNumber())
         {
-            cout<<"Names in sequence file "<<seqfile<<" and guidetree "<<treefile<<" do not match!"<<endl;
+            cout<<"Names in sequence file "<<seqfile<<" and guide tree "<<treefile<<" do not match!"<<endl;
             exit(-1);
         }
 
@@ -514,7 +585,7 @@ private:
 
         for (; si!=sequences->end(); si++)
         {
-            if ((int)si->length()>*longest)
+            if ((int)si->length()>=*longest)
             {
                 *slongest = *longest;
                 *longest = (int)si->length();
@@ -571,75 +642,128 @@ private:
 
     /********************************************/
 
-    void getGuideTree(vector<string> *names,vector<string> *sequences,string *tree,bool isDna)
+    void setHMModel(vector<string> *sequences,bool isDna,bool isRna=false)
     {
-
-        ReadNewick rn;
-        ReadFile rfa;
-
-        // get nucleotide frequencies - either empirical (NOTE! all seqs used!) or user-defined
-        //
-        float freqs[4];
-        freqs[0]=freqs[1]=freqs[2]=freqs[3]=0;
-
-        if (isDna)
+        // Check that sequences match the model
+        if (HASHMM)
         {
-
-            // user-defined nucleotide frequencies
-            if (dnaFreqs!="")
+            if (isDna && hmm->getAlphabet().length()==20)
             {
-                int i=0; int j=0;
-                while (dnaFreqs.find(",",i)<=dnaFreqs.length())
-                {
-                    freqs[j++]=atof(dnaFreqs.substr(i,dnaFreqs.find(",",i)-i).c_str());
-                    i=dnaFreqs.find(",",i)+1;
-                }
-                freqs[3]=atof(dnaFreqs.substr(i).c_str());
-                float total=freqs[0]+freqs[1]+freqs[2]+freqs[3];
-                freqs[0]/=total;
-                freqs[1]/=total;
-                freqs[2]/=total;
-                freqs[3]/=total;
-
+                cout<<"Sequences in "<<seqfile<<" seem to be DNA but the alphabet in "<<hmmname<<" is for protein!"<<endl;
+                exit(-1);
             }
-            // empirical nucleotide frequencies
-            else
+            else if (!isDna && hmm->getAlphabet().length()==4)
             {
-                rfa.countDnaFreqs(freqs,sequences);
-                float total=freqs[0]+freqs[1]+freqs[2]+freqs[3];
-                freqs[0]/=total;
-                freqs[1]/=total;
-                freqs[2]/=total;
-                freqs[3]/=total;
+                cout<<"Sequences in "<<seqfile<<" seem to be protein but the alphabet in "<<hmmname<<" is for DNA!"<<endl;
+                exit(-1);
             }
+
+            // Or make a new model
         }
-
-        if (treefile=="" && !MERGE || (MERGE && (treefile1=="" || treefile2=="") ) )
+        else
         {
-            IntMatrix *substScores;
-
+            // protein model
             if (isDna)
             {
-                hmm = new HMModel;
-                hmm->dnaModel(freqs,rfa.isRna);
+                // codon model
+                if (CODON)
+                {
+                    hmm = new HMModel;
+                    hmm->codonModel();
 
-                substScores = new IntMatrix(5,5,"pwSubstScores");
-                hmm->pairwiseModel(substScores,pwDist);
+                }
+                // dna model
+                else
+                {
+                    hmm = new HMModel;
 
-                delete hmm;
+                    float freqs[4];
+                    bool isRna = false;
+                    this->getDNABaseFreqs(sequences,freqs,&isRna);
+
+                    hmm->dnaModel(freqs,isRna);
+
+                }
             }
             else
             {
                 hmm = new HMModel;
                 hmm->proteinModel();
-
-                substScores = new IntMatrix(21,21,"pwSubstScores");
-                hmm->pairwiseModel(substScores,pwDist);
-
-                delete hmm;
             }
+        }
 
+    }
 
+    void getDNABaseFreqs(vector<string> *sequences,float *freqs,bool isRna=false)
+    {
+        ReadFile rfa;
+
+        // get nucleotide frequencies - either empirical (NOTE! all seqs used!) or user-defined
+        //
+        freqs[0]=freqs[1]=freqs[2]=freqs[3]=0;
+
+        // user-defined nucleotide frequencies
+        if (dnaFreqs!="")
+        {
+            int i=0; int j=0;
+            while (dnaFreqs.find(",",i)<=dnaFreqs.length())
+            {
+                freqs[j++]=atof(dnaFreqs.substr(i,dnaFreqs.find(",",i)-i).c_str());
+                i=dnaFreqs.find(",",i)+1;
+            }
+            freqs[3]=atof(dnaFreqs.substr(i).c_str());
+            float total=freqs[0]+freqs[1]+freqs[2]+freqs[3];
+            freqs[0]/=total;
+            freqs[1]/=total;
+            freqs[2]/=total;
+            freqs[3]/=total;
+
+        }
+        // empirical nucleotide frequencies
+        else
+        {
+            rfa.countDnaFreqs(freqs,sequences);
+            float total=freqs[0]+freqs[1]+freqs[2]+freqs[3];
+            freqs[0]/=total;
+            freqs[1]/=total;
+            freqs[2]/=total;
+            freqs[3]/=total;
+        }
+    }
+
+    void getPairwiseSubstScores(vector<string> *sequences,IntMatrix *substScores,bool isDna)
+    {
+        if (isDna)
+        {
+            HMModel *tmp_hmm = new HMModel;
+
+            float freqs[4];
+            bool isRna = false;
+            this->getDNABaseFreqs(sequences,freqs,&isRna);
+
+            tmp_hmm->dnaModel(freqs,isRna);
+            tmp_hmm->pairwiseModel(substScores,pwDist);
+
+            delete tmp_hmm;
+        }
+        else
+        {
+            HMModel *tmp_hmm = new HMModel;
+
+            tmp_hmm->proteinModel();
+            tmp_hmm->pairwiseModel(substScores,pwDist);
+
+            delete tmp_hmm;
+        }
+    }
+
+    void getGuideTree(vector<string> *names,vector<string> *sequences,string *tree,bool isDna)
+    {
+
+        ReadNewick rn;
+
+        if (treefile=="" && !MERGE || (MERGE && (treefile1=="" || treefile2=="") ) )
+        {
             int time1 = time(0);
 
             GuideTree gt;
@@ -786,14 +910,17 @@ private:
                 }
                 else if(MAFFTALIGNMENT && ma.test_executable())
                 {
-                    if(NOISE>0)
-                        cout<<"Using MAFFT for guide tree inference. Use option '-nomafft' to disable.\n";
 
+                    vector<string> tmp_names;
                     vector<string> tmp_seqs;
+                    vector<string>::iterator ni = names->begin();
                     vector<string>::iterator si = sequences->begin();
 
-                    for(;si!=sequences->end();si++)
+                    for(;si!=sequences->end();si++,ni++)
+                    {
+                        tmp_names.push_back(*ni);
                         tmp_seqs.push_back(*si);
+                    }
 
                     this->removeGaps(&tmp_seqs);
 
@@ -801,11 +928,13 @@ private:
 
                     if(isDna && CODON)
                     {
-                        this->translateSequences(names,&tmp_seqs);
+                        this->translateSequences(&tmp_names,&tmp_seqs);
                         tmp_isDna = false;
                     }
 
-                    ma.align_sequences(names,&tmp_seqs);
+
+                    ma.align_sequences(&tmp_names,&tmp_seqs);
+
 
                     if(!this->sequencesAligned(&tmp_seqs))
                     {
@@ -813,10 +942,81 @@ private:
                         exit(0);
                     }
 
-                    gt.computeTree(&tmp_seqs,names,tmp_isDna);
+                    gt.computeTree(&tmp_seqs,&tmp_names,tmp_isDna);
+
+                    if(isDna && CODON)
+                    {
+                        TranslateSequences trseq;
+                        vector<string> dSeqs;
+                        if (!trseq.translateDNA(&tmp_names,&tmp_seqs,&dSeqs,&dnaSeqs))
+                        {
+                            cout<<"Backtranslation failed. Exiting."<<endl;
+                            exit(-1);
+                        }
+                        tmp_seqs.clear();
+                        for(int i=0;i<dSeqs.size();i++)
+                            tmp_seqs.push_back(dSeqs.at(i));
+
+                        tmp_isDna = true;
+                    }
+
+                    if(true)
+                    {
+                        // Get the tree
+                        //
+                        string tmp_tree = gt.getTree();
+
+                        // Build the tree    structure and get its root
+                        //
+                        map<string,TreeNode*> tmp_nodes;
+
+                        ReadNewick rn;
+                        rn.buildTree(tmp_tree,&tmp_nodes);
+
+                        AncestralNode* tmp_root = static_cast<AncestralNode*>(tmp_nodes[rn.getRoot()]);
+
+                        // Now set the sequences ...
+                        //
+                        bool tmpPREALIGNED = PREALIGNED;
+                        PREALIGNED = true;
+                        int nsqs = 0;
+                        tmp_root->setCharString(&tmp_names,&tmp_seqs,&nsqs);
+                        PREALIGNED = tmpPREALIGNED;
+
+                        // and check that the sequence names match
+                        //
+                        this->checkMatchingNames(tmp_root,&tmp_names,nsqs);
+
+                        this->readAlignment(tmp_root,&tmp_names,&tmp_seqs,tmp_isDna,tmp_seqs.at(0).length());
+
+                        int bestScore = this->computeParsimonyScore(tmp_root,tmp_isDna);
+                        cout<<"\nInitial alignment score: "<<bestScore;
+                        if(CODON)
+                            cout<<" (based on protein alignment)"<<endl<<endl;
+                        else
+                            cout<<endl<<endl;
+
+                        delete tmp_root;
+                    }
                 }
+
+                // Do not use MAFFT; make own pairwise alignments
+                //
                 else
+                {
+                    IntMatrix *substScores;
+
+                    if (isDna)
+                        substScores = new IntMatrix(5,5,"pwSubstScores");
+                    else
+                        substScores = new IntMatrix(21,21,"pwSubstScores");
+
+                    this->getPairwiseSubstScores(sequences,substScores,isDna);
+
                     gt.computeTree(sequences,names,substScores);
+
+                    delete substScores;
+                }
 
                 if (NOISE>0)
                     cout<<"GuideTree; time "<<(time(0)-time1)<<"s"<<endl;
@@ -824,7 +1024,6 @@ private:
                 *tree = gt.getTree();
             }
 
-            delete substScores;
 
             if (NOISE>0)
                 cout<<"tree "<<*tree<<endl;
@@ -900,55 +1099,15 @@ private:
             }
         }
 
-        // Check that sequences match the model
-        if (HASHMM)
-        {
-            if (isDna && hmm->getAlphabet().length()==20)
-            {
-                cout<<"Sequences in "<<seqfile<<" seem to be DNA but the alphabet in "<<hmmname<<" is for protein!"<<endl;
-                exit(-1);
-            }
-            else if (!isDna && hmm->getAlphabet().length()==4)
-            {
-                cout<<"Sequences in "<<seqfile<<" seem to be protein but the alphabet in "<<hmmname<<" is for DNA!"<<endl;
-                exit(-1);
-            }
+//        this->setHMModel(sequences,isDna);
 
-            // Or make a new model
-        }
-        else
-        {
-            // protein model
-            if (isDna)
-            {
-                // codon model
-                if (CODON)
-                {
-                    hmm = new HMModel;
-                    hmm->codonModel();
-
-                }
-                // dna model
-                else
-                {
-                    hmm = new HMModel;
-                    hmm->dnaModel(freqs,rfa.isRna);
-
-                }
-            }
-            else
-            {
-                hmm = new HMModel;
-                hmm->proteinModel();
-            }
-        }
 
         Node* n = new Node(*tree);
         n->mark_sequences(names);
         int treeleaves = 0;
         int treematches = 0;
         n->countMatchingLeaves(&treeleaves,&treematches);
-//        cout<<treeleaves<<" "<<treematches<<endl;
+
         if (treeleaves!=treematches)
         {
             if (PRUNETREE)
@@ -1123,6 +1282,40 @@ private:
         }
 
     }
+    void checkStuff(map<string,string> *org_stuff,vector<string> *names,vector<string> *seqs)
+    {
+        int c=0;
+        for(int i=0;i<names->size();i++)
+        {
+            string name = names->at(i);
+            string tseq = seqs->at(i);
+
+            string oseq = org_stuff->find(name)->second;
+
+            for(string::iterator it = tseq.begin();it!=tseq.end();)
+            {
+                if(*it=='-')
+                    tseq.erase(it);
+                else
+                    it++;
+            }
+            for(string::iterator it = oseq.begin();it!=oseq.end();)
+            {
+                if(*it=='-')
+                    oseq.erase(it);
+                else
+                    it++;
+            }
+
+
+            if(oseq!=tseq)
+            {
+                cout<<"difference: "<<name<<"\n"<<tseq<<"\n"<<oseq<<"\n";
+            }
+        }
+    }
+
 };
+
 
 #endif

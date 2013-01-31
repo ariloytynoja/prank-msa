@@ -43,13 +43,13 @@ void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntM
         tree = "("+names->at(0)+");";
 
         if (NOISE>=0)
-            cout<<"Generating dummy guidetree for one sequence."<<endl;
+            cout<<"Generating dummy guide tree for one sequence."<<endl;
 
         return;
     }
 
     if (NOISE>=0)
-        cout<<"Generating approximate guidetree."<<endl;
+        cout<<"Generating approximate guide tree."<<endl;
 
     vector<string>::iterator si = sequences->begin();
     int longest = 0;
@@ -296,7 +296,7 @@ void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDn
         tree = "("+names->at(0)+");";
 
         if (NOISE>=0)
-            cout<<"Generating dummy guidetree for one sequence."<<endl;
+            cout<<"Generating dummy guide tree for one sequence."<<endl;
 
         return;
     }
@@ -306,7 +306,7 @@ void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDn
     distance->initialise(0);
 
     if (NOISE>0)
-        cout<<"Computing a guidetree from a pre-defined multiple alignment."<<endl;
+        cout<<"Computing a guide tree from a pre-defined multiple alignment."<<endl;
 
     vector<string>::iterator si = seqs->begin();
     vector<string>::iterator se = seqs->end();

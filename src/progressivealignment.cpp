@@ -52,7 +52,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     Exonerate_reads er;
     if (!CONVERT && EXONERATE && !er.test_executable())
     {
-        cout<<"The executable for Exonerate not found. Fast alignment anchoring is not used.\n";
+//        cout<<"The executable for Exonerate not found. Fast alignment anchoring is not used.\n";
         EXONERATE = false;
     }
 
@@ -90,13 +90,22 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         isDna = false;
     }
 
-    this->makeSettings(isDna);
+
+//    map<string,string> org_stuff;
+//    for(int i=0;i<names.size();i++)
+//        org_stuff.insert(org_stuff.begin(),pair<string,string>(names.at(i),sequences.at(i)));
+//    cout<<"org "<<org_stuff.size()<<endl;
 
 
-    // Get the guidetree -- or generate one
+//    cout<<"check 1\n";
+//    this->checkStuff(&org_stuff,&names,&sequences);
+//    cout<<"check 1\n";
+
+
+    // Make setting and set the alignment model
     //
-    string tree;
-    this->getGuideTree(&names,&sequences,&tree,isDna);
+    this->makeSettings(isDna);
+    this->setHMModel(&sequences,isDna);
 
 
     // Find the lengths and reserve space
@@ -104,6 +113,12 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     int longest = 0; int slongest = 0;
     Site *sites = new Site();
     this->findLongestSeq(&sequences,&longest,&slongest,sites);
+
+
+    // Get the guidetree -- or generate one
+    //
+    string tree;
+    this->getGuideTree(&names,&sequences,&tree,isDna);
 
 
     // Build the tree structure and get its root
@@ -114,6 +129,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     rn.buildTree(tree,&nodes);
 
     AncestralNode* root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
+
 
     // If an old tree is provided, mark the shared sub-trees
     //
@@ -130,6 +146,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     this->checkMatchingNames(root,&names,nsqs);
 
 
+//    cout<<"check 2\n";
+//    this->checkStuff(&org_stuff,&names,&sequences);
+//    cout<<"check 2\n";
 
     /////////////////////////////////
     // Different alignment options //
@@ -139,78 +158,30 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     //
     if (PREALIGNED)
     {
-        this->checkSeqsAligned(&sequences);
+        this->readAlignment(root,&names,&sequences,isDna,longest);
 
-        ReadAlignment ra;
-        ra.initialiseMatrices(longest+2);
-
-        if (NOISE>=0)
-            cout<<"Reading multiple alignment."<<endl;
-
-        root->setTotalNodes();
-        root->readAlignment();
-
-        cout<<"\n\nWriting\n";
-        if (PRINTTREE)
-            this->printNewickTree(root,outfile+".dnd");
-
-        printAlignment(root,&names,&sequences,0,isDna);
-
-        ra.cleanUp();
+        int bestScore = this->computeParsimonyScore(root,isDna);
+        cout<<"\nAlignment score: "<<bestScore<<endl;
     }
 
     // Partly aligned data: just do the unaligned nodes
     //
     else if (PARTLYALIGNED)
     {
+        this->partlyAlign(root,&names,&sequences,isDna,longest);
 
-        ReadAlignment ra;
-        ra.initialiseMatrices(longest+2);
-
-        Hirschberg hir;
-        hir.initialiseMatrices((int)(((float)longest+2)*initialMatrixSize));
-
-        if (NOISE>=0)
-            cout<<"Finishing partially aligned alignment."<<endl;
-
-        root->setTotalNodes();
-        root->partlyAlignSequences();
-
-        cout<<"\n\nWriting\n";
-        if (PRINTTREE)
-            this->printNewickTree(root,outfile+".dnd");
-
-        printAlignment(root,&names,&sequences,0,isDna);
-
-        ra.cleanUp();
-        hir.cleanUp();
+        int bestScore = this->computeParsimonyScore(root,isDna);
+        cout<<"\nAlignment score: "<<bestScore<<endl;
     }
 
     // Alignment based on an old tree: re-align nodes that have changed
     //
     else if (UPDATE)
     {
+        this->updateAlignment(root,&names,&sequences,isDna,longest);
 
-        ReadAlignment ra;
-        ra.initialiseMatrices(longest+2);
-
-        Hirschberg hir;
-        hir.initialiseMatrices((int)(((float)longest+2)*initialMatrixSize));
-
-        if (NOISE>=0)
-            cout<<"Updating partially aligned alignment."<<endl;
-
-        root->setTotalNodes();
-        root->updateAlignedSequences();
-
-        cout<<"\n\nWriting\n";
-        if (PRINTTREE)
-            this->printNewickTree(root,outfile+".dnd");
-
-        printAlignment(root,&names,&sequences,0,isDna);
-
-        ra.cleanUp();
-        hir.cleanUp();
+        int bestScore = this->computeParsimonyScore(root,isDna);
+        cout<<"\nAlignment score: "<<bestScore<<endl;
     }
 
     // Regular alignment
@@ -227,9 +198,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         root->setTotalNodes();
 
-        bool saveDOPOST = DOPOST;
-        if (iterations>1)
-            DOPOST = false;
+//        bool saveDOPOST = DOPOST;
+//        if (iterations>1)
+//            DOPOST = false;
 
         if (NOISE>=0)
             cout<<"\nGenerating multiple alignment: iteration 1."<<endl;
@@ -242,7 +213,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             if (PRINTTREE)
                 this->printNewickTree(root,outfile+".1.dnd");
 
-            printAlignment(root,&names,&sequences,1,isDna);
+            this->printAlignment(root,&names,&sequences,outfile+".1",isDna);
         }
 
         // Write best so far..
@@ -250,7 +221,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         if (PRINTTREE)
             this->printNewickTree(root,outfile+".best.dnd",false);
 
-        printAlignment(root,&names,&sequences,-1,isDna,false);
+        this->printAlignment(root,&names,&sequences,outfile+".best",isDna,false);
 
         int bestScore = this->computeParsimonyScore(root,isDna);
         cout<<"\nAlignment score: "<<bestScore<<endl;
@@ -258,6 +229,10 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         thisIteration++;
         while (thisIteration<=iterations)
         {
+
+//            cout<<"check 3\n";
+//            this->checkStuff(&org_stuff,&names,&sequences);
+//            cout<<"check 3\n";
 
             map<string,float> subtreesOld;
             if (UPDATESECOND)
@@ -294,8 +269,12 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             }
             root->setTotalNodes();
 
-            if(thisIteration==iterations)
-                DOPOST = saveDOPOST;
+//            if(thisIteration==iterations)
+//                DOPOST = saveDOPOST;
+
+//            cout<<"check 4\n";
+//            this->checkStuff(&org_stuff,&names,&sequences);
+//            cout<<"check 4\n";
 
             if (NOISE>=0)
                 cout<<"\nGenerating multiple alignment: iteration "<<thisIteration<<"."<<endl;
@@ -320,24 +299,26 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
             if(WRITEITER)
             {
+                string fname = outfile+"."+itos(thisIteration);
+
                 cout<<"\n\nWriting\n";
                 if (PRINTTREE)
-                    this->printNewickTree(root,outfile+"."+itos(thisIteration)+".dnd");
+                    this->printNewickTree(root,fname+".dnd");
 
-                printAlignment(root,&names,&sequences,thisIteration,isDna);
+                this->printAlignment(root,&names,&sequences,fname,isDna);
             }
 
             int thisScore = this->computeParsimonyScore(root,isDna,bestScore);
             cout<<"\nAlignment score: "<<thisScore<<endl;
 
-            if(thisScore>bestScore)
+            if(thisScore<bestScore)
             {
                 bestScore = thisScore;
 
                 if (PRINTTREE)
                     this->printNewickTree(root,outfile+".best.dnd",false);
 
-                printAlignment(root,&names,&sequences,-1,isDna,false);
+                this->printAlignment(root,&names,&sequences,outfile+".best",isDna,false);
 
             }
 
@@ -345,25 +326,29 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         }
 
         hir.cleanUp();
+
+        //************************************************************************//
+
+        string filename = outfile+".best";
+
+        cout<<"\n\nWriting\n";
+        if (PRINTTREE)
+            cout<<" - alignment guide tree to '"<<filename<<".dnd'\n";
+
+        if (WRITEXML)
+            cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'\n";
+        else
+            cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'\n";
+
+        if (WRITEANCSEQ)
+            cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'\n";
+
+        if(LISTEVENTS)
+            cout<<" - inferred events to file '"<<filename<<".events'\n";
+
+        //************************************************************************//
+
     }
-
-    string filename = outfile+".best";
-
-    cout<<"\n\nWriting\n";
-    if (PRINTTREE)
-        cout<<" - alignment guide tree to '"<<filename<<".dnd'\n";
-
-    if (WRITEXML)
-        cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'\n";
-    else
-        cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'\n";
-
-    if (WRITEANCSEQ)
-        cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'\n";
-
-    if(LISTEVENTS)
-        cout<<" - inferred events to file '"<<filename<<".events'\n";
-
 
     sites->deleteMatrices();
     delete sites;
@@ -373,14 +358,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
 }
 
-void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nms,vector<string> *seqs,int iteration, bool isDna,bool verbose)
+void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nms,vector<string> *seqs,string filename, bool isDna,bool verbose)
 {
-    string filename = outfile;
-    if(iteration>0)
-        filename+="."+itos(iteration);
-    else if(iteration<0)
-        filename+=".best";
-
     if(verbose)
     {
         if (WRITEXML)
@@ -427,7 +406,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         wfa.writeSeqs(file.c_str(),nms,seqs,format,isDna,root,false);
 
         if (WRITEXML)
-            printXml(root,iteration,false);
+            this->printXml(root,filename,false);
     }
     else
     {
@@ -437,7 +416,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         wfa.writeSeqs(file.c_str(),nms,seqs,format,false,root,false);
 
         if (WRITEXML)
-            printXml(root,iteration,false);
+            this->printXml(root,filename,false);
 
         vector<string> dSeqs;
         if (!trseq.translateDNA(nms,seqs,&dSeqs,&dnaSeqs))
@@ -450,23 +429,17 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         wfa.writeSeqs(file.c_str(),nms,&dSeqs,format,true,root,true);
 
         if (WRITEXML)
-            printXml(root,iteration,true);
+            this->printXml(root,filename,true);
     }
 
     if (WRITEANCSEQ)
-        printAncestral(root,iteration,isDna,verbose);
+        this->printAncestral(root,filename,isDna,verbose);
 
 }
 
 
-void ProgressiveAlignment::printXml(AncestralNode *root,int iteration,bool translate)
+void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool translate)
 {
-
-    string filename = outfile;
-    if(iteration>0)
-        filename+"."+itos(iteration);
-    else if(iteration<0)
-        filename+=".best";
 
     int n = root->getTerminalNodeNumber();
     int l = root->getSequence()->length();
@@ -808,6 +781,9 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
 
     if(LISTEVENTS && ( bestScore<0 || score < bestScore) )
     {
+
+//        cout<<"events "<<score<<" "<<bestScore<<endl;
+
         vector<substEvent> substs;
         root->getSubstEvents(&substs);
 
@@ -894,16 +870,10 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
 
 }
 
-void ProgressiveAlignment::printAncestral(AncestralNode *root,int iteration, bool isDna, bool verbose)
+void ProgressiveAlignment::printAncestral(AncestralNode *root,string filename, bool isDna, bool verbose)
 {
     this->setAlignedSequences(root);
     this->reconstructAncestors(root,isDna);
-
-    string filename = outfile;
-    if(iteration>0)
-        filename+="."+itos(iteration);
-    else if(iteration<0)
-        filename+=".best";
 
     if(verbose)
         cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'.\n";

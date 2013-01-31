@@ -73,35 +73,42 @@ TranslateSequences::~TranslateSequences()
 }
 
 
-bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *sequences,map<string,string> *dnaSequences)
+bool TranslateSequences::translateProtein(const vector<string> *names,vector<string> *sequences,map<string,string> *dnaSequences)
 {
 
-    vector<string>::iterator nit = names->begin();
+    vector<string>::const_iterator nit = names->begin();
     vector<string>::iterator sit = sequences->begin();
-//    dnaSeqs.clear();
+
     dnaSequences->clear();
     bool replaced = false;
     string full_alphabet = "ACGTN";
 
-    bool inFrame = true;
+    bool inFrame = false;
 
-    for (; sit!=sequences->end(); sit++)
+    if(PREALIGNED || UPDATE || PARTLYALIGNED)
     {
-        for (unsigned int j=0; j<sit->length(); j+=3)
+        inFrame = true;
+
+        for (; sit!=sequences->end(); sit++)
         {
-            string codon = sit->substr(j,3);
-            if (codonToAa.find(codon)==codonToAa.end())
+            for (unsigned int j=0; j<sit->length(); j+=3)
             {
-                inFrame = false;
-                if(UPDATE || PREALIGNED)
-                    cout<<"Input alignment not in frame. Gaps removed and realignment needed.\n";
-                UPDATE = false;
-                PREALIGNED = false;
-                break;
+                string codon = sit->substr(j,3);
+                if (codonToAa.find(codon)==codonToAa.end())
+                {
+                    inFrame = false;
+                    if(UPDATE || PREALIGNED || PARTLYALIGNED)
+                        cout<<"Input alignment not in frame. Gaps removed and realignment needed.\n";
+                    UPDATE = false;
+                    PREALIGNED = false;
+                    PARTLYALIGNED = false;
+
+                    break;
+                }
             }
+            if(not inFrame)
+                break;
         }
-        if(not inFrame)
-            break;
     }
 
     sit = sequences->begin();
@@ -129,6 +136,7 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
                 }
             }
             *sit = seq;
+//            cout<<seq<<endl;
         }
 
         for (unsigned int j=0; j<sit->length(); j+=3)
@@ -150,7 +158,6 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
 
     for (; sit!=sequences->end(); sit++,nit++)
     {
-//        dnaSeqs.insert(make_pair(*nit,*sit));
         string seq = *sit;
         for (string::iterator ci = seq.begin();ci != seq.end();ci++)
         {
@@ -161,6 +168,7 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
             }
         }
         dnaSequences->insert(make_pair(*nit,seq));
+
         string tmp ="";
         for (unsigned int j=0; j<sit->length(); j+=3)
         {
@@ -171,6 +179,8 @@ bool TranslateSequences::translateProtein(vector<string> *names,vector<string> *
             cout<<tmp<<endl;
 
         *sit=tmp;
+
+//        cout<<*nit<<endl<<*sit<<endl<<seq<<endl;
     }
     return true;
 }
@@ -189,6 +199,7 @@ bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vecto
 
         string nuc = "";
 
+//        cout<<endl<<*nit<<endl<<*pit<<endl<<dnaSeq<<endl;
         for (unsigned int j=0,i=0; j<pit->length(); j++)
         {
             string aa = pit->substr(j,1);

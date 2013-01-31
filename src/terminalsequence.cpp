@@ -57,6 +57,7 @@ TerminalSequence::TerminalSequence(string* s)
     {
         if (s->size()%3!=0)
         {
+            cout<<s->size()<<" "<<*s<<endl;
             cout<<"codon sequence length is not multiple of three!"<<endl;
             exit(0);
         }
