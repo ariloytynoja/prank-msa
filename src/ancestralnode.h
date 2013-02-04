@@ -145,6 +145,8 @@ public:
         std::string gstr = aseqs->at(0);
         aseqs->erase(aseqs->begin());
 
+//        std::cout<<nodeName<<std::endl<<gstr<<std::endl;
+//        std::cout<<nodeName<<std::endl<<alignedseqstr<<std::endl;
         for(int i=0;i<gstr.length();i++)
         {
             if(gstr.at(i)=='-')

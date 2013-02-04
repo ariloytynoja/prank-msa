@@ -1,3 +1,9 @@
+v.130129
+- Introduced alignment score and automatic iteration to maximise the score
+- Changed interface for the analysis input and output
+- New output: inferred evolutionary events per branch
+
+
 v.121218
 - More detailed information about unmatching names. New option "-prunedata".
 

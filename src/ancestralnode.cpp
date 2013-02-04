@@ -2056,3 +2056,4 @@ void AncestralNode::getSubstEvents(std::vector<substEvent> *substs)
 //    cout<<nodeName<<" done "<<endl;
 
 }
+
