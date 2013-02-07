@@ -734,10 +734,10 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
     int delCount = 0;
     int idLength = 0;
 
-    int idscore_1 = 10;
-    int idscore_2 = 15;
-    int idscore_3 = 20;
-    int idscore_4 = 25;
+    int idscore_1 = 6;
+    int idscore_2 = 8;
+    int idscore_3 = 9;
+    int idscore_4 = 10;
 
     if(INDELSCORE != "")
     {
