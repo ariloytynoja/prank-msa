@@ -55,6 +55,7 @@ extern bool MERGE;
 extern bool TREESTRING;
 extern bool PARTLYALIGNED;
 extern bool PREALIGNED;
+extern bool PRINTSCOREONLY;
 extern bool UPDATE;
 extern bool UPDATESECOND;
 extern float updateTolerance;

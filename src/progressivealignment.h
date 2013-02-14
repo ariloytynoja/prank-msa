@@ -58,8 +58,12 @@ private:
     void getFullAlignmentMatrix(AncestralNode *root,vector<string> *aseqs);
     void getAncestralAlignmentSeqs(AncestralNode *root,map<string,string> *anc_seqs);
 
-    void readAlignment(AncestralNode *root,vector<string> *names,vector<string> *sequences,bool isDna,int longest,bool verbose=true,bool writeOutput=true)
+    void readAlignment(AncestralNode *root,vector<string> *names,vector<string> *sequences,bool isDna,int longest,bool verbose=true,bool writeOutput=true,string outputSuffix="")
     {
+        if(PRINTSCOREONLY)
+            verbose = false;
+
+
         if(!this->sequencesAligned(sequences))
         {
             cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
@@ -75,15 +79,15 @@ private:
         root->setTotalNodes();
         root->readAlignment();
 
-        if(verbose)
+        if(verbose && NOISE>=0 || writeOutput)
             cout<<"\n\nWriting\n";
 
         if(writeOutput)
         {
             if (PRINTTREE)
-                this->printNewickTree(root,outfile+".dnd",verbose);
+                this->printNewickTree(root,outfile+outputSuffix+".dnd",verbose);
 
-            this->printAlignment(root,names,sequences,outfile,isDna,verbose);
+            this->printAlignment(root,names,sequences,outfile+outputSuffix,isDna,verbose);
         }
 
         ra.cleanUp();
@@ -107,7 +111,7 @@ private:
         if (PRINTTREE)
             this->printNewickTree(root,outfile+".dnd");
 
-        printAlignment(root,names,sequences,0,isDna);
+        printAlignment(root,names,sequences,outfile,isDna);
 
         ra.cleanUp();
         hir.cleanUp();
@@ -131,7 +135,7 @@ private:
         if (PRINTTREE)
             this->printNewickTree(root,outfile+".dnd");
 
-        printAlignment(root,names,sequences,0,isDna);
+        printAlignment(root,names,sequences,outfile,isDna);
 
         ra.cleanUp();
         hir.cleanUp();
@@ -139,7 +143,7 @@ private:
 
     void reconstructAncestors(AncestralNode *root,bool isDna);
     void setAlignedSequences(AncestralNode *root);
-    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1);
+    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1,int *nSubst=0,int *nIns=0,int *nDel=0);
 
     void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,string filename, bool isDna, bool verbose=true);
     void printAncestral(AncestralNode *root,string filename,bool isDna, bool verbose=true);
@@ -157,6 +161,12 @@ private:
         if (CONVERT)
         {
             cout<<" - converting '"<<seqfile<<"' to '"<<outfile<<this->formatExtension(format)<<"'"<<endl<<endl;
+        }
+        else if (PRINTSCOREONLY)
+        {
+            cout<<" - computing score for '"<<seqfile<<"' and '"<<treefile<<"'"<<endl<<endl;
+            if(NOISE==0) { NOISE=-1; SCREEN = false;}
+
         }
         else
         {
@@ -239,6 +249,11 @@ private:
 
             ReadNewick rn;
             string oldtree = rn.readFile(oldtreefile.c_str());
+            if (oldtree=="")
+            {
+                cout<<"No tree found in "<<oldtreefile<<"! Exiting."<<endl;
+                exit(-1);
+            }
             map<string,TreeNode*> oldnodes;
 
             rn.buildTree(oldtree,&oldnodes);
@@ -249,6 +264,7 @@ private:
 
             root->markRealignSubtrees(&subtreesOld);
             UPDATE = true;
+
         }
     }
 
@@ -979,23 +995,28 @@ private:
                         //
                         bool tmpPREALIGNED = PREALIGNED;
                         PREALIGNED = true;
+                        bool tmpFOREVER = FOREVER;
+                        FOREVER = false;
+
                         int nsqs = 0;
                         tmp_root->setCharString(&tmp_names,&tmp_seqs,&nsqs);
                         PREALIGNED = tmpPREALIGNED;
 
+                         cout<<"\nInitial alignment for guide tree estimation."<<endl;
                         // and check that the sequence names match
                         //
                         this->checkMatchingNames(tmp_root,&tmp_names,nsqs);
 
-                        this->readAlignment(tmp_root,&tmp_names,&tmp_seqs,tmp_isDna,tmp_seqs.at(0).length());
+                        this->readAlignment(tmp_root,&tmp_names,&tmp_seqs,tmp_isDna,tmp_seqs.at(0).length(),false,WRITEITER,".mafft");
 
                         int bestScore = this->computeParsimonyScore(tmp_root,tmp_isDna);
                         cout<<"\nInitial alignment score: "<<bestScore;
                         if(CODON)
                             cout<<" (based on protein alignment)"<<endl<<endl;
                         else
-                            cout<<endl<<endl;
+                            cout<<endl;
 
+                        FOREVER = tmpFOREVER;
                         delete tmp_root;
                     }
                 }

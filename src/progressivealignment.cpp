@@ -146,13 +146,10 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     this->checkMatchingNames(root,&names,nsqs);
 
 
-//    cout<<"check 2\n";
-//    this->checkStuff(&org_stuff,&names,&sequences);
-//    cout<<"check 2\n";
-
     /////////////////////////////////
     // Different alignment options //
     /////////////////////////////////
+
 
     // Prealigned data: compute ancestral sequences or convert to xml
     //
@@ -160,8 +157,17 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->readAlignment(root,&names,&sequences,isDna,longest);
 
-        int bestScore = this->computeParsimonyScore(root,isDna);
-        cout<<"\nAlignment score: "<<bestScore<<endl;
+        int nSubst; int nIns; int nDel;
+        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel);
+
+        cout<<"\nAlignment score: "<<bestScore;
+        if(PRINTSCOREONLY)
+        {
+            cout<<" [ "<<nSubst<<" subst., "<<nIns<<" ins., "<<nDel<<" del. ]"<<endl<<endl;
+             exit(0);
+        }
+        else
+            cout<<endl;
     }
 
     // Partly aligned data: just do the unaligned nodes
@@ -198,9 +204,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         root->setTotalNodes();
 
-//        bool saveDOPOST = DOPOST;
-//        if (iterations>1)
-//            DOPOST = false;
 
         if (NOISE>=0)
             cout<<"\nGenerating multiple alignment: iteration 1."<<endl;
@@ -211,7 +214,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         {
             cout<<"\n\nWriting\n";
             if (PRINTTREE)
-                this->printNewickTree(root,outfile+".1.dnd");
+                this->printNewickTree(root,outfile+".1.dnd",true);
 
             this->printAlignment(root,&names,&sequences,outfile+".1",isDna);
         }
@@ -229,10 +232,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         thisIteration++;
         while (thisIteration<=iterations)
         {
-
-//            cout<<"check 3\n";
-//            this->checkStuff(&org_stuff,&names,&sequences);
-//            cout<<"check 3\n";
 
             map<string,float> subtreesOld;
             if (UPDATESECOND)
@@ -269,13 +268,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             }
             root->setTotalNodes();
 
-//            if(thisIteration==iterations)
-//                DOPOST = saveDOPOST;
-
-//            cout<<"check 4\n";
-//            this->checkStuff(&org_stuff,&names,&sequences);
-//            cout<<"check 4\n";
-
             if (NOISE>=0)
                 cout<<"\nGenerating multiple alignment: iteration "<<thisIteration<<"."<<endl;
 
@@ -303,7 +295,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
                 cout<<"\n\nWriting\n";
                 if (PRINTTREE)
-                    this->printNewickTree(root,fname+".dnd");
+                    this->printNewickTree(root,fname+".dnd",true);
 
                 this->printAlignment(root,&names,&sequences,fname,isDna);
             }
@@ -398,6 +390,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
     if (CODON)
         l*=3;
+
 
     if (!TRANSLATE)
     {
@@ -685,7 +678,7 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
     root->setAlignedSequenceStrings(&aseqs);
 }
 
-int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore)
+int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel)
 {
 
     this->setAlignedSequences(root);
@@ -774,6 +767,13 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
                 score += idscore_4;
         }
         idLength += ite->length;
+    }
+
+    if(nSubst)
+    {
+        *nSubst = substScore;
+        *nIns = insCount;
+        *nDel = delCount;
     }
 
     if(NOISE>0)

@@ -69,6 +69,7 @@ bool TREESTRING = false;
 bool PARTLYALIGNED = false;
 
 bool PREALIGNED = false;
+bool PRINTSCOREONLY = false;
 
 bool UPDATE = false;
 bool UPDATESECOND = true;

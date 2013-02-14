@@ -192,6 +192,13 @@ void readArguments(int argc, char *argv[])
             else if (s=="-keep")
             {
                 PREALIGNED = true;
+                PRINTSCOREONLY = false;
+            }
+
+            else if (s=="-score")
+            {
+                PREALIGNED = true;
+                PRINTSCOREONLY = true;
             }
 
             else if (s=="-update")
