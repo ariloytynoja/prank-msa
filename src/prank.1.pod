@@ -64,6 +64,10 @@ Output alignment guidetree.
 
 Output ancestral sequences.
 
+=item B<-showall>
+
+Output all of these.
+
 =item B<-noanchors>
 
 Do not use Exonerate anchoring. (Exonerate to be installed separately.)
@@ -152,17 +156,21 @@ Do not remove gaps from pre-aligned sequences.
 
 =over 8
 
+=item B<-iterate=#>
+
+Rounds of re-alignment iteration; by default, iterate five times and keep the best result.
+
 =item B<-once>
 
-Run only once. The default is to run twice if no guidetree is given.
-
-=item B<-twice>
-
-Run twice always.
+Run only once. Same as -iterate=1.
 
 =item B<-prunetree>
 
 Prune guide tree branches with no sequence data.
+
+=item B<-prunedata>
+
+Prune sequence data with no guide tree leaves.
 
 =item B<-uselogs>
 

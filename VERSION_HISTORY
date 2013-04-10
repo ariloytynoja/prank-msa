@@ -1,3 +1,8 @@
+v.130410
+- More information about optimization score and fix for last alignment
+- Minor fixes on alignment conversion and use of external models
+
+
 v.130129
 - Introduced alignment score and automatic iteration to maximise the score
 - Changed interface for the analysis input and output

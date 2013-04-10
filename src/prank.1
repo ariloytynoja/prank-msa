@@ -62,7 +62,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PRANK 1"
-.TH PRANK 1 "2012-06-27" "v.121211" "The Probabilistic Alignment Kit"
+.TH PRANK 1 "2013-04-10" "v.130410" "The Probabilistic Alignment Kit"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -118,6 +118,9 @@ Output alignment guidetree.
 .IP "\fB\-showanc\fR" 8
 .IX Item "-showanc"
 Output ancestral sequences.
+.IP "\fB\-showall\fR" 8
+.IX Item "-showall"
+Output all of these.
 .IP "\fB\-noanchors\fR" 8
 .IX Item "-noanchors"
 Do not use Exonerate anchoring. (Exonerate to be installed separately.)
@@ -177,15 +180,18 @@ No missing data. Use \fB\-F\fR for terminal gaps.
 Do not remove gaps from pre-aligned sequences.
 .SS "\s-1OTHER\s0 \s-1PARAMETERS\s0"
 .IX Subsection "OTHER PARAMETERS"
+.IP "\fB\-iterate=#\fR" 8
+.IX Item "-iterate=#"
+Rounds of re-alignment iteration; by default, iterate five times and keep the best result.
 .IP "\fB\-once\fR" 8
 .IX Item "-once"
-Run only once. The default is to run twice if no guidetree is given.
-.IP "\fB\-twice\fR" 8
-.IX Item "-twice"
-Run twice always.
+Run only once. Same as \-iterate=1.
 .IP "\fB\-prunetree\fR" 8
 .IX Item "-prunetree"
 Prune guide tree branches with no sequence data.
+.IP "\fB\-prunedata\fR" 8
+.IX Item "-prunedata"
+Prune sequence data with no guide tree leaves.
 .IP "\fB\-uselogs\fR" 8
 .IX Item "-uselogs"
 Slower but should work for a greater number of sequences.
