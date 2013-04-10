@@ -129,12 +129,14 @@ void HMModel::readModel(const char* filename)
     }
     else if (as==20)
     {
-        fullAlphabet = "ARNDCQEGHILKMFPSTWYVX";
+//        fullAlphabet = "ARNDCQEGHILKMFPSTWYVX";
+        fullAlphabet = alphabet+"XBZJ";
         fas = fullAlphabet.length();
     }
     else if (as==21)
     {
-        fullAlphabet = "ARNDCQEGHILKMFPSTWYVZX";
+//        fullAlphabet = "ARNDCQEGHILKMFPSTWYVZX";
+        fullAlphabet = alphabet+"ZXBZJ";
         fas = fullAlphabet.length();
     }
     else if (as==61)
@@ -1363,6 +1365,7 @@ void HMModel::alignmentModel(AncestralNode *tn)
         }
 
         delete aaFreqs;
+
     }
 
     else if (as==21)

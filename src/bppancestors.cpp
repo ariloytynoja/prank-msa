@@ -99,6 +99,11 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     while(true)
     {
 
+        f_name.str("");
+        t_name.str("");
+        o_name.str("");
+        m_name.str("");
+
         f_name <<tmp_dir<<"f"<<r<<".fas";
         ifstream f_file(f_name.str().c_str());
 
@@ -113,6 +118,13 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
 
         if(!f_file && !t_file && !o_file && !m_file)
         {
+            ofstream f_tmp;
+            f_tmp.open(f_name.str().c_str(), (ios::out) );
+            ofstream t_tmp;
+            t_tmp.open(t_name.str().c_str(), (ios::out) );
+            ofstream o_tmp;
+            o_tmp.open(o_name.str().c_str(), (ios::out) );
+
             break;
         }
         r = rand();

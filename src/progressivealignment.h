@@ -143,7 +143,7 @@ private:
 
     void reconstructAncestors(AncestralNode *root,bool isDna);
     void setAlignedSequences(AncestralNode *root);
-    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1,int *nSubst=0,int *nIns=0,int *nDel=0);
+    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1,int *nSubst=0,int *nIns=0,int *nDel=0,int *nInsDel=0);
 
     void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,string filename, bool isDna, bool verbose=true);
     void printAncestral(AncestralNode *root,string filename,bool isDna, bool verbose=true);
@@ -573,7 +573,11 @@ private:
         else if (isDna && TRANSLATE)
         {
             TranslateSequences trseq;
-
+            if(format!=8 && !PREALIGNED)
+            {
+                cout<<"Translating to other formats but FASTA requires aligned sequences.\nYou can specify that with option '-keep'.\n\n";
+                exit(0);
+            }
             if (!trseq.translateProtein(&names,&sequences,&dnaSeqs))
             {
                 cout<<"Translation to protein failed. Exiting."<<endl<<endl;

@@ -107,15 +107,13 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     this->makeSettings(isDna);
     this->setHMModel(&sequences,isDna);
 
-
-    // Find the lengths and reserve space
+     // Find the lengths and reserve space
     //
     int longest = 0; int slongest = 0;
     Site *sites = new Site();
     this->findLongestSeq(&sequences,&longest,&slongest,sites);
 
-
-    // Get the guidetree -- or generate one
+     // Get the guidetree -- or generate one
     //
     string tree;
     this->getGuideTree(&names,&sequences,&tree,isDna);
@@ -157,13 +155,16 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->readAlignment(root,&names,&sequences,isDna,longest);
 
-        int nSubst; int nIns; int nDel;
-        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel);
+        int nSubst; int nIns; int nDel; int nInsDel;
+        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel);
 
         cout<<"\nAlignment score: "<<bestScore;
         if(PRINTSCOREONLY)
         {
-            cout<<" [ "<<nSubst<<" subst., "<<nIns<<" ins., "<<nDel<<" del. ]"<<endl<<endl;
+            if(nInsDel>0)
+                cout<<" [ "<<nSubst<<" subst., "<<nIns<<" ins., "<<nDel<<" del., "<<nInsDel<<" indel. ]"<<endl<<endl;
+            else
+                cout<<" [ "<<nSubst<<" subst., "<<nIns<<" ins., "<<nDel<<" del. ]"<<endl<<endl;
              exit(0);
         }
         else
@@ -678,7 +679,7 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
     root->setAlignedSequenceStrings(&aseqs);
 }
 
-int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel)
+int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel,int *nInsDel)
 {
 
     this->setAlignedSequences(root);
@@ -725,6 +726,7 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
 
     int insCount = 0;
     int delCount = 0;
+    int insdelCount = 0;
     int idLength = 0;
 
     int idscore_1 = 6;
@@ -745,10 +747,19 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
     vector<indelEvent>::iterator ite = indels.begin();
     for(;ite!=indels.end();ite++)
     {
-        if(ite->isInsertion)
-            insCount++;
+
+        if(ite->branch == root->getLChild()->getNodeName() || ite->branch == root->getRChild()->getNodeName() )
+        {
+//            cout<<ite->branch<<endl;
+            insdelCount++;
+        }
         else
-            delCount++;
+        {
+            if(ite->isInsertion)
+                insCount++;
+            else
+                delCount++;
+        }
 
         if(NOTGAP && ite->isTerminal)
         {
@@ -774,10 +785,11 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
         *nSubst = substScore;
         *nIns = insCount;
         *nDel = delCount;
+        *nInsDel = insdelCount;
     }
 
     if(NOISE>0)
-        cout<<"\nInferred events: "<<substScore<<" subst, "<<insCount<<" ins, "<<delCount<<" dels\n";
+        cout<<"\nInferred events: "<<substScore<<" subst, "<<insCount<<" ins, "<<delCount<<" dels, "<<insdelCount<<" insdels\n";
 
     if(LISTEVENTS && ( bestScore<0 || score < bestScore) )
     {

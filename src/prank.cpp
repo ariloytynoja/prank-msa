@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 130129;
+    version = 130410;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -798,8 +798,8 @@ void printHelp(bool complete)
     cout<<"  -keep [keep alignment \"as is\" (e.g. for ancestor inference)]"<<endl;
     if (complete)
         cout<<"  -pwdist=# [expected pairwise distance for computing guide tree; default: dna "<<pwDnaDist<<" / prot "<<pwProtDist<<"]"<<endl;
-    cout<<"  -once [run only once; default: twice if no guide tree given]"<<endl;
-    cout<<"  -twice [run always twice]"<<endl;
+    cout<<"  -iterate=# [rounds of re-alignment iteration]"<<endl;
+    cout<<"  -once [run only once; same as -iterate=1]"<<endl;
     cout<<"  -prunetree [prune guide tree branches with no sequence data]"<<endl;
     cout<<"  -prunedata [prune sequence data with no guide tree leaves]"<<endl;
 
