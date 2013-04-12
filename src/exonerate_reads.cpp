@@ -51,7 +51,7 @@ bool Exonerate_reads::test_executable()
         _NSGetExecutablePath(path, &size);
         epath = string(path);
         epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
-        epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
+        //epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
 
         #else
         int length = readlink("/proc/self/exe",path,200-1);
