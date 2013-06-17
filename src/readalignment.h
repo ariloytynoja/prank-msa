@@ -94,7 +94,7 @@ public:
     ReadAlignment();
     ~ReadAlignment();
 
-    void readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore* pms,TreeNode* tnode,std::vector<int>* path);
+    bool readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore* pms,TreeNode* tnode,std::vector<int>* path);
 
     void defineBegin();
     void defineEnd();

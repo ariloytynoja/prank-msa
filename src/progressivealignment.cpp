@@ -118,7 +118,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     string tree;
     this->getGuideTree(&names,&sequences,&tree,isDna);
 
-
     // Build the tree structure and get its root
     //
     map<string,TreeNode*> nodes;
@@ -128,6 +127,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
     AncestralNode* root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
 
+//    string tmpstr;
+//    root->getNewickBrl(&tmpstr);
+//    cout<<tmpstr<<endl;
 
     // If an old tree is provided, mark the shared sub-trees
     //

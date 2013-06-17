@@ -731,8 +731,8 @@ void readArguments(int argc, char *argv[])
     }
 
     // options don't work together
-    if (PREALIGNED)
-        FOREVER=false;
+//    if (PREALIGNED)
+//        FOREVER=false;
 
     if (format!=8 && format!=11 && format!=12 && format!=17 && format!=18 && format!=19)
         format = 8;

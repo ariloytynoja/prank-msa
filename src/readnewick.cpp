@@ -96,6 +96,7 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
         Node* n = new Node(s);
         s=n->rootedTree();
 
+
         b = s.begin();
         e = s.end();
 
@@ -141,8 +142,6 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
         bool hasText = false;
         bool isOpen = false;
 
-//        cout<<s<<endl;
-
         while (b!=e)
         {
             if ((*b)==' ' || (*b)=='\t' || (*b)=='\n')
@@ -155,7 +154,11 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
             {
                 isOpen = true;
                 hasText = false;
-                r += n+(*b);
+                if(n!=";")
+                    r += n+(*b);
+                else
+                    r += (*b);
+
                 n = "";
                 b++;
             }
@@ -170,14 +173,14 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
 
                     b++;
                     string tag="";
-                    while((*b)!=':' && (*b)!=',' && (*b)!='.' && (*b)!='[' && (*b)!=';')
+                    while((*b)!=':' && (*b)!=',' && (*b)!='.' && (*b)!='[' && (*b)!=';' && (*b)!=')')
                     {
                         tag += *b;
                         b++;
                     }
                     b--;
 
-//                    cout<<tag<<endl;
+//                    cout<<"tag "<<tag<<endl;
 
                     stringstream tc;
                     if(tag!="")
@@ -212,8 +215,10 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                     }
 
                     nodes->insert(make_pair(tc.str(),tn));
+
                     r = r.substr(0,r.length()-1);
                     r += tc.str();
+
                     root = tc.str();
                     n = "";
                 }

@@ -52,7 +52,7 @@ class Node
     void findMiddle(int branch);
     void divideTree(std::string tree,std::string* trees,float* distances);
 
-
+    bool has_missing_branch_lengths;
 
     bool node_has_sequence;
     bool node_has_left_child;

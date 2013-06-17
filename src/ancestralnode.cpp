@@ -44,6 +44,7 @@ extern float branchScalingFactor;
 extern bool MAXBRANCH;
 extern bool FIXEDBRANCH;
 extern bool FOREVER_FOR_PA;
+extern bool FOREVER;
 
 string tmpNodeName;
 
@@ -62,11 +63,15 @@ AncestralNode::~AncestralNode()
 AncestralNode::AncestralNode(string s)
         : TreeNode()
 {
+
+//    cout<<s<<endl;
+
     root = false;
     terminal = false;
     seq = 0;
     siteLength = 0;
     branchLength = 0;
+    seq = NULL;
 
     realignNode = false;
 
@@ -123,11 +128,21 @@ AncestralNode::AncestralNode(string s)
         ld = atof(ln.substr(ln.find(":")+1).c_str());
         ln = ln.substr(0,ln.find(":"));
     }
+    else
+    {
+        ld = defaultBranchLength;
+    }
+
     if(rn.find(":") != string::npos)
     {
         rd = atof(rn.substr(rn.find(":")+1).c_str());
         rn = rn.substr(0,rn.find(":"));
     }
+    else
+    {
+        rd = defaultBranchLength;
+    }
+
     if (ln.at(0)=='#' && ln.at(ln.length()-1)=='#')
     {
         lInternal = true;
@@ -135,6 +150,7 @@ AncestralNode::AncestralNode(string s)
     else
     {
         lInternal = false;
+//        cout<<ln<<" "<<ld<<endl;
         lChild = new TerminalNode(ln,ld);
     }
     if (rn.at(0)=='#' && rn.at(rn.length()-1)=='#')
@@ -144,6 +160,7 @@ AncestralNode::AncestralNode(string s)
     else
     {
         rInternal = false;
+//        cout<<rn<<" "<<rd<<endl;
         rChild = new TerminalNode(rn,rd);
     }
 //    cout<<ln<<" : "<<ld<<" , "<<rn<<" : "<<rd<<endl;
@@ -181,23 +198,32 @@ AncestralNode::AncestralNode(string s)
     groupName = "null";
 }
 
-void AncestralNode::partlyAlignSequences()
+bool AncestralNode::partlyAlignSequences()
 {
 
-    lChild->partlyAlignSequences();
-    rChild->partlyAlignSequences();
+    bool success;
+    success = lChild->partlyAlignSequences();
+    if(not success)
+        return false;
+
+    success = rChild->partlyAlignSequences();
+    if(not success)
+        return false;
 
     if (lChild->getGroupName() !="null" && lChild->getGroupName() == rChild->getGroupName())
     {
-        FOREVER = false;
-        this->readThisNode();
+
+        bool success = this->readThisNode();
+        if(not success)
+            return false;
+
         groupName = lChild->getGroupName();
-        FOREVER = FOREVER_FOR_PA;
     }
     else
     {
         this->alignThisNode();
     }
+    return true;
 }
 
 void AncestralNode::updateAlignedSequences()
@@ -503,16 +529,22 @@ void AncestralNode::printDebugNodes()
 
 }
 
-void AncestralNode::readAlignment()
+bool AncestralNode::readAlignment()
 {
-    lChild->readAlignment();
-    rChild->readAlignment();
-    this->readThisNode();
+    bool success;
+    success = lChild->readAlignment();
+    if(not success)
+        return false;
+
+    success = rChild->readAlignment();
+    if(not success)
+        return false;
+
+    return this->readThisNode();
 }
 
-void AncestralNode::readThisNode()
+bool AncestralNode::readThisNode()
 {
-
     if (rnd_seed>0)
     {
         string catNames = "";
@@ -631,7 +663,26 @@ void AncestralNode::readThisNode()
 
 
     ReadAlignment* ra = new ReadAlignment();
-    ra->readSeqs(lChild->getSequence(),rChild->getSequence(),pms,this,&path);
+    bool success = ra->readSeqs(lChild->getSequence(),rChild->getSequence(),pms,this,&path);
+
+    if(not success && FOREVER)
+    {
+        lChild->getSequence()->cleanSpace();
+        rChild->getSequence()->cleanSpace();
+
+        delete ancSeq;
+        delete ra;
+        delete pms;
+
+        return false;
+    }
+    if(not success)
+    {
+        cout<<"Reading the alignment file failed. Exiting.\n\n";
+        exit(-1);
+    }
+
+
     if (NOISE>0)
         cout<<"ReadAlignment: "<<ra->getMaxScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
 
@@ -710,6 +761,21 @@ void AncestralNode::readThisNode()
     seq->setChildGaps(lChild->getSequence(),rChild->getSequence());
     seq->setGappedSeq(ancSeq);
 
+    if (DOTS)
+    {
+        int l = getSequence()->length();
+        for (int i=0; i<l; i++)
+        {
+            if (seq->isPermInsertion(i))
+            {
+                if (seq->getLIndex(i)<0)
+                    rChild->setPermanentInsertion(seq->getRIndex(i));
+                if (seq->getRIndex(i)<0)
+                    lChild->setPermanentInsertion(seq->getLIndex(i));
+            }
+        }
+    }
+
     if (PRINTNODES)
         this->printDebugNodes();
 
@@ -719,6 +785,8 @@ void AncestralNode::readThisNode()
     rChild->getSequence()->cleanSpace();
 
     delete ancSeq;
+
+    return true;
 }
 
 

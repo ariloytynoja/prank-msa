@@ -63,7 +63,6 @@ private:
         if(PRINTSCOREONLY)
             verbose = false;
 
-
         if(!this->sequencesAligned(sequences))
         {
             cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
@@ -77,7 +76,23 @@ private:
             cout<<"Reading multiple alignment."<<endl;
 
         root->setTotalNodes();
-        root->readAlignment();
+        bool success = root->readAlignment();
+        if(not success)
+        {
+            root->deleteAncestralSeqs();
+
+            cout<<"\nReading the alignment failed. Trying without option '+F'.\n";
+            FOREVER = false;
+            ra.cleanUp();
+            ra.initialiseMatrices(longest+2);
+
+            success = root->readAlignment();
+            if(not success)
+            {
+                cout<<"Reading the alignment failed. Terminating.\n";
+                exit(-1);
+            }
+        }
 
         if(verbose && NOISE>=0 || writeOutput)
             cout<<"\n\nWriting\n";
@@ -105,7 +120,23 @@ private:
             cout<<"Finishing partially aligned alignment."<<endl;
 
         root->setTotalNodes();
-        root->partlyAlignSequences();
+        bool success = root->partlyAlignSequences();
+        if(not success)
+        {
+            root->deleteAncestralSeqs();
+
+            cout<<"\nCompleting the alignment failed. Trying without option '+F'.\n";
+            FOREVER = false;
+
+            success = root->partlyAlignSequences();
+            if(not success)
+            {
+                cout<<"Completing the alignment failed. Terminating.\n";
+                exit(-1);
+            }
+        }
+
+//        root->partlyAlignSequences();
 
         cout<<"\n\nWriting\n";
         if (PRINTTREE)
@@ -1263,7 +1294,7 @@ private:
 
     void makeSettings(bool isDna)
     {
-        if (isDna)
+        if (isDna & not CODON)
         {
             if (gapRate<0)
                 gapRate = dnaGapRate;

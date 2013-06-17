@@ -79,6 +79,8 @@ Node::Node(string t)
     node_has_left_child = true;
     node_has_right_child = true;
 
+    has_missing_branch_lengths = false;
+
     tree = t;
 
     for (unsigned int i = 0; i < tree.size(); i++)
@@ -127,6 +129,11 @@ Node::Node(string t)
 
 string Node::rootedTree()
 {
+    if(has_missing_branch_lengths)
+    {
+        cout<<"The guide tree with missing branch lengths should be rooted. Exiting."<<endl<<endl;
+        exit(0);
+    }
     return mpTree;
 }
 
@@ -313,6 +320,7 @@ void Node::findMiddle(int branch)
 
 void Node::divideTree(string tree,string* trees,float* distance)
 {
+
     trees[0] = "";
 
     if ((tree.substr(tree.length()-1)).compare(";")==0)
@@ -333,6 +341,11 @@ void Node::divideTree(string tree,string* trees,float* distance)
             trees[0] = tmp.substr(0,tmp.find(":",0));
             distance[0] = atof((tmp.substr(tmp.find(":",0)+1).c_str()));
         }
+        else
+        {
+            has_missing_branch_lengths = true;
+        }
+
         tree = tree.substr(tree.find(",",0)+1);
 
         bool trifurc = false;
@@ -372,6 +385,10 @@ void Node::divideTree(string tree,string* trees,float* distance)
 
                 distance[1] = atof(tmp.c_str());
             }
+            else
+            {
+                has_missing_branch_lengths = true;
+            }
         }
 
     }
@@ -396,12 +413,17 @@ void Node::divideTree(string tree,string* trees,float* distance)
 
             if (open<=0)
             {
-                distance[0] = 0;
+                distance[0] = defaultBranchLength;
                 if(tree.at(i+1) == ':') {
 
                     string tmp = tree.substr(i+2,tree.find(",",i+2));
                     distance[0] = atof(tmp.c_str());
                 }
+                else
+                {
+                    has_missing_branch_lengths = true;
+                }
+
                 tree = tree.substr(tree.find(",",i)+1);
 
                 bool trifurc = false;
@@ -445,6 +467,10 @@ void Node::divideTree(string tree,string* trees,float* distance)
 
                         string tmp = tree.substr(tree.find_last_of(":")+1);
                         distance[1] = atof(tmp.c_str());
+                    }
+                    else
+                    {
+                        has_missing_branch_lengths = true;
                     }
                 }
                 break;

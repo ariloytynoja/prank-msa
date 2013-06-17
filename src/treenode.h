@@ -101,8 +101,8 @@ public:
     std::string nhx_tag;
 
     virtual void alignSequences() {}
-    virtual void readAlignment() {}
-    virtual void partlyAlignSequences() {}
+    virtual bool readAlignment() { return true; }
+    virtual bool partlyAlignSequences() { return true; }
     virtual void updateAlignedSequences() {}
 
     virtual int getTerminalNodeNumber() = 0;
@@ -346,6 +346,8 @@ public:
                 alignedstates.push_back(-3);
         }
     }
+
+    virtual void deleteAncestralSeqs() {}
 
 };
 

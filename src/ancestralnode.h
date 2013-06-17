@@ -77,11 +77,11 @@ public:
 
     void alignSequences( );
     void alignThisNode( );
-    void readAlignment();
-    void readThisNode();
+    bool readAlignment();
+    bool readThisNode();
     void printDebugNodes();
 
-    void partlyAlignSequences();
+    bool partlyAlignSequences();
     void updateAlignedSequences();
 
     void getCleanNewick(std::string* tree);
@@ -185,6 +185,17 @@ public:
     {
         lChild->fixTerminalNodenames();
         rChild->fixTerminalNodenames();
+    }
+
+    void deleteAncestralSeqs()
+    {
+        lChild->deleteAncestralSeqs();
+        rChild->deleteAncestralSeqs();
+
+        if(seq != NULL)
+        {
+            delete seq;
+        }
     }
 
 };

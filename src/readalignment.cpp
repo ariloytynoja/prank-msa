@@ -142,7 +142,7 @@ IntMatrix* ReadAlignment::ptYY;
 IntMatrix* ReadAlignment::ptZM;
 IntMatrix* ReadAlignment::ptZY;
 
-void ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,TreeNode* tn,vector<int>* path)
+bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,TreeNode* tn,vector<int>* path)
 {
 
     seq1 = s1;
@@ -1098,9 +1098,15 @@ void ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
         }
         else
         {
-            cout<<"something wrong"<<endl;
-            cout<<"ns: "<<s<<"; "<<proc<<" "<<state<<"; ("<<i<<" "<<j<<"): "<<newsite->index()<<endl;
-            exit(-1);
+            delete beg;
+            delete end;
+            delete newsite;
+
+            return false;
+
+//            cout<<"something wrong"<<endl;
+//            cout<<"ns: "<<s<<"; "<<proc<<" "<<state<<"; ("<<i<<" "<<j<<"): "<<newsite->index()<<endl;
+//            exit(-1);
         }
         countSites++;
 
@@ -1131,6 +1137,7 @@ void ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
     delete end;
     delete newsite;
 
+    return true;
 }
 
 
