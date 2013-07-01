@@ -94,6 +94,11 @@ void ReadFile::countDnaFreqs(float* freqs)
     }
     if (nu>nt)
         isRna=true;
+
+    if(freqs[0]==0 || freqs[1]==0 || freqs[2]==0 || freqs[3]==0)
+    {
+        freqs[0]++; freqs[1]++; freqs[2]++; freqs[3]++;
+    }
 }
 
 void ReadFile::countDnaFreqs(float* freqs,vector<string> *pseqs)
@@ -123,6 +128,11 @@ void ReadFile::countDnaFreqs(float* freqs,vector<string> *pseqs)
     }
     if (nu>nt)
         isRna=true;
+
+    if(freqs[0]==0 || freqs[1]==0 || freqs[2]==0 || freqs[3]==0)
+    {
+        freqs[0]++; freqs[1]++; freqs[2]++; freqs[3]++;
+    }
 }
 
 int ReadFile::readFile(const char* inputfile)

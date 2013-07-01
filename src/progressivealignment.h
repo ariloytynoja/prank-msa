@@ -1132,6 +1132,17 @@ private:
                 string tree1 = rn.readFile(treefile1.c_str());
                 string tree2 = rn.readFile(treefile2.c_str());
 
+                if (tree1=="")
+                {
+                    cout<<"No tree found in "<<treefile1<<"! Exiting."<<endl;
+                    exit(-1);
+                }
+                if (tree2=="")
+                {
+                    cout<<"No tree found in "<<treefile2<<"! Exiting."<<endl;
+                    exit(-1);
+                }
+
                 if(tree1.at(tree1.size()-1)==';')
                     tree1.erase(tree1.size()-1);
 
