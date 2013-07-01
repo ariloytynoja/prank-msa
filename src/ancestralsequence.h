@@ -193,7 +193,22 @@ public:
         {
             return false;
         }
-    };
+    }
+    void setInsertion(int i)
+    {
+        if (i>=0 && i<length())
+        {
+            insertionSite->s(1,i);
+        }
+    }
+    void unsetInsertion(int i)
+    {
+        if (i>=0 && i<length())
+        {
+            insertionSite->s(0,i);
+        }
+    }
+
     bool isPermInsertion(int i)
     {
         if (i>=0 && i<length())

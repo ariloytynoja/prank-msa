@@ -213,6 +213,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         root->alignSequences();
 
+        this->updateIndelSites(root);
+
         if(iterations>1 && WRITEITER)
         {
             cout<<"\n\nWriting\n";
@@ -352,6 +354,39 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     delete root;
 
 }
+
+
+void ProgressiveAlignment::updateIndelSites(AncestralNode *root)
+{
+//    cout<<endl;
+//    for(int i=0;i<root->getSequence()->length();i++)
+//        cout<<i<<" "<<root->getSequence()->isInsertion(i)<<" "<<root->getSequence()->isPermInsertion(i)<<endl;
+
+//    cout<<endl;
+//    for(int i=0;i<root->getSequence()->length();i++)
+//        cout<<i<<" "<<root->getLChild()->getSequence()->isInsertion(i)<<" "<<root->getLChild()->getSequence()->isPermInsertion(i)<<endl;
+
+//    cout<<endl;
+//    for(int i=0;i<root->getSequence()->length();i++)
+//        cout<<i<<" "<<root->getRChild()->getSequence()->isInsertion(i)<<" "<<root->getRChild()->getSequence()->isPermInsertion(i)<<endl;
+
+    for(int i=0;i<root->getSequence()->length();i++)
+        if(not root->getSequence()->isInsertion(i))
+            root->updateInsertionSite(i);
+
+    //    cout<<endl;
+    //    for(int i=0;i<root->getSequence()->length();i++)
+    //        cout<<i<<" "<<root->getSequence()->isInsertion(i)<<" "<<root->getSequence()->isPermInsertion(i)<<endl;
+
+    //    cout<<endl;
+    //    for(int i=0;i<root->getSequence()->length();i++)
+    //        cout<<i<<" "<<root->getLChild()->getSequence()->isInsertion(i)<<" "<<root->getLChild()->getSequence()->isPermInsertion(i)<<endl;
+
+    //    cout<<endl;
+    //    for(int i=0;i<root->getSequence()->length();i++)
+    //        cout<<i<<" "<<root->getRChild()->getSequence()->isInsertion(i)<<" "<<root->getRChild()->getSequence()->isPermInsertion(i)<<endl;
+}
+
 
 void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nms,vector<string> *seqs,string filename, bool isDna,bool verbose)
 {

@@ -119,6 +119,8 @@ public:
         }
     }
 
+    bool updateInsertionSite(int i);
+
 };
 
 #endif

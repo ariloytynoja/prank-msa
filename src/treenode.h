@@ -349,6 +349,8 @@ public:
 
     virtual void deleteAncestralSeqs() {}
 
+
+    virtual bool updateInsertionSite(int i) {}
 };
 
 #endif

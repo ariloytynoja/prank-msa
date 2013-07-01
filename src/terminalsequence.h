@@ -28,10 +28,6 @@ class TerminalSequence : public Sequence
 {
     IntMatrix* seqvec;    // shortcut for unambiguous terminal seqs: profile is useless!
 
-    bool isGap(int )
-    {
-        return false;
-    }
     bool isXGap(int )
     {
         return false;
@@ -46,6 +42,10 @@ public:
     TerminalSequence(std::string* s);
     ~TerminalSequence();
 
+    bool isGap(int )
+    {
+        return false;
+    }
     int charAt(int i)
     {
         return seqvec->g(i);    // index unambiguous character at site i

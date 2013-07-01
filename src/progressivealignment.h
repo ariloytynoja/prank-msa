@@ -134,9 +134,7 @@ private:
                 cout<<"Completing the alignment failed. Terminating.\n";
                 exit(-1);
             }
-        }
-
-//        root->partlyAlignSequences();
+        }     
 
         cout<<"\n\nWriting\n";
         if (PRINTTREE)
@@ -175,6 +173,8 @@ private:
     void reconstructAncestors(AncestralNode *root,bool isDna);
     void setAlignedSequences(AncestralNode *root);
     int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1,int *nSubst=0,int *nIns=0,int *nDel=0,int *nInsDel=0);
+
+    void updateIndelSites(AncestralNode *root);
 
     void printAlignment(AncestralNode *root,std::vector<std::string> *nms,std::vector<std::string> *sqs,string filename, bool isDna, bool verbose=true);
     void printAncestral(AncestralNode *root,string filename,bool isDna, bool verbose=true);

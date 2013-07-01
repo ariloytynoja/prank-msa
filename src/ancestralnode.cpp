@@ -2125,3 +2125,27 @@ void AncestralNode::getSubstEvents(std::vector<substEvent> *substs)
 
 }
 
+bool AncestralNode::updateInsertionSite(int i)
+{
+    bool lSite = false;
+    if (seq->getLIndex(i)>=0)
+    {
+        lSite = this->getLChild()->updateInsertionSite(seq->getLIndex(i));
+    }
+
+    bool rSite = false;
+    if (seq->getRIndex(i)>=0)
+    {
+        rSite = this->getRChild()->updateInsertionSite(seq->getRIndex(i));
+    }
+
+    if(lSite || rSite)
+    {
+        this->getSequence()->unsetInsertion(i);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
