@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 130701;
+    version = 130705;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -711,28 +711,6 @@ void readArguments(int argc, char *argv[])
     else
         srand(time(0));
 
-    // partly aligned switches between F/non-F
-    // and has to remember the settings
-    if (FOREVER && PARTLYALIGNED)
-        FOREVER_FOR_PA = true;
-    else
-        FOREVER_FOR_PA = false;
-
-    // remind that +F is not the default option
-    if (!FOREVER && !PREALIGNED && !CONVERT && !BACKTRANSLATE)
-    {
-        DOTS=false;
-
-//        cout<<endl<<"Note: by default option '+F' is not selected.";
-//        if (argc==2 && seqfile!="")
-//            cout<<" Select it with command \"prank +F -d="<<seqfile<<"\"."<<endl;
-//        else
-//            cout<<" Select it by adding option \"+F\"."<<endl;
-    }
-
-    // options don't work together
-//    if (PREALIGNED)
-//        FOREVER=false;
 
     if (format!=8 && format!=11 && format!=12 && format!=17 && format!=18 && format!=19)
         format = 8;

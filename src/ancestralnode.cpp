@@ -43,7 +43,6 @@ extern float fixedBranchLength;
 extern float branchScalingFactor;
 extern bool MAXBRANCH;
 extern bool FIXEDBRANCH;
-extern bool FOREVER_FOR_PA;
 extern bool FOREVER;
 
 string tmpNodeName;
@@ -226,13 +225,19 @@ bool AncestralNode::partlyAlignSequences()
     return true;
 }
 
-void AncestralNode::updateAlignedSequences()
+bool AncestralNode::updateAlignedSequences()
 {
 
 //    cout<<"update "<<nodeName<<endl;
 
-    lChild->updateAlignedSequences();
-    rChild->updateAlignedSequences();
+    bool success;
+    success = lChild->updateAlignedSequences();
+    if(not success)
+        return false;
+
+    success = rChild->updateAlignedSequences();
+    if(not success)
+        return false;
 
     if (this->realignNode)
     {
@@ -242,10 +247,11 @@ void AncestralNode::updateAlignedSequences()
     else
     {
 //        cout<<"read "<<nodeName<<endl;
-        FOREVER = false;
-        this->readThisNode();
-        FOREVER = FOREVER_FOR_PA;
+        bool success = this->readThisNode();
+        if(not success)
+            return false;
     }
+    return true;
 }
 
 /*

@@ -141,9 +141,6 @@ std::string currentNode = "";
 // keep insertion forever
 bool FOREVER = false;
 
-// for partly aligned
-bool FOREVER_FOR_PA = false;
-
 // old implementation
 bool FOREVER_OLD = false;
 
@@ -306,12 +303,6 @@ float initialMatrixSize = 1.5;
 bool PWMATRIXMAXSIZE = true;
 
 float pwInitialMatrixSize = 1.5;
-
-
-/********* personalised stuff **********/
-
-// turn +F on at a later point
-int fOnNode = -1;
 
 
 /************************************************/

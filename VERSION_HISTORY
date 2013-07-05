@@ -1,3 +1,9 @@
+v.130705
+- Significant fixes:
+ * option -F was mistakenly turned off by the new iterative approach
+ * without option -F, ancestor reconstruction (and scoring) were incorrect
+
+
 v.130410
 - More information about optimization score and fix for last alignment
 - Minor fixes on alignment conversion and use of external models

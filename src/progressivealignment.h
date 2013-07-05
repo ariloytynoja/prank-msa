@@ -158,7 +158,22 @@ private:
             cout<<"Updating partially aligned alignment."<<endl;
 
         root->setTotalNodes();
-        root->updateAlignedSequences();
+        bool success = root->updateAlignedSequences();
+
+        if(not success)
+        {
+            root->deleteAncestralSeqs();
+
+            cout<<"\nUpdating the alignment failed. Trying without option '+F'.\n";
+            FOREVER = false;
+
+            success = root->updateAlignedSequences();
+            if(not success)
+            {
+                cout<<"Completing the alignment failed. Terminating.\n";
+                exit(-1);
+            }
+        }
 
         cout<<"\n\nWriting\n";
         if (PRINTTREE)
@@ -212,7 +227,7 @@ private:
                 {
                     cout<<" - merging alignments in '"<<seqfile1<<"' and '"<<seqfile2<<"'";
                     if (treefile1!="" & treefile2!="")
-                        cout<<"\n - using alignment guide trees '"<<treefile1<<"'' and '"<<treefile2<<"'\n";
+                        cout<<"\n - using alignment guide trees '"<<treefile1<<"' and '"<<treefile2<<"'\n";
                     else
                         cout<<"\n - using inferred alignment guide trees\n";
                 }

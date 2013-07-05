@@ -89,7 +89,6 @@ extern std::string message;
 extern std::string currentNode;
 
 extern bool FOREVER;
-extern bool FOREVER_FOR_PA;
 extern bool FOREVER_OLD;
 
 extern string dnaFreqs;
@@ -172,8 +171,6 @@ extern float resizeFactor;
 extern float initialMatrixSize;
 extern bool PWMATRIXMAXSIZE;
 extern float pwInitialMatrixSize;
-
-extern int fOnNode;
 
 extern double sumLogs(double a, double b);
 extern std::string itos(int i);

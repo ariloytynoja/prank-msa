@@ -103,7 +103,7 @@ public:
     virtual void alignSequences() {}
     virtual bool readAlignment() { return true; }
     virtual bool partlyAlignSequences() { return true; }
-    virtual void updateAlignedSequences() {}
+    virtual bool updateAlignedSequences() { return true; }
 
     virtual int getTerminalNodeNumber() = 0;
     virtual int getInternalNodeNumber() = 0;

@@ -82,7 +82,7 @@ public:
     void printDebugNodes();
 
     bool partlyAlignSequences();
-    void updateAlignedSequences();
+    bool updateAlignedSequences();
 
     void getCleanNewick(std::string* tree);
     void outputXml(std::ofstream* out,std::map<std::string,std::string> *anc_seqs,bool triple);

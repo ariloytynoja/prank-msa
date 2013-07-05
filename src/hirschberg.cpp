@@ -411,11 +411,6 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
 
     alignmentNumber++;
     if (NOISE>0) cout<<"Alignment number: "<<alignmentNumber<<"."<<endl;
-    if (alignmentNumber==fOnNode)
-    {
-        if (NOISE>0 && FOREVER==false) cout<<"+F turned on."<<endl;
-        FOREVER = true;
-    }
 
     seq1 = s1;
     seq2 = s2;
