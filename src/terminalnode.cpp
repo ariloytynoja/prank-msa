@@ -264,7 +264,7 @@ void TerminalNode::getCharactersAt(vector<string>* col,int i, bool parentPermIns
     }
 }
 
-bool TerminalNode::updateInsertionSite(int i)
+bool TerminalNode::updateInsertionSite(int i,bool has_parent)
 {
     if(this->getSequence()->isGap(i))
         return false;

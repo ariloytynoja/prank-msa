@@ -94,6 +94,8 @@ private:
             }
         }
 
+        this->updateIndelSites(root);
+
         if(verbose && NOISE>=0 || writeOutput)
             cout<<"\n\nWriting\n";
 
@@ -136,6 +138,8 @@ private:
             }
         }     
 
+        this->updateIndelSites(root);
+
         cout<<"\n\nWriting\n";
         if (PRINTTREE)
             this->printNewickTree(root,outfile+".dnd");
@@ -175,6 +179,8 @@ private:
             }
         }
 
+        this->updateIndelSites(root);
+
         cout<<"\n\nWriting\n";
         if (PRINTTREE)
             this->printNewickTree(root,outfile+".dnd");
@@ -187,7 +193,7 @@ private:
 
     void reconstructAncestors(AncestralNode *root,bool isDna);
     void setAlignedSequences(AncestralNode *root);
-    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1,int *nSubst=0,int *nIns=0,int *nDel=0,int *nInsDel=0);
+    int computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore=-1,int *nSubst=0,int *nIns=0,int *nDel=0,int *nInsDel=0,bool noSuffix=false);
 
     void updateIndelSites(AncestralNode *root);
 

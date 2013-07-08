@@ -350,7 +350,7 @@ public:
     virtual void deleteAncestralSeqs() {}
 
 
-    virtual bool updateInsertionSite(int i) {}
+    virtual bool updateInsertionSite(int i, bool has_parent) {}
 };
 
 #endif

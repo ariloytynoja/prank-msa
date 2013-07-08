@@ -119,7 +119,7 @@ public:
         }
     }
 
-    bool updateInsertionSite(int i);
+    bool updateInsertionSite(int i,bool has_parent);
 
 };
 

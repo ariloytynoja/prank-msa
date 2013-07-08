@@ -228,6 +228,14 @@ public:
         }
     }
 
+    void unsetPermInsertion(int i)
+    {
+        if (i>=0 && i<length())
+        {
+            permInsertionSite->s(0,i);
+        }
+    }
+
     bool isChildGap(int i)
     {
         if (i>=0 && i<length() && childGapSite->g(i)==1)
@@ -238,7 +246,7 @@ public:
         {
             return false;
         }
-    };
+    }
 
     bool hasNeighborGaps(int i)
     {

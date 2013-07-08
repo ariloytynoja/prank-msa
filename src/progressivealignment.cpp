@@ -157,8 +157,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->readAlignment(root,&names,&sequences,isDna,longest);
 
-        int nSubst; int nIns; int nDel; int nInsDel;
-        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel);
+        int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
+        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
 
         cout<<"\nAlignment score: "<<bestScore;
         if(PRINTSCOREONLY)
@@ -179,7 +179,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->partlyAlign(root,&names,&sequences,isDna,longest);
 
-        int bestScore = this->computeParsimonyScore(root,isDna);
+        int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
+        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
         cout<<"\nAlignment score: "<<bestScore<<endl;
     }
 
@@ -189,7 +190,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->updateAlignment(root,&names,&sequences,isDna,longest);
 
-        int bestScore = this->computeParsimonyScore(root,isDna);
+        int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
+        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
         cout<<"\nAlignment score: "<<bestScore<<endl;
     }
 
@@ -370,8 +372,7 @@ void ProgressiveAlignment::updateIndelSites(AncestralNode *root)
 //    }
 
     for(int i=0;i<root->getSequence()->length();i++)
-        if(not root->getSequence()->isInsertion(i))
-            root->updateInsertionSite(i);
+            root->updateInsertionSite(i,not root->getSequence()->isInsertion(i));
 
 //    cout<<endl;
 //    for(int i=0;i<root->getSequence()->length();i++)
@@ -711,7 +712,7 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
     root->setAlignedSequenceStrings(&aseqs);
 }
 
-int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel,int *nInsDel)
+int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel,int *nInsDel,bool noSuffix)
 {
 
     this->setAlignedSequences(root);
@@ -895,6 +896,9 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
         if(alloutput.str().length()>0)
         {
             string outname = outfile+".best.events";
+            if(noSuffix)
+                outname = outfile+".events";
+
 //            if (NOISE>=0)
 //                cout<<" - inferred events to file '"<<outname<<"'.\n";
 

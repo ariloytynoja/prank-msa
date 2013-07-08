@@ -2131,23 +2131,27 @@ void AncestralNode::getSubstEvents(std::vector<substEvent> *substs)
 
 }
 
-bool AncestralNode::updateInsertionSite(int i)
+bool AncestralNode::updateInsertionSite(int i,bool has_parent)
 {
+    bool is_parent = has_parent || not this->getSequence()->isInsertion(i);
+
     bool lSite = false;
     if (seq->getLIndex(i)>=0)
     {
-        lSite = this->getLChild()->updateInsertionSite(seq->getLIndex(i));
+        lSite = this->getLChild()->updateInsertionSite(seq->getLIndex(i),is_parent);
     }
 
     bool rSite = false;
     if (seq->getRIndex(i)>=0)
     {
-        rSite = this->getRChild()->updateInsertionSite(seq->getRIndex(i));
+        rSite = this->getRChild()->updateInsertionSite(seq->getRIndex(i),is_parent);
     }
 
-    if(lSite || rSite)
+//    if(lSite || rSite || is_parent)
+    if(is_parent)
     {
         this->getSequence()->unsetInsertion(i);
+        this->getSequence()->unsetPermInsertion(i);
         return true;
     }
     else
