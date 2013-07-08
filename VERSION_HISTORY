@@ -1,5 +1,5 @@
 v.130705
-- Significant fixes:
+- Significant bug fixes -- update *strongly* recommended:
  * option -F was mistakenly turned off by the new iterative approach
  * without option -F, ancestor reconstruction (and scoring) were incorrect
 
