@@ -29,7 +29,7 @@
 using namespace std;
 
 void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntMatrix* substScores)
-{
+{   
     bool isDna = (substScores->X()<=5);
     int ns = sequences->size();
 

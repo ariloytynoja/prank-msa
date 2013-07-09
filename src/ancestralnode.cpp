@@ -271,15 +271,6 @@ void AncestralNode::alignSequences()
 
 void AncestralNode::alignThisNode()
 {
-
-    if (rnd_seed>0)
-    {
-        string catNames = "";
-        this->concatenateTerminalNames(&catNames);
-        int h = this->hash(catNames.c_str());
-        srand(h);
-    }
-
     char prop[20];
     sprintf(prop,"(%i/%i)",alignedNodes,totalNodes-1);
 
@@ -293,6 +284,16 @@ void AncestralNode::alignThisNode()
     int time1 = time(0);
 
     Hirschberg* hp = new Hirschberg();
+
+    if (rnd_seed>0)
+    {
+        string catNames = "";
+        this->concatenateTerminalNames(&catNames);
+        unsigned int rs = this->hash(catNames.c_str());
+
+        hp->setRandomSeed(rs);
+    }
+
     hp->alignSeqs(lChild->getSequence(),rChild->getSequence(),pms);
     if (NOISE>0)
         cout<<"Hirschberg: "<<hp->getMaxScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
@@ -551,14 +552,6 @@ bool AncestralNode::readAlignment()
 
 bool AncestralNode::readThisNode()
 {
-    if (rnd_seed>0)
-    {
-        string catNames = "";
-        this->concatenateTerminalNames(&catNames);
-        int h = this->hash(catNames.c_str());
-        srand(h);
-    }
-
     if (NOISE>1)
         cout<<"AncestralNode::readThisNode() "<<nodeName<<endl;
 
@@ -669,6 +662,16 @@ bool AncestralNode::readThisNode()
 
 
     ReadAlignment* ra = new ReadAlignment();
+
+    if (rnd_seed>0)
+    {
+        string catNames = "";
+        this->concatenateTerminalNames(&catNames);
+        unsigned int rs = this->hash(catNames.c_str());
+
+        ra->setRandomSeed(rs);
+    }
+
     bool success = ra->readSeqs(lChild->getSequence(),rChild->getSequence(),pms,this,&path);
 
     if(not success && FOREVER)
@@ -2133,7 +2136,7 @@ void AncestralNode::getSubstEvents(std::vector<substEvent> *substs)
 
 bool AncestralNode::updateInsertionSite(int i,bool has_parent)
 {
-    bool is_parent = has_parent || not this->getSequence()->isInsertion(i);
+    bool is_parent = has_parent || not this->getSequence()->isGap(i);
 
     bool lSite = false;
     if (seq->getLIndex(i)>=0)

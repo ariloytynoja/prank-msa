@@ -1198,6 +1198,9 @@ void ReadAlignment::defineEnd()
 
 bool ReadAlignment::rndBool()
 {
+    if(REPRODUCIBLE)
+        srand(random_seed);
+
     double p = (double)rand()/(double)RAND_MAX;
     if (p>0.5)
         return true;
@@ -1207,6 +1210,9 @@ bool ReadAlignment::rndBool()
 
 int ReadAlignment::rndInt(int i)
 {
+    if(REPRODUCIBLE)
+        srand(random_seed);
+
     return (int)(i*(rand()/(RAND_MAX+1.0)));
 }
 

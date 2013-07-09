@@ -369,6 +369,11 @@ void readArguments(int argc, char *argv[])
                 dnaFreqs = string(argv[i]).substr(10);
             }
 
+            else if (s=="-jc")
+            {
+                dnaFreqs = "1,1,1,1";
+            }
+
             else if (s.substr(0,9)=="-gaprate=")
             {
                 gapRate = atof(string(argv[i]).substr(9).c_str());
@@ -472,6 +477,11 @@ void readArguments(int argc, char *argv[])
             else if (s.substr(0,6)=="-seed=")
             {
                 rnd_seed = atoi(string(argv[i]).substr(6).c_str());
+            }
+
+            else if (s=="-reproducible")
+            {
+                REPRODUCIBLE = true;
             }
 
 

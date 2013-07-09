@@ -160,6 +160,7 @@ float protGapExt = 0.5;
 /******* random number seed ********/
 
 int rnd_seed = -1;
+bool REPRODUCIBLE = false;
 
 /********* model: other **********/
 

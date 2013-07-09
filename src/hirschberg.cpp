@@ -148,6 +148,8 @@ Hirschberg::Hirschberg()
     beg = new Site(0);
     end = new Site(1);
     newsite = new Site();
+
+    random_seed = (unsigned)time(NULL);
 }
 
 void Hirschberg::initialiseMatrices(int size)
@@ -3802,6 +3804,9 @@ void Hirschberg::getMidSite(int s1,int e1,int s2,int e2)
 
 bool Hirschberg::rndBool()
 {
+    if(REPRODUCIBLE)
+        srand(random_seed);
+
     double p = (double)rand()/(double)RAND_MAX;
     if (p>0.5)
         return true;
@@ -3811,6 +3816,9 @@ bool Hirschberg::rndBool()
 
 int Hirschberg::rndInt(int i)
 {
+    if(REPRODUCIBLE)
+        srand(random_seed);
+
     return (int)(i*(rand()/(RAND_MAX+1.0)));
 }
 

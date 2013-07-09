@@ -103,6 +103,7 @@ extern float protGapRate;
 extern float protGapExt;
 
 extern int rnd_seed;
+extern bool REPRODUCIBLE;
 
 extern bool CODON;
 extern bool DNA;

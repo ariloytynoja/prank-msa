@@ -29,6 +29,7 @@
 #include "flmatrix.h"
 #include "dbmatrix.h"
 #include "intmatrix.h"
+#include <cstdlib>
 
 class Hirschberg
 {
@@ -211,6 +212,8 @@ protected:
     int countSites;
     int i,j;
     int k;
+
+    int random_seed;
 public:
     double small;
     Hirschberg();
@@ -241,6 +244,8 @@ public:
     void initialiseIndex(int *min,int *max);
     void initialiseMatrices(int size);
     void cleanUp();
+
+    void setRandomSeed(int i) {random_seed = i; srand(random_seed);}
 };
 
 #endif

@@ -139,7 +139,6 @@ public:
 
     void computeFwd(int j,int i);
     void computeBwd(int j,int i);
-
 };
 
 #endif

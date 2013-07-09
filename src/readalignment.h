@@ -90,6 +90,8 @@ class ReadAlignment
     int countSites;
     int i,j,k;
     double small;
+
+    int random_seed;
 public:
     ReadAlignment();
     ~ReadAlignment();
@@ -110,6 +112,8 @@ public:
     int rndInt(int i);
     double max(double a,double b);
     double max(double a,double b,double c);
+
+    void setRandomSeed(int i) {random_seed = i; srand(random_seed);}
 };
 
 #endif
