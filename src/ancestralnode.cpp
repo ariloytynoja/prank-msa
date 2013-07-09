@@ -758,6 +758,7 @@ bool AncestralNode::readThisNode()
         delete pms;
     }
 
+//    cout<<"\n"<<*lChild->getSequence()->getGappedSeq()<<"\n"<<*rChild->getSequence()->getGappedSeq()<<"\n";
     CharacterProbability *cp = new CharacterProbability(lChild->getSequence(),rChild->getSequence());
 
 
