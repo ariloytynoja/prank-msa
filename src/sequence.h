@@ -68,7 +68,7 @@ public:
 
     bool prealignedGapAt(int i)
     {
-        return gappedseq.at(i)=='-';
+        return gappedseq.at(i)=='-' || gappedseq.at(i)=='.';
     }
 
     int charAt(int )

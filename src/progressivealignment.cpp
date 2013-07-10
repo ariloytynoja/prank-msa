@@ -238,8 +238,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         thisIteration++;
 
-        bool tmpDOTS = DOTS;
-        DOTS = false;
         while (thisIteration<=iterations)
         {
 
@@ -304,8 +302,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
             if(WRITEITER)
             {
-                DOTS = tmpDOTS;
-
                 string fname = outfile+"."+itos(thisIteration);
 
                 cout<<"\n\nWriting\n";
@@ -313,8 +309,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
                     this->printNewickTree(root,fname+".dnd",true);
 
                 this->printAlignment(root,&names,&sequences,fname,isDna);
-
-                DOTS = false;
             }
 
             int thisScore = this->computeParsimonyScore(root,isDna,bestScore);
@@ -322,22 +316,16 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
             if(thisScore<bestScore)
             {
-                DOTS = tmpDOTS;
-
                 bestScore = thisScore;
 
                 if (PRINTTREE)
                     this->printNewickTree(root,outfile+".best.dnd",false);
 
                 this->printAlignment(root,&names,&sequences,outfile+".best",isDna,false);
-
-                DOTS = false;
             }
 
             thisIteration++;
         }
-
-        DOTS = tmpDOTS;
 
         hir.cleanUp();
 
