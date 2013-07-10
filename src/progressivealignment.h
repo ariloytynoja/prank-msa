@@ -86,6 +86,7 @@ private:
             ra.cleanUp();
             ra.initialiseMatrices(longest+2);
 
+            root->setTotalNodes();
             success = root->readAlignment();
             if(not success)
             {
@@ -130,6 +131,7 @@ private:
             cout<<"\nCompleting the alignment failed. Trying without option '+F'.\n";
             FOREVER = false;
 
+            root->setTotalNodes();
             success = root->partlyAlignSequences();
             if(not success)
             {
@@ -171,6 +173,7 @@ private:
             cout<<"\nUpdating the alignment failed. Trying without option '+F'.\n";
             FOREVER = false;
 
+            root->setTotalNodes();
             success = root->updateAlignedSequences();
             if(not success)
             {

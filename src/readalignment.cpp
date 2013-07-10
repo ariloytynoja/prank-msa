@@ -202,7 +202,6 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
         // Compute the substitution prices
         //
         msr->computeFwd( j, i );
-// 		cout<<move<<": "<<j<<" "<<i<<"; "<<static_cast<TerminalSequence*>(seq1)->charAt(j-1)<<" "<<static_cast<TerminalSequence*>(seq2)->charAt(i-1)<<endl;
 
         FOR(k,nState)
         {
@@ -231,7 +230,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                         sxM = k*15+2;
                     }
 
-                    if (seq2->fwdGapEnds( i ))   // ..and another closes is seq2
+                    if (seq2->fwdGapEnds( i ) || i==sl2 && seq2->fwdGapContinues( i ))   // ..and another closes is seq2
                     {
 
                         cxM = yM->g(k,s-1);
@@ -241,7 +240,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                             sxM = k*15+8;
                         }
                     }
-                    if (seq2->fwdChildGapEnds( i ))   // ..and another closes is seq2 child
+                    if (seq2->fwdChildGapEnds( i ) || i==sl2 && seq2->fwdChildGapContinues( i ))   // ..and another closes is seq2 child
                     {
 
                         cxM = zM->g(k,s-1);
@@ -272,7 +271,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                 }
 
 
-                if (seq1->fwdGapEnds( j ))   // flagged gap ends in seq1
+                if (seq1->fwdGapEnds( j ) || j==sl1 && seq1->fwdGapContinues( j ) )   // flagged gap ends in seq1
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -309,7 +308,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                         swM = k*15+2;
                     }
 
-                    if (seq2->fwdGapEnds( i ))   // ..and another closes is seq2
+                    if (seq2->fwdGapEnds( i ) || i==sl2 && seq2->fwdGapContinues( i ))   // ..and another closes is seq2
                     {
 
                         cwM = yM->g(k,s-1);
@@ -319,7 +318,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                             swM = k*15+8;
                         }
                     }
-                    if (seq2->fwdChildGapEnds( i ))   // ..and another closes is seq2 child
+                    if (seq2->fwdChildGapEnds( i ) || i==sl2 && seq2->fwdChildGapContinues( i ))   // ..and another closes is seq2 child
                     {
 
                         cwM = zM->g(k,s-1);
@@ -349,7 +348,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                     }
                 }
 
-                if (seq1->fwdChildGapEnds( j ))   // flagged gap ends in seq1 child
+                if (seq1->fwdChildGapEnds( j )  || j==sl1 && seq1->fwdChildGapContinues( j ))   // flagged gap ends in seq1 child
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -369,7 +368,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                     }
                 }
 
-                if (seq2->fwdGapEnds( i ))   // flagged gap ends in seq2; X-gap goes right so earlier
+                if (seq2->fwdGapEnds( i ) || i==sl2 && seq2->fwdGapContinues( i ) )   // flagged gap ends in seq2; X-gap goes right so earlier
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -389,7 +388,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                     }
                 }
 
-                if (seq2->fwdChildGapEnds( i ))   // flagged gap ends in seq2 child; X-gap goes right so earlier
+                if (seq2->fwdChildGapEnds( i ) || i==sl2 && seq2->fwdChildGapContinues( i ))   // flagged gap ends in seq2 child; X-gap goes right so earlier
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -429,7 +428,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
             else if (move==1)
             {
 
-                if (seq1->fwdGapEnds( j ))   // flagged gap ends in seq1; Y-gap goes down so earlier
+                if (seq1->fwdGapEnds( j ) || j==sl1 && seq1->fwdGapContinues( j ))   // flagged gap ends in seq1; Y-gap goes down so earlier
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -450,7 +449,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                 }
 
 
-                if (seq1->fwdChildGapEnds( j ))   // flagged gap ends in seq1 child; Y-gap goes down so earlier
+                if (seq1->fwdChildGapEnds( j )  || j==sl1 && seq1->fwdChildGapContinues( j ))   // flagged gap ends in seq1 child; Y-gap goes down so earlier
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -487,7 +486,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                         syM = k*15+2;
                     }
 
-                    if (seq1->fwdGapEnds( j ))   // .. and another closes in seq1
+                    if (seq1->fwdGapEnds( j )  || j==sl1 && seq1->fwdChildGapContinues( j ))   // .. and another closes in seq1
                     {
 
                         cyM = xM->g(k,s-1);
@@ -497,7 +496,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                             syM = k*15+5;
                         }
                     }
-                    if (seq1->fwdChildGapEnds( j ))   // .. and another closes in seq1 child
+                    if (seq1->fwdChildGapEnds( j )  || j==sl1 && seq1->fwdChildGapContinues( j ))   // .. and another closes in seq1 child
                     {
 
                         cyM = wM->g(k,s-1);
@@ -528,7 +527,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                 }
 
 
-                if (seq2->fwdGapEnds( i ))   // flagged gap ends in seq2
+                if (seq2->fwdGapEnds( i )  || i==sl2 && seq2->fwdGapContinues( i ) )   // flagged gap ends in seq2
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -565,7 +564,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                         szM = k*15+2;
                     }
 
-                    if (seq1->fwdGapEnds( j ))   // .. and another closes in seq1
+                    if (seq1->fwdGapEnds( j )  || j==sl1 && seq1->fwdGapContinues( j ))   // .. and another closes in seq1
                     {
 
                         czM = xM->g(k,s-1);
@@ -575,7 +574,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                             szM = k*15+5;
                         }
                     }
-                    if (seq1->fwdChildGapEnds( j ))   // .. and another closes in seq1 child
+                    if (seq1->fwdChildGapEnds( j ) || j==sl1 && seq1->fwdChildGapContinues( j ))   // .. and another closes in seq1 child
                     {
 
                         czM = wM->g(k,s-1);
@@ -606,7 +605,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                 }
 
 
-                if (seq2->fwdChildGapEnds( i ))   // flagged gap ends in seq2 child
+                if (seq2->fwdChildGapEnds( i )  || i==sl2 && seq2->fwdChildGapContinues( i ))   // flagged gap ends in seq2 child
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -645,7 +644,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
             else if (move==2)
             {
 
-                if (seq1->fwdGapEnds( j ))   // flagged gap ends in seq1
+                if (seq1->fwdGapEnds( j ) || j==sl1 && seq1->fwdGapContinues( j ))   // flagged gap ends in seq1
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -665,7 +664,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                     }
                 }
 
-                if (seq1->fwdChildGapEnds( j ))   // flagged gap ends in seq1 child
+                if (seq1->fwdChildGapEnds( j ) || j==sl1 && seq1->fwdChildGapContinues( j ))   // flagged gap ends in seq1 child
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -685,7 +684,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                     }
                 }
 
-                if (seq2->fwdGapEnds( i ))   // flagged gap ends in seq2
+                if (seq2->fwdGapEnds( i ) || i==sl2 && seq2->fwdGapContinues( i ))   // flagged gap ends in seq2
                 {
 
                     int l = hmm->transIndY(k,0);
@@ -705,7 +704,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
                     }
                 }
 
-                if (seq2->fwdChildGapEnds( i ))   // flagged gap ends in seq2 child
+                if (seq2->fwdChildGapEnds( i ) || i==sl2 && seq2->fwdChildGapContinues( i ))   // flagged gap ends in seq2 child
                 {
 
                     int l = hmm->transIndY(k,0);
