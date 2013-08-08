@@ -64,6 +64,7 @@ extern string dnafile;
 
 extern bool MAFFTALIGNMENT;
 extern bool TREEFROMALIGNMENT;
+extern bool SCOREMAFFT;
 
 extern int format;
 

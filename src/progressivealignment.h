@@ -1035,7 +1035,7 @@ private:
                         tmp_isDna = true;
                     }
 
-                    if(true)
+                    if(SCOREMAFFT)
                     {
                         // Get the tree
                         //
@@ -1103,7 +1103,6 @@ private:
 
                 *tree = gt.getTree();
             }
-
 
             if (NOISE>0)
                 cout<<"tree "<<*tree<<endl;

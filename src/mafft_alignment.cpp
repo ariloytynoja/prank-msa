@@ -121,7 +121,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
 
     while ( fgets( temp, sizeof temp, fpipe))
     {
-    	string line(temp);
+       string line(temp);
 
         if (line[0] == '>')
         {

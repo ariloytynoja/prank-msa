@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 130708;
+    version = 130807;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -231,6 +231,12 @@ void readArguments(int argc, char *argv[])
                 MAFFTALIGNMENT = false;
             }
 
+
+            // compute score for mafft alignment
+            else if (s=="-scoremafft")
+            {
+                SCOREMAFFT = true;
+            }
 
             // estimate guide tree from input alignment (before realignment)
             else if (s=="-njtree")
@@ -750,6 +756,7 @@ void printHelp(bool complete)
     {
         cout<<"  -noanchors [no Exonerate anchoring]"<<endl;
         cout<<"  -nomafft [no MAFFT guide tree]"<<endl;
+        cout<<"  -scoremafft [score also MAFFT alignment]"<<endl;
     }
     cout<<"  -support [compute posterior support]"<<endl;
     cout<<"  -njtree [estimate tree from input alignment (and realign)]"<<endl;
