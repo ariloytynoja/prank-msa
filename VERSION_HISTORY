@@ -1,3 +1,8 @@
+v.130807
+- disabled copmutation of alignment score for the guide tree alignment
+- more information about iteration with user provided tree
+
+
 v.130708
 - Significant bug fixes -- update *strongly* recommended:
  * option -F was mistakenly turned off by the new iterative approach

@@ -260,7 +260,7 @@ private:
                 if(!FOREVER && !PREALIGNED)
                     cout<<" - option '+F' is not used; it can be enabled with '+F'"<<endl;
                 else if(PREALIGNED)
-                    cout<<" - option '+F' is not compatible with '-keep'"<<endl;
+                    cout<<" - option '+F' is not always compatible with '-keep'"<<endl;
 
                 Mafft_alignment ma;
                 bool mafftOK = ma.test_executable();
@@ -282,6 +282,12 @@ private:
                         cout<<"    BppAncestor for ancestral state reconstruction\n";
                 }
                 cout<<endl;
+
+                if(treefile!="" && iterations>1)
+                {
+                    cout<<"Warning: iterative search may change the guide tree. If you want to keep\n the phylogeny provided in '"<<treefile<<
+                          "', please add option '-once'.\n\n";
+                }
             }
         }
     }
