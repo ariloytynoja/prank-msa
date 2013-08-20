@@ -928,6 +928,7 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,string filename, b
 
     string tree = "";
     root->getLabelledNewickBrl(&tree);
+    tree += ";";
 
     ofstream ancTre((filename+".anc.dnd").c_str());
     ancTre<<tree<<endl;
