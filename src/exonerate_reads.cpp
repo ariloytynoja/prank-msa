@@ -17,7 +17,6 @@
 
 using namespace std;
 
-
 Exonerate_reads::Exonerate_reads()
 {
 
@@ -33,7 +32,8 @@ bool Exonerate_reads::test_executable()
     int length = readlink("/proc/self/exe",path,200-1);
 	
     string epath = string(path).substr(0,length);
-    epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+    if (epath.find("/")!=std::string::npos)
+        epath = epath.substr(0,epath.rfind("/")+1);
     exoneratepath = epath;
     epath = epath+"exonerate.exe > /dev/null 2>/dev/null";
     status = system(epath.c_str());
@@ -50,13 +50,15 @@ bool Exonerate_reads::test_executable()
         uint32_t size = sizeof(path);
         _NSGetExecutablePath(path, &size);
         epath = string(path);
-        epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+        if (epath.find("/")!=std::string::npos)
+            epath = epath.substr(0,epath.rfind("/")+1);
         //epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
 
         #else
         int length = readlink("/proc/self/exe",path,200-1);
         epath = string(path).substr(0,length);
-        epath.replace(epath.rfind("prank"),string("prank").size(),string(""));
+        if (epath.find("/")!=std::string::npos)
+            epath = epath.substr(0,epath.rfind("/")+1);
 
         #endif
         

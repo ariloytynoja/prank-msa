@@ -1,6 +1,8 @@
-v.130807
+v.130820
 - disabled copmutation of alignment score for the guide tree alignment
-- more information about iteration with user provided tree
+- more information about iteration with a user-provided tree
+- workaround for a BppAncestor bug causing incomplete last codon
+- path to other binaries no more affected by renaming of the program file
 
 
 v.130708

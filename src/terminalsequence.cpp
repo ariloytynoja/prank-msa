@@ -69,6 +69,8 @@ TerminalSequence::TerminalSequence(string* s)
 
         sAlpha = 61;
 
+        bool stop_removed = false;
+
         string S;
         for (int i=0; i<(int)s->length(); i++)
         {
@@ -83,12 +85,16 @@ TerminalSequence::TerminalSequence(string* s)
                 charseq += S.substr(i,3);
             else if (S.substr(i,3)=="---" || S.substr(i,3)=="...")
                 ;
-            else
+            else if(i+3<S.length())
                 charseq += "NNN";
+            else
+                stop_removed = true;
         }
 
         seqLength = realLength = charseq.size()/3;
 
+        if(NOISE>0 && stop_removed)
+            cout<<"Note: stop codon was removed\n";
     }
 
     else   // Protein or DNA

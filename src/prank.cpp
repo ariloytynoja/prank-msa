@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 130807;
+    version = 130820;
 
     readArguments(argc, argv);
     int time1 = time(0);
