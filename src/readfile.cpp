@@ -135,6 +135,29 @@ void ReadFile::countDnaFreqs(float* freqs,vector<string> *pseqs)
     }
 }
 
+int ReadFile::readBppPhylip(const char* filename)
+{
+    ifstream input(filename, ios::in);
+    names.clear();
+    seqs.clear();
+
+    if (!input)
+    {
+        cout<<"Failed to open sequence file "<<filename<<". Exiting.\n\n";
+        exit(-1);
+    }
+    this->readBppPhylip(input);
+
+    if (names.size() == seqs.size())
+    return names.size();
+    else
+    {
+        cout<<"Reading sequence data failed. Found "<<names.size()<<" names but "<<seqs.size()<<" sequences. Exiting.\n\n";
+        exit(-1);
+    }
+}
+
+
 int ReadFile::readFile(const char* inputfile)
 {
 
@@ -386,6 +409,47 @@ void ReadFile::readPhylip(std::istream & input)
         readInterleaved(temp,input,nseq,length);
     else
         readSequential(temp,input,nseq,length);
+}
+
+void ReadFile::readBppPhylip(istream & input)
+{
+    int nseq = -1;
+    int length = -1;
+
+    string temp, name, sequence = "";  // Initialization
+    getline(input, temp, '\n');  // Copy current line in temporary string
+
+    stringstream nums(temp);
+    nums>>nseq>>length;
+
+    if (nseq<1 || length<1)
+    {
+        cout<<"Input file starts with a digit but not with two positive digits. Reading the file failed. Exiting.\n";
+        exit(-1);
+    }
+
+    for (int i=0; i<nseq; i++)
+    {
+        getline(input, temp, '\n');
+
+        stringstream rows(temp);
+        rows>>name>>sequence;
+
+        name = this->remove_last_whitespaces(name);
+        sequence = this->remove_whitespaces(sequence);
+
+        do
+        {
+            getline(input, temp, '\n');
+
+            temp = this->remove_whitespaces(temp);
+            sequence += temp;
+        }
+        while (temp.length()>0);
+
+        names.push_back(name);
+        seqs.push_back(sequence);
+    }
 }
 
 void ReadFile::readInterleaved(string temp,istream & input,int nseq, int length)

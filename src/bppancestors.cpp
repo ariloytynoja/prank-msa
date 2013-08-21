@@ -199,7 +199,7 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
 
     stringstream command;
     command << bppdistpath<<"bppancestor input.sequence.file="<<f_name.str()<<" input.sequence.format=Fasta input.sequence.sites_to_use=all input.tree.file="<<t_name.str()<<
-            " input.tree.format=NHX input.sequence.max_gap_allowed=100% initFreqs=observed output.sequence.file="<<o_name.str()<<" output.sequence.format=Fasta";
+            " input.tree.format=NHX input.sequence.max_gap_allowed=100% initFreqs=observed output.sequence.file="<<o_name.str()<<" output.sequence.format=Phylip";
     if(!isDna)
         command << " alphabet=Protein model=WAG01";
     else
@@ -247,7 +247,8 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     */
 
     ReadFile rf;
-    rf.readFile(o_name.str().c_str());
+//    rf.readFile(o_name.str().c_str());
+    rf.readBppPhylip(o_name.str().c_str());
     vector<string> s = rf.getSeqs();
     vector<string> n = rf.getNames();
 

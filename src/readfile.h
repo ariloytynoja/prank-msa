@@ -40,6 +40,9 @@ public:
     void readNexus(istream & input);
     void readPhylip(istream & input);
 
+    int readBppPhylip(const char* filename);
+    void readBppPhylip(istream & input);
+
     void readInterleaved(string temp,istream & input,int nseq, int length);
     void readSequential(string temp,istream & input,int nseq, int length);
 

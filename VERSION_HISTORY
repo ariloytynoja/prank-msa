@@ -1,3 +1,7 @@
+v.130821
+- *proper* workaround for the BppAncestor bug
+
+
 v.130820
 - disabled copmutation of alignment score for the guide tree alignment
 - more information about iteration with a user-provided tree
