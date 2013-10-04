@@ -110,7 +110,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
      // Find the lengths and reserve space
     //
     int longest = 0; int slongest = 0;
-    Site *sites = new Site();
+    sites = new Site();
     this->findLongestSeq(&sequences,&longest,&slongest,sites);
 
      // Get the guidetree -- or generate one
@@ -337,10 +337,20 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         if (PRINTTREE)
             cout<<" - alignment guide tree to '"<<filename<<".dnd'\n";
 
-        if (WRITEXML)
-            cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'\n";
+        if(TRANSLATE)
+        {
+            if (WRITEXML)
+                cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"' and '"<<filename<<".[nuc|pep]"<<".xml'.\n";
+            else
+                cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"'.\n";
+        }
         else
-            cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'\n";
+        {
+            if (WRITEXML)
+                cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'\n";
+            else
+                cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'\n";
+        }
 
         if (WRITEANCSEQ)
             cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'\n";
@@ -363,24 +373,10 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
 void ProgressiveAlignment::updateIndelSites(AncestralNode *root)
 {
-//    cout<<endl;
-//    for(int i=0;i<root->getSequence()->lengthF();i++)
-//    {
-//        cout<<i<<" "<<root->getSequence()->isInsertion(i)<<" "<<root->getSequence()->isPermInsertion(i)<<" ; ";
-//        cout<<" "<<root->getLChild()->getSequence()->isInsertion(i)<<" "<<root->getLChild()->getSequence()->isPermInsertion(i)<<" ; ";
-//        cout<<" "<<root->getRChild()->getSequence()->isInsertion(i)<<" "<<root->getRChild()->getSequence()->isPermInsertion(i)<<endl;
-//    }
 
     for(int i=0;i<root->getSequence()->length();i++)
             root->updateInsertionSite(i,not root->getSequence()->isInsertion(i));
 
-//    cout<<endl;
-//    for(int i=0;i<root->getSequence()->length();i++)
-//    {
-//        cout<<i<<" "<<root->getSequence()->isInsertion(i)<<" "<<root->getSequence()->isPermInsertion(i)<<" ; ";
-//        cout<<" "<<root->getLChild()->getSequence()->isInsertion(i)<<" "<<root->getLChild()->getSequence()->isPermInsertion(i)<<" ; ";
-//        cout<<" "<<root->getRChild()->getSequence()->isInsertion(i)<<" "<<root->getRChild()->getSequence()->isPermInsertion(i)<<endl;
-//    }
 }
 
 
@@ -388,12 +384,21 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 {
     if(verbose)
     {
-        if (WRITEXML)
-            cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'.\n";
+        if(TRANSLATE)
+        {
+            if (WRITEXML)
+                cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"' and '"<<filename<<".xml'.\n";
+            else
+                cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"'.\n";
+        }
         else
-            cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'.\n";
+        {
+            if (WRITEXML)
+                cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'.\n";
+            else
+                cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'.\n";
+        }
     }
-
     int l = root->getSequence()->length();
 
     nms->clear();
@@ -452,11 +457,130 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
             exit(-1);
         }
 
+        bool tmpCODON = CODON;
+        bool tmpisDna = isDna;
+        bool tmpPREALIGNED = PREALIGNED;
+
+        AncestralNode* tmpRoot = root;
+
+        if(!MTTABLE)
+        {
+            // Make setting and set the alignment model
+            //
+            CODON = true;
+            isDna = true;
+            PREALIGNED = true;
+            this->makeSettings(isDna);
+            this->setHMModel(&dSeqs,isDna);
+
+             // Find the lengths and reserve space
+            //
+            int longest = 0; int slongest = 0;
+            this->findLongestSeq(&dSeqs,&longest,&slongest,sites);
+
+             // Get the guidetree -- or generate one
+            //
+            string tree = "";
+            root->getCleanNewick(&tree);
+
+            // Build the tree structure and get its root
+            //
+            map<string,TreeNode*> nodes;
+
+            ReadNewick rn;
+            rn.buildTree(tree,&nodes);
+
+            AncestralNode* codonRoot = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
+
+            // Now set the sequences ...
+            //
+            int nsqs = 0;
+            codonRoot->setCharString(nms,&dSeqs,&nsqs);
+
+            //
+            if(!this->sequencesAligned(&dSeqs))
+            {
+                cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
+                exit(0);
+            }
+
+            ReadAlignment ra;
+            ra.initialiseMatrices(longest+2);
+
+            codonRoot->setTotalNodes();
+
+            bool success = codonRoot->readAlignment();
+
+            if(not success)
+            {
+                codonRoot->deleteAncestralSeqs();
+
+                cout<<"\nReading the alignment failed. Trying without option '+F'.\n";
+                FOREVER = false;
+                ra.cleanUp();
+                ra.initialiseMatrices(longest+2);
+
+                codonRoot->setTotalNodes();
+                success = codonRoot->readAlignment();
+                if(not success)
+                {
+                    cout<<"Reading the alignment failed. Terminating.\n";
+                    exit(-1);
+                }
+            }
+
+            this->updateIndelSites(codonRoot);
+
+            nms->clear();
+            codonRoot->getTerminalNames(nms);
+
+            vector<string>::iterator si = dSeqs.begin();
+            for (; si!=dSeqs.end(); si++)
+            {
+                si->clear();
+            }
+
+            vector<string> col;
+
+            for (int i=0; i<l; i++)
+            {
+
+                col.clear();
+                codonRoot->getCharactersAt(&col,i);
+                vector<string>::iterator cb = col.begin();
+                vector<string>::iterator ce = col.end();
+
+                si = dSeqs.begin();
+                for (; cb!=ce; cb++,si++)
+                {
+                    *si+=*cb;
+                }
+            }
+
+            l*=3;
+
+            tmpRoot = codonRoot;
+            ra.cleanUp();
+
+        }
+
         file = filename+".nuc"+formatExtension(format);
-        wfa.writeSeqs(file.c_str(),nms,&dSeqs,format,true,root,true);
+        wfa.writeSeqs(file.c_str(),nms,&dSeqs,format,true,tmpRoot,true);
 
         if (WRITEXML)
-            this->printXml(root,filename,true);
+            this->printXml(tmpRoot,filename,true);
+
+        CODON = tmpCODON;
+        isDna = tmpisDna;
+        PREALIGNED = tmpPREALIGNED;
+
+        this->makeSettings(isDna);
+        this->setHMModel(seqs,isDna);
+
+        if(!MTTABLE)
+            delete tmpRoot;
+
+
     }
 
     if (WRITEANCSEQ)
@@ -530,7 +654,7 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
     }
     nms.clear();
 
-    if (!(TRANSLATE && translate))
+    if (1) //!(TRANSLATE && translate))
     {
         // internal nodes
         map<string,string> anc_seqs;
@@ -957,7 +1081,7 @@ void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,char* alignmen
     int n = root->getTerminalNodeNumber();
     int l = root->getSequence()->length();
 
-    if (!translate)
+    if (1) //!translate)
     {
 
         vector<string> col;

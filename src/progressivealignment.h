@@ -49,6 +49,9 @@ public:
     ~ProgressiveAlignment();
 
 private:
+
+    Site *sites;
+
     void getAlignmentMatrix(AncestralNode *root,char* alignment,bool translate);
     void getAlignmentMatrix(AncestralNode *root,vector<string> *aseqs,bool translate);
 

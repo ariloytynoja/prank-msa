@@ -66,6 +66,7 @@ TerminalSequence::TerminalSequence(string* s)
         {
             codons.insert(make_pair(alpha.substr(i,3),i/3));
         }
+        codons.insert(make_pair("---",61));
 
         sAlpha = 61;
 
