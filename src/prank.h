@@ -86,6 +86,9 @@ bool MAFFTALIGNMENT = true;
 // estimate guide tree from input alignment (before realignment)
 bool TREEFROMALIGNMENT = false;
 
+// stop after tree estimation
+bool TREEONLY = false;
+
 // compute score for mafft alignment
 bool SCOREMAFFT = false;
 

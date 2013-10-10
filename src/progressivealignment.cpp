@@ -118,6 +118,21 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     string tree;
     this->getGuideTree(&names,&sequences,&tree,isDna);
 
+    if(TREEONLY)
+    {
+        cout<<"\n\nWriting\n";
+        cout<<" - estimated tree to '"<<outfile<<".dnd'\n\n";
+
+        string name = outfile+".dnd";
+        ofstream seqout(name.c_str());
+        seqout<<tree<<endl;
+        seqout.close();
+
+        sites->deleteMatrices();
+        delete sites;
+
+        exit(0);
+    }
     // Build the tree structure and get its root
     //
     map<string,TreeNode*> nodes;

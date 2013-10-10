@@ -226,6 +226,12 @@ private:
             if(NOISE==0) { NOISE=-1; SCREEN = false;}
 
         }
+        else if (TREEONLY)
+        {
+            cout<<" - computing NJ tree for '"<<seqfile<<"'"<<endl;
+            if(NOISE==0) { NOISE=-1; SCREEN = false;}
+
+        }
         else
         {
             if (BACKTRANSLATE)

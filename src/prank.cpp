@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 130820;
+    version = 131010;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -242,6 +242,11 @@ void readArguments(int argc, char *argv[])
             else if (s=="-njtree")
             {
                 TREEFROMALIGNMENT = true;
+            }
+
+            else if (s=="-treeonly")
+            {
+                TREEONLY = true;
             }
 
             // output alignment format
@@ -760,6 +765,7 @@ void printHelp(bool complete)
     }
     cout<<"  -support [compute posterior support]"<<endl;
     cout<<"  -njtree [estimate tree from input alignment (and realign)]"<<endl;
+    cout<<"  -treeonly [estimate tree only]"<<endl;
     cout<<"  -quiet"<<endl;
     if (complete)
     {
