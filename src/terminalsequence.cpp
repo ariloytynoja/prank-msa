@@ -86,7 +86,7 @@ TerminalSequence::TerminalSequence(string* s)
                 charseq += S.substr(i,3);
             else if (S.substr(i,3)=="---" || S.substr(i,3)=="...")
                 ;
-            else if(i+3<S.length())
+            else if(i+3<S.length() || PREALIGNED)
                 charseq += "NNN";
             else
                 stop_removed = true;

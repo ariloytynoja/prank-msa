@@ -472,112 +472,115 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
             exit(-1);
         }
 
+
         bool tmpCODON = CODON;
         bool tmpisDna = isDna;
         bool tmpPREALIGNED = PREALIGNED;
 
         AncestralNode* tmpRoot = root;
 
-        if(!MTTABLE)
+        if(MTTABLE)
         {
-            // Make setting and set the alignment model
-            //
-            CODON = true;
-            isDna = true;
-            PREALIGNED = true;
-            this->makeSettings(isDna);
-            this->setHMModel(&dSeqs,isDna);
+            cout<<"Warning: DNA ancestor reconstruction based on the standard codon model.\n";
+        }
 
-             // Find the lengths and reserve space
-            //
-            int longest = 0; int slongest = 0;
-            this->findLongestSeq(&dSeqs,&longest,&slongest,sites);
+        // Make setting and set the alignment model
+        //
+        CODON = true;
+        isDna = true;
+        PREALIGNED = true;
+        this->makeSettings(isDna);
+        this->setHMModel(&dSeqs,isDna);
 
-             // Get the guidetree -- or generate one
-            //
-            string tree = "";
-            root->getCleanNewick(&tree);
+         // Find the lengths and reserve space
+        //
+        int longest = 0; int slongest = 0;
+        this->findLongestSeq(&dSeqs,&longest,&slongest,sites);
 
-            // Build the tree structure and get its root
-            //
-            map<string,TreeNode*> nodes;
+         // Get the guidetree -- or generate one
+        //
+        string tree = "";
+        root->getCleanNewick(&tree);
 
-            ReadNewick rn;
-            rn.buildTree(tree,&nodes);
+        // Build the tree structure and get its root
+        //
+        map<string,TreeNode*> nodes;
 
-            AncestralNode* codonRoot = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
+        ReadNewick rn;
+        rn.buildTree(tree,&nodes);
 
-            // Now set the sequences ...
-            //
-            int nsqs = 0;
-            codonRoot->setCharString(nms,&dSeqs,&nsqs);
+        AncestralNode* codonRoot = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
 
-            //
-            if(!this->sequencesAligned(&dSeqs))
-            {
-                cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
-                exit(0);
-            }
+        // Now set the sequences ...
+        //
+        int nsqs = 0;
+        codonRoot->setCharString(nms,&dSeqs,&nsqs);
 
-            ReadAlignment ra;
+        //
+        if(!this->sequencesAligned(&dSeqs))
+        {
+            cout<<"Sequences don't seem to be aligned. Exiting.\n\n";
+            exit(0);
+        }
+
+        ReadAlignment ra;
+        ra.initialiseMatrices(longest+2);
+
+        codonRoot->setTotalNodes();
+
+        bool success = codonRoot->readAlignment();
+
+        if(not success)
+        {
+            codonRoot->deleteAncestralSeqs();
+
+            cout<<"\nReading the alignment failed. Trying without option '+F'.\n";
+            FOREVER = false;
+            ra.cleanUp();
             ra.initialiseMatrices(longest+2);
 
             codonRoot->setTotalNodes();
-
-            bool success = codonRoot->readAlignment();
-
+            success = codonRoot->readAlignment();
             if(not success)
             {
-                codonRoot->deleteAncestralSeqs();
-
-                cout<<"\nReading the alignment failed. Trying without option '+F'.\n";
-                FOREVER = false;
-                ra.cleanUp();
-                ra.initialiseMatrices(longest+2);
-
-                codonRoot->setTotalNodes();
-                success = codonRoot->readAlignment();
-                if(not success)
-                {
-                    cout<<"Reading the alignment failed. Terminating.\n";
-                    exit(-1);
-                }
+                cout<<"Reading the alignment failed. Terminating.\n";
+                exit(-1);
             }
-
-            this->updateIndelSites(codonRoot);
-
-            nms->clear();
-            codonRoot->getTerminalNames(nms);
-
-            vector<string>::iterator si = dSeqs.begin();
-            for (; si!=dSeqs.end(); si++)
-            {
-                si->clear();
-            }
-
-            vector<string> col;
-
-            for (int i=0; i<l; i++)
-            {
-
-                col.clear();
-                codonRoot->getCharactersAt(&col,i);
-                vector<string>::iterator cb = col.begin();
-                vector<string>::iterator ce = col.end();
-
-                si = dSeqs.begin();
-                for (; cb!=ce; cb++,si++)
-                {
-                    *si+=*cb;
-                }
-            }
-
-            l*=3;
-
-            tmpRoot = codonRoot;
-            ra.cleanUp();
-
         }
+
+        this->updateIndelSites(codonRoot);
+
+        nms->clear();
+        codonRoot->getTerminalNames(nms);
+
+        vector<string>::iterator si = dSeqs.begin();
+        for (; si!=dSeqs.end(); si++)
+        {
+            si->clear();
+        }
+
+        vector<string> col;
+
+        for (int i=0; i<l; i++)
+        {
+
+            col.clear();
+            codonRoot->getCharactersAt(&col,i);
+            vector<string>::iterator cb = col.begin();
+            vector<string>::iterator ce = col.end();
+
+            si = dSeqs.begin();
+            for (; cb!=ce; cb++,si++)
+            {
+                *si+=*cb;
+            }
+        }
+
+        l*=3;
+
+        tmpRoot = codonRoot;
+        ra.cleanUp();
+
 
         file = filename+".nuc"+formatExtension(format);
         wfa.writeSeqs(file.c_str(),nms,&dSeqs,format,true,tmpRoot,true);
@@ -592,8 +595,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         this->makeSettings(isDna);
         this->setHMModel(seqs,isDna);
 
-        if(!MTTABLE)
-            delete tmpRoot;
+        delete tmpRoot;
 
 
     }
@@ -669,21 +671,19 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
     }
     nms.clear();
 
-    if (1) //!(TRANSLATE && translate))
+
+    // internal nodes
+    map<string,string> anc_seqs;
+    this->getAncestralAlignmentSeqs(root,&anc_seqs);
+
+    root->setSiteLength(l);
+    for (int i=0; i<l; i++)
     {
-        // internal nodes
-        map<string,string> anc_seqs;
-        this->getAncestralAlignmentSeqs(root,&anc_seqs);
-
-
-        root->setSiteLength(l);
-        for (int i=0; i<l; i++)
-        {
-            root->setSiteIndex(i,i);
-        }
-
-        root->outputXml(&seqout,&anc_seqs,translate);
+        root->setSiteIndex(i,i);
     }
+
+    root->outputXml(&seqout,&anc_seqs,translate);
+
     seqout<<"</nodes>"<<endl;
 
     if(nState>1 || DOPOST)

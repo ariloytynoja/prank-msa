@@ -27,7 +27,7 @@
 class AncestralNode : public TreeNode
 {
     AncestralSequence* seq;
-
+    bool reestimateBranchLength;
 public:
     AncestralNode(std::string s);
 

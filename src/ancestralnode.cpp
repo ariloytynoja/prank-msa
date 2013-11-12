@@ -82,6 +82,8 @@ AncestralNode::AncestralNode(string s)
     LRealign = false;
     RRealign = false;
 
+    reestimateBranchLength = false;
+
     string left_tag = "";
     string right_tag = "";
 
@@ -130,6 +132,7 @@ AncestralNode::AncestralNode(string s)
     else
     {
         ld = defaultBranchLength;
+        reestimateBranchLength = true;
     }
 
     if(rn.find(":") != string::npos)
@@ -140,6 +143,7 @@ AncestralNode::AncestralNode(string s)
     else
     {
         rd = defaultBranchLength;
+        reestimateBranchLength = true;
     }
 
     if (ln.at(0)=='#' && ln.at(ln.length()-1)=='#')
@@ -297,6 +301,11 @@ void AncestralNode::alignThisNode()
     hp->alignSeqs(lChild->getSequence(),rChild->getSequence(),pms);
     if (NOISE>0)
         cout<<"Hirschberg: "<<hp->getMaxScore()<<"; time "<<(time(0)-time1)<<"s"<<endl;
+
+    if(this->reestimateBranchLength)
+    {
+        this->getAlignedSeqStr();
+    }
 
     delete hp;
     delete pms;
