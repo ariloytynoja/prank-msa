@@ -943,7 +943,7 @@ void AncestralNode::markRealignSubtrees(map<string,float> *subtrees)
     map<string,float>::iterator it = subtrees->find(subtree);
     if(it != subtrees->end())
     {
-        if( abs( (getLeftBrL() - it->second)/getLeftBrL() ) < 0.1 )
+        if( abs( (getLeftBrL() - it->second)/getLeftBrL() ) < updateTolerance )
         {
             subtree = "";
             getRChild()->getSubtreeBelow(&subtree);
@@ -951,7 +951,7 @@ void AncestralNode::markRealignSubtrees(map<string,float> *subtrees)
             it = subtrees->find(subtree);
             if(it != subtrees->end())
             {
-                if( abs( (getRightBrL() - it->second)/getRightBrL() ) < 0.1 )
+                if( abs( (getRightBrL() - it->second)/getRightBrL() ) < updateTolerance )
                 {
                     realignNode = false;
                 }
