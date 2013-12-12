@@ -796,6 +796,15 @@ void HMModel::alignmentModel(AncestralNode *tn)
         }
     }
 
+    if (ld<minBrL)
+    {
+        ld=minBrL;
+    }
+    if (rd<minBrL)
+    {
+        rd=minBrL;
+    }
+
     trp->initialise(0);
     double t;
 

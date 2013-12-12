@@ -39,7 +39,6 @@ bool Exonerate_reads::test_executable()
     status = system(epath.c_str());
 
     #else
-    status = system("`exonerate  >/dev/null 2>/dev/null`");
 
     if(WEXITSTATUS(status) != 1)
     {
@@ -64,9 +63,18 @@ bool Exonerate_reads::test_executable()
         
         exoneratepath = epath;
         epath = epath+"exonerate >/dev/null 2>/dev/null";
+
         status = system(epath.c_str());
     }
     #endif
+
+    if(WEXITSTATUS(status) == 1) {
+        if(NOISE>0)
+            cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";
+        return true;
+    }
+
+    status = system("`exonerate  >/dev/null 2>/dev/null`");
 
     if(WEXITSTATUS(status) == 1 && NOISE>0)
         cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";

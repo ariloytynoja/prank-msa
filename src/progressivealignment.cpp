@@ -724,7 +724,7 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
 {
 
     BppAncestors bppa;
-    if(bppa.testExecutable())
+    if(BPPANCESTORS && bppa.testExecutable())
     {
         if(NOISE>0)
             cout<<"Using BppAncestor to infer ancestral sequences\n";

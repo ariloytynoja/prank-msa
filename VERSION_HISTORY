@@ -1,3 +1,9 @@
+v.131211
+- search order for external tools changed: use own one first
+- '-nobbpa' to run without BppAncestors (even when available)
+- a fix for rare crashes due to overly long branch lengths
+
+
 v.131119
 - ancestor inference for translated alignments of DNA sequences
 - new option '-treeonly'

@@ -56,10 +56,6 @@ bool BppAncestors::testExecutable()
     return WEXITSTATUS(status) == 0;
 
     # else
-    int status = system("bppancestor >/dev/null 2>/dev/null");
-
-    if(WEXITSTATUS(status) == 0)
-        return true;
 
     char path[200];
     string epath;
@@ -82,7 +78,12 @@ bool BppAncestors::testExecutable()
 
     bppdistpath = epath;
     epath = epath+"bppancestor >/dev/null 2>/dev/null";
-    status = system(epath.c_str());
+    int status = system(epath.c_str());
+
+    if(WEXITSTATUS(status) == 0)
+        return true;
+
+    status = system("bppancestor >/dev/null 2>/dev/null");
 
     return WEXITSTATUS(status) == 0;
 

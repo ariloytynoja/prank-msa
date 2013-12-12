@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 131119;
+    version = 131211;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -254,6 +254,12 @@ void readArguments(int argc, char *argv[])
             {
                 string tmp = string(argv[i]).substr(11);
                 format = parseFormat(tmp);
+            }
+
+            // do not estimate ancestors with bppancestor
+            else if (s=="-nobppa")
+            {
+                BPPANCESTORS = false;
             }
 
             // output alignment format

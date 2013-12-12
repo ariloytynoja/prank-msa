@@ -32,10 +32,6 @@ bool Mafft_alignment::test_executable()
     return WEXITSTATUS(status) == 1;
 
     # else
-    int status = system("mafft -h >/dev/null 2>/dev/null");
-
-    if(WEXITSTATUS(status) == 1)
-        return true;
 
     char path[200];
     string epath;
@@ -58,7 +54,13 @@ bool Mafft_alignment::test_executable()
 
     mafftpath = epath;
     epath = epath+"mafft -h >/dev/null 2>/dev/null";
-    status = system(epath.c_str());
+    int status = system(epath.c_str());
+
+    if(WEXITSTATUS(status) == 1)
+        return true;
+
+    status = system("mafft -h >/dev/null 2>/dev/null");
+
     return WEXITSTATUS(status) == 1;
 
     #endif

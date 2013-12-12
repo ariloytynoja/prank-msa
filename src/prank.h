@@ -92,6 +92,9 @@ bool TREEONLY = false;
 // compute score for mafft alignment
 bool SCOREMAFFT = false;
 
+// estimate ancestors with bppancestors
+bool BPPANCESTORS = true;
+
 // merge two alignments
 bool MERGE = false;
 
@@ -246,7 +249,7 @@ bool MAXBRANCH = false;
 float dnaMaxPairwiseLength = 0.3;
 float protMaxPairwiseLength = 0.5;
 
-bool ADJUSTMODEL = false;
+bool ADJUSTMODEL = true;
 
 // use real guidetree distances
 bool REALBRANCHES = false;

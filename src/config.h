@@ -66,6 +66,7 @@ extern bool MAFFTALIGNMENT;
 extern bool TREEFROMALIGNMENT;
 extern bool TREEONLY;
 extern bool SCOREMAFFT;
+extern bool BPPANCESTORS;
 
 extern int format;
 
