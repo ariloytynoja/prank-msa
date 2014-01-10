@@ -83,6 +83,7 @@ bool BppAncestors::testExecutable()
     if(WEXITSTATUS(status) == 0)
         return true;
 
+    bppdistpath = "";
     status = system("bppancestor >/dev/null 2>/dev/null");
 
     return WEXITSTATUS(status) == 0;
@@ -211,7 +212,8 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
             command << " alphabet=DNA model=HKY85";
     }
 
-//    cout<<command.str()<<endl;
+    if(NOISE>0)
+        cout<<"cmd: "<<command.str()<<endl;
 
 
     FILE *fpipe;

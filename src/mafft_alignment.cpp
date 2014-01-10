@@ -59,6 +59,7 @@ bool Mafft_alignment::test_executable()
     if(WEXITSTATUS(status) == 1)
         return true;
 
+    mafftpath = "";
     status = system("mafft -h >/dev/null 2>/dev/null");
 
     return WEXITSTATUS(status) == 1;
@@ -98,6 +99,8 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
 
     stringstream command;
     command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas  2>/dev/null";
+    if(NOISE>0)
+        cout<<"cmd: "<<command.str()<<endl;
 
 //    #if defined (__CYGWIN__)
 //    char path[200];

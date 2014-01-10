@@ -74,6 +74,7 @@ bool Exonerate_reads::test_executable()
         return true;
     }
 
+    exoneratepath = "";
     status = system("`exonerate  >/dev/null 2>/dev/null`");
 
     if(WEXITSTATUS(status) == 1 && NOISE>0)
@@ -188,7 +189,6 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 
     stringstream command;
     command<<exoneratepath<<"exonerate  ";
-
 //    #if defined (__CYGWIN__)
 //    char path[200];
 //    int length = readlink("/proc/self/exe",path,200-1);
@@ -201,7 +201,9 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 //    command<<"exonerate  ";
 //    #endif
     command << " -q "+tmp_dir+"q"<<r<<".fas -t "+tmp_dir+"t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
-    
+    if(NOISE>0)
+        cout<<"cmd: "<<command.str()<<endl;
+
     FILE *fpipe;
     if ( !(fpipe = (FILE*)popen(command.str().c_str(),"r")) )
     {
