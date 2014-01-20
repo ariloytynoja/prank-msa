@@ -207,6 +207,10 @@ bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vecto
             {
                 nuc+="---";
             }
+            else if (aa==".")
+            {
+                nuc+="...";
+            }
             else
             {
                 string codon = dnaSeq.substr(i,3);
