@@ -55,11 +55,20 @@ TerminalSequence::TerminalSequence(string* s)
 
     if (CODON)
     {
+
+        bool gaps_removed = false;
+
         if (s->size()%3!=0)
         {
-            cout<<s->size()<<" "<<*s<<endl;
-            cout<<"codon sequence length is not multiple of three!"<<endl;
-            exit(0);
+            this->removeGaps(s);
+            gaps_removed = true;
+
+            if (s->size()%3!=0)
+            {
+                cout<<s->size()<<" "<<*s<<endl;
+                cout<<"codon sequence length is not multiple of three!"<<endl;
+                exit(0);
+            }
         }
 
         for (int i=0; i<183; i+=3)
@@ -96,6 +105,9 @@ TerminalSequence::TerminalSequence(string* s)
 
         if(NOISE>0 && stop_removed)
             cout<<"Note: stop codon was removed\n";
+
+        if(NOISE>0 && gaps_removed)
+            cout<<"Note: gaps were removed\n";
     }
 
     else   // Protein or DNA

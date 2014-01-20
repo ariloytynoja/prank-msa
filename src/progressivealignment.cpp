@@ -454,6 +454,10 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
         if (WRITEXML)
             this->printXml(root,filename,false);
+
+        if (WRITEANCSEQ)
+            this->printAncestral(root,filename,isDna,verbose);
+
     }
     else
     {
@@ -524,6 +528,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         }
 
         ReadAlignment ra;
+        ra.cleanUp();
         ra.initialiseMatrices(longest+2);
 
         codonRoot->setTotalNodes();
@@ -579,7 +584,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         l*=3;
 
         tmpRoot = codonRoot;
-        ra.cleanUp();
+        //ra.cleanUp();
 
 
         file = filename+".nuc"+formatExtension(format);
@@ -587,6 +592,9 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
         if (WRITEXML)
             this->printXml(tmpRoot,filename,true);
+
+        if (WRITEANCSEQ)
+            this->printAncestral(root,filename,isDna,verbose);
 
         CODON = tmpCODON;
         isDna = tmpisDna;
@@ -597,11 +605,9 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
         delete tmpRoot;
 
-
     }
-
-    if (WRITEANCSEQ)
-        this->printAncestral(root,filename,isDna,verbose);
+//    if (WRITEANCSEQ)
+//        this->printAncestral(root,filename,isDna,verbose);
 
 }
 

@@ -23,6 +23,7 @@
 #include <string>
 #include <iostream>
 #include <sequence.h>
+#include <string.h>
 
 class TerminalSequence : public Sequence
 {
@@ -146,6 +147,21 @@ public:
     {
         return false;
     }
+
+    void removeGaps(std::string *si)
+    {
+        std::string s = "";
+        for (int i=0; i<(int)si->length(); i++)
+        {
+            char c = si->at(i);
+            if (c!='-')
+            {
+                s+=c;
+            }
+        }
+        *si = s;
+    }
+
 };
 
 #endif

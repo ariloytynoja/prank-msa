@@ -39,6 +39,9 @@ Site::~Site()
 
 void Site::setMatrices(int longest,int )
 {
+    if(count>2)
+        this->deleteMatrices();
+
     int s = (int)(initialMatrixSize*(float)longest);
 
     anc = new BoolMatrix(s,"site_anc");
