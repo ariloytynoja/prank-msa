@@ -60,7 +60,7 @@ bool ReadFile::dnaSeqs()
             if (pos>=0 && pos<=(int)nucs.length())
                 match++;
 //            if((*si).at(i) != '-')
-            if ((*si).at(i) != '-' && (*si).at(i) != '?')
+            if ((*si).at(i) != '-' && (*si).at(i) != '?' && (*si).at(i) != '.')
                 total2++;
         }
     }
