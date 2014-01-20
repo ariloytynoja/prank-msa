@@ -58,6 +58,9 @@ TerminalSequence::TerminalSequence(string* s)
 
         bool gaps_removed = false;
 
+        if (! (PREALIGNED || PARTLYALIGNED || UPDATE) )
+            this->removeGaps(s);
+
         if (s->size()%3!=0)
         {
             this->removeGaps(s);
