@@ -183,7 +183,8 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
 //                    cout<<"tag "<<tag<<endl;
 
                     stringstream tc;
-                    if(tag!="")
+                    char * pEnd;
+                    if(tag!="" && strtol(tag.c_str(),&pEnd,10)>0)
                     {
                         tc<<"#"<<tag<<"#";
                     }
