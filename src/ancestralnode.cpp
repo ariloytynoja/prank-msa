@@ -623,7 +623,7 @@ bool AncestralNode::readThisNode()
             }
             else
             {
-                cout<<"ReadAlignment: Error reading the alignment. Gaps not following codon structure. Exiting.\n\n";
+                cout<<"Error reading the alignment. Gaps not following codon structure. Exiting.\n\n";
                 exit(-1);
             }
 

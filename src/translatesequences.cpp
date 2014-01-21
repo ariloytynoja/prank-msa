@@ -98,11 +98,13 @@ bool TranslateSequences::translateProtein(const vector<string> *names,vector<str
                 {
                     inFrame = false;
                     if(UPDATE || PREALIGNED || PARTLYALIGNED)
-                        cout<<"Input alignment not in frame. Gaps removed and realignment needed.\n";
-                    UPDATE = false;
-                    PREALIGNED = false;
-                    PARTLYALIGNED = false;
-
+                    {
+                        cout<<"Error reading the alignment. Gaps not following codon structure. Exiting.\n";
+                        exit(0);
+//                        UPDATE = false;
+//                        PREALIGNED = false;
+//                        PARTLYALIGNED = false;
+                    }
                     break;
                 }
             }

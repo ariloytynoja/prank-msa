@@ -181,17 +181,17 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                     b--;
 
 //                    cout<<"tag "<<tag<<endl;
-
+                    // An attempt to get around a BppAncestor bug: not needed anymore
                     stringstream tc;
-                    char * pEnd;
-                    if(tag!="" && strtol(tag.c_str(),&pEnd,10)>0)
-                    {
-                        tc<<"#"<<tag<<"#";
-                    }
-                    else
-                    {
+//                    char * pEnd;
+//                    if(tag!="" && strtol(tag.c_str(),&pEnd,10)>0)
+//                    {
+//                        tc<<"#"<<tag<<"#";
+//                    }
+//                    else
+//                    {
                         tc<<"#"<<count++<<"#";
-                    }
+//                    }
 
                     AncestralNode *tn = new AncestralNode(n);
                     tn->setNodeName(tc.str());

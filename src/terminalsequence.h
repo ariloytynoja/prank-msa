@@ -154,7 +154,7 @@ public:
         for (int i=0; i<(int)si->length(); i++)
         {
             char c = si->at(i);
-            if (c!='-')
+            if (c!='-' && c!='.')
             {
                 s+=c;
             }
