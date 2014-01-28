@@ -358,6 +358,9 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
                 cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"' and '"<<filename<<".[nuc|pep]"<<".xml'.\n";
             else
                 cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"'.\n";
+
+            if (WRITEANCSEQ)
+                cout<<" - ancestors to '"<<filename<<".[nuc|pep].anc"<<this->formatExtension(format)<<"' and '"<<filename<<".[nuc|pep].anc.dnd'\n";
         }
         else
         {
@@ -365,10 +368,10 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
                 cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'\n";
             else
                 cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'\n";
-        }
 
-        if (WRITEANCSEQ)
-            cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'\n";
+            if (WRITEANCSEQ)
+                cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'\n";
+        }
 
         if(LISTEVENTS)
             cout<<" - inferred events to file '"<<filename<<".events'\n";
@@ -405,6 +408,9 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
                 cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"' and '"<<filename<<".xml'.\n";
             else
                 cout<<" - alignment to '"<<filename<<".[nuc|pep]"<<this->formatExtension(format)<<"'.\n";
+
+            if (WRITEANCSEQ)
+                cout<<" - ancestors to '"<<filename<<".[nuc|pep].anc"<<this->formatExtension(format)<<"' and '"<<filename<<".[nuc|pep].anc.dnd'\n";
         }
         else
         {
@@ -412,7 +418,13 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
                 cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"' and '"<<filename<<".xml'.\n";
             else
                 cout<<" - alignment to '"<<filename<<this->formatExtension(format)<<"'.\n";
+
+            if (WRITEANCSEQ)
+                cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'\n";
         }
+
+        if(LISTEVENTS)
+            cout<<" - inferred events to file '"<<filename<<".events'\n";
     }
     int l = root->getSequence()->length();
 
@@ -468,6 +480,9 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
         if (WRITEXML)
             this->printXml(root,filename,false);
+
+        if (WRITEANCSEQ)
+            this->printAncestral(root,filename+".pep",isDna,verbose);
 
         vector<string> dSeqs;
         if (!trseq.translateDNA(nms,seqs,&dSeqs,&dnaSeqs))
@@ -594,7 +609,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
             this->printXml(tmpRoot,filename,true);
 
         if (WRITEANCSEQ)
-            this->printAncestral(root,filename,isDna,verbose);
+            this->printAncestral(tmpRoot,filename+".nuc",isDna,verbose);
 
         CODON = tmpCODON;
         isDna = tmpisDna;
@@ -1067,9 +1082,6 @@ void ProgressiveAlignment::printAncestral(AncestralNode *root,string filename, b
 {
     this->setAlignedSequences(root);
     this->reconstructAncestors(root,isDna);
-
-    if(verbose)
-        cout<<" - ancestors to '"<<filename<<".anc"<<this->formatExtension(format)<<"' and '"<<filename<<".anc.dnd'.\n";
 
     string tree = "";
     root->getLabelledNewickBrl(&tree);
