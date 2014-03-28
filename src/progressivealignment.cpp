@@ -464,12 +464,18 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         string file = filename+formatExtension(format);
         wfa.writeSeqs(file.c_str(),nms,seqs,format,isDna,root,false);
 
-        if (WRITEXML)
-            this->printXml(root,filename,false);
+        if (WRITEXML || WRITEANCSEQ)
+        {
 
-        if (WRITEANCSEQ)
-            this->printAncestral(root,filename,isDna,verbose);
+            this->setAlignedSequences(root);
+            this->reconstructAncestors(root,isDna);
 
+            if (WRITEXML)
+                this->printXml(root,filename,false);
+
+            if (WRITEANCSEQ)
+                this->printAncestral(root,filename,isDna,verbose);
+        }
     }
     else
     {
@@ -478,11 +484,17 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         string file = filename+".pep"+formatExtension(format);
         wfa.writeSeqs(file.c_str(),nms,seqs,format,false,root,false);
 
-        if (WRITEXML)
-            this->printXml(root,filename,false);
+        if (WRITEXML || WRITEANCSEQ)
+        {
 
-        if (WRITEANCSEQ)
-            this->printAncestral(root,filename+".pep",isDna,verbose);
+            this->setAlignedSequences(root);
+            this->reconstructAncestors(root,isDna);
+            if (WRITEXML)
+                this->printXml(root,filename,false);
+
+            if (WRITEANCSEQ)
+                this->printAncestral(root,filename+".pep",isDna,verbose);
+        }
 
         vector<string> dSeqs;
         if (!trseq.translateDNA(nms,seqs,&dSeqs,&dnaSeqs))
@@ -583,7 +595,6 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
         for (int i=0; i<l; i++)
         {
-
             col.clear();
             codonRoot->getCharactersAt(&col,i);
             vector<string>::iterator cb = col.begin();
@@ -605,11 +616,17 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         file = filename+".nuc"+formatExtension(format);
         wfa.writeSeqs(file.c_str(),nms,&dSeqs,format,true,tmpRoot,true);
 
-        if (WRITEXML)
-            this->printXml(tmpRoot,filename,true);
+        if (WRITEXML || WRITEANCSEQ)
+        {
+            this->setAlignedSequences(tmpRoot);
+            this->reconstructAncestors(tmpRoot,isDna);
 
-        if (WRITEANCSEQ)
-            this->printAncestral(tmpRoot,filename+".nuc",isDna,verbose);
+            if (WRITEXML)
+                this->printXml(tmpRoot,filename,true);
+
+            if (WRITEANCSEQ)
+                this->printAncestral(tmpRoot,filename+".nuc",isDna,verbose);
+        }
 
         CODON = tmpCODON;
         isDna = tmpisDna;
@@ -634,17 +651,35 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
     int l = root->getSequence()->length();
     int nState = hmm->getNStates();
 
-    char* alignment;
-    if (CODON || translate)
-    {
-        alignment = new char[n*l*3];
-    }
-    else
-    {
-        alignment = new char[n*l];
-    }
+//    char* alignment;
+//    if (CODON || translate)
+//    {
+//        alignment = new char[n*l*3];
+//    }
+//    else
+//    {
+//        alignment = new char[n*l];
+//    }
 
-    this->getAlignmentMatrix(root,alignment,translate);
+//    this->getAlignmentMatrix(root,alignment,translate);
+
+// ->
+    vector<string> anms;
+    root->getNames(&anms);
+
+    vector<string> aseqs;
+    root->getAllSequenceStrings(&aseqs);
+
+
+    vector<string>::iterator ani = anms.begin();
+    vector<string>::iterator asi = aseqs.begin();
+
+    map<string,string> aligned_seqs;
+
+    for (; ani!=anms.end(); asi++,ani++)
+        aligned_seqs.insert(make_pair(*ani,*asi));
+
+// <-
 
     if (TRANSLATE && !translate)
         filename+=".pep";
@@ -671,22 +706,10 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
     // terminal nodes
     for (int j=0; j<n; j++)
     {
-        seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<(*si++)<<"\">"<<endl;
+        string name = *si++;
+        seqout<<"<leaf id=\"seq"<<j+1<<"\" name=\""<<name<<"\">"<<endl;
         seqout<<"  <sequence>"<<endl<<"    ";
-        if (CODON || translate)
-        {
-            for (int i=0; i<l*3; i++)
-            {
-                seqout<<alignment[j*l*3+i];
-            }
-        }
-        else
-        {
-            for (int i=0; i<l; i++)
-            {
-                seqout<<alignment[j*l+i];
-            }
-        }
+        seqout<<aligned_seqs.find(name)->second;
         seqout<<endl;
         seqout<<"  </sequence>"<<endl<<"</leaf>"<<endl;
     }
@@ -694,16 +717,7 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
 
 
     // internal nodes
-    map<string,string> anc_seqs;
-    this->getAncestralAlignmentSeqs(root,&anc_seqs);
-
-    root->setSiteLength(l);
-    for (int i=0; i<l; i++)
-    {
-        root->setSiteIndex(i,i);
-    }
-
-    root->outputXml(&seqout,&anc_seqs,translate);
+    root->outputXml(&seqout,&aligned_seqs,translate);
 
     seqout<<"</nodes>"<<endl;
 
@@ -736,7 +750,7 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
 
     seqout<<"</ms_alignment>"<<endl;
 
-    delete []alignment;
+//    delete []alignment;
 
 }
 
@@ -875,8 +889,11 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
 int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel,int *nInsDel,bool noSuffix)
 {
 
-    this->setAlignedSequences(root);
-    this->reconstructAncestors(root,isDna);
+    if (! (WRITEXML || WRITEANCSEQ))
+    {
+        this->setAlignedSequences(root);
+        this->reconstructAncestors(root,isDna);
+    }
 
     string alpha = hmm->getFullAlphabet();
     int sAlpha = alpha.length();
@@ -1080,8 +1097,8 @@ int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,i
 
 void ProgressiveAlignment::printAncestral(AncestralNode *root,string filename, bool isDna, bool verbose)
 {
-    this->setAlignedSequences(root);
-    this->reconstructAncestors(root,isDna);
+//    this->setAlignedSequences(root);
+//    this->reconstructAncestors(root,isDna);
 
     string tree = "";
     root->getLabelledNewickBrl(&tree);
@@ -1204,7 +1221,6 @@ void ProgressiveAlignment::getAlignmentMatrix(AncestralNode *root,vector<string>
 {
     int n = root->getTerminalNodeNumber();
     int l = root->getSequence()->length();
-
 
     for (int i=0; i<n; i++)
         aseqs->push_back(string(""));
