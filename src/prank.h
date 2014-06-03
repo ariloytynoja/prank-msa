@@ -256,6 +256,8 @@ bool REALBRANCHES = false;
 
 // correct guidetree distances
 bool CORRECTP = false;
+// penalise gaps in NJ distances
+bool PENALISEGAPS = false;
 
 
 /********* technical: hirschberg, full probability **********/

@@ -889,11 +889,11 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
 int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel,int *nInsDel,bool noSuffix)
 {
 
-    if (! (WRITEXML || WRITEANCSEQ))
-    {
+//    if (! (WRITEXML || WRITEANCSEQ))
+//    {
         this->setAlignedSequences(root);
         this->reconstructAncestors(root,isDna);
-    }
+//    }
 
     string alpha = hmm->getFullAlphabet();
     int sAlpha = alpha.length();

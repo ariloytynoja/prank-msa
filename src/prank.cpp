@@ -32,7 +32,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    version = 140110;
+    version = 140603;
 
     readArguments(argc, argv);
     int time1 = time(0);
@@ -601,6 +601,12 @@ void readArguments(int argc, char *argv[])
             else if (s=="-correctp")
             {
                 CORRECTP = true;
+            }
+
+            // penalise gaps in NJ distances
+            else if (s=="-njgaps")
+            {
+                PENALISEGAPS = true;
             }
 
             /********* technical: hirschberg, full probability **********/

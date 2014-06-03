@@ -1,3 +1,9 @@
+v.140603
+- now avoids crashes due to weird sequence names
+- now (codon) ancestral reconstructio also for translated alignments
+- new option '-njgaps' to consider gaps as mismatches for NJ distances
+
+
 v.140110
 - a fix for the external tool paths
 

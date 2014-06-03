@@ -175,8 +175,16 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
 
     ofstream f_output;
     f_output.open( f_name.str().c_str(), (ios::out) );
+    int count = 0;
+    map<string,string> tmp_names;
     for(;si!=sequences.end();si++,ni++)
-        f_output<<">"<<*ni<<"\n"<<*si<<"\n";
+    {
+        string name1 = *ni;
+        stringstream name2;
+        name2<<"seq"<<count++;
+        tmp_names.insert(make_pair(name1,name2.str()));
+        f_output<<">"<<name2.str()<<"\n"<<*si<<"\n";
+    }
     f_output.close();
 
 
@@ -184,6 +192,15 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
 
     int nodeNum = root->getTerminalNodeNumber();
     root->getNHXBrl(&tree,&nodeNum);
+
+    for(map<string,string>::iterator it = tmp_names.begin();it != tmp_names.end(); it++)
+    {
+        size_t pos = 0;
+        if((pos = tree.find(it->first)) != std::string::npos)
+            tree.replace(pos, it->first.length(), it->second);
+
+    }
+
     stringstream tag;
     tag << root->getNodeName();
     char b,e; int num;

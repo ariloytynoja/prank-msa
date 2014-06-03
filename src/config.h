@@ -152,6 +152,7 @@ extern float protMaxPairwiseLength;
 extern bool ADJUSTMODEL;
 
 extern bool CORRECTP;
+extern bool PENALISEGAPS;
 
 extern bool FULLBAND;
 extern bool FULLFULL;

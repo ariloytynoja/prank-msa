@@ -335,10 +335,14 @@ void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDn
 
                 if (c1!='-' && c2!='-')
                 {
-                    s++;
+                    if(!PENALISEGAPS)
+                        s++;
                     if (c1==c2)
                         m++;
                 }
+                if(PENALISEGAPS && (c1!='-' || c2!='-'))
+                    s++;
+
             }
 
             float p = 1-(float)m/(float)s;
