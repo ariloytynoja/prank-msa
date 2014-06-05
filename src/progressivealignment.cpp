@@ -123,9 +123,21 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         cout<<"\n\nWriting\n";
         cout<<" - estimated tree to '"<<outfile<<".dnd'\n\n";
 
+        map<string,TreeNode*> nodes;
+
+        ReadNewick rn;
+        rn.buildTree(tree,&nodes);
+
+        AncestralNode* root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
+        string rooted = "";
+        root->getNewickBrl(&rooted);
+        rooted.append(";");
+
+//        cout<<tree<<endl<<rooted<<endl;
+
         string name = outfile+".dnd";
         ofstream seqout(name.c_str());
-        seqout<<tree<<endl;
+        seqout<<rooted<<endl;
         seqout.close();
 
         sites->deleteMatrices();
