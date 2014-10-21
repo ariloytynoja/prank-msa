@@ -852,6 +852,38 @@ private:
 
         ReadNewick rn;
 
+        int changed = 0;
+
+        for(int i=0;i<sequences->size();)
+        {
+            int pos = 0;
+            int hit;
+
+            if(isDna)
+                hit = sequences->at(i).find_first_not_of("ACGTURYMKSWHBVDNacgturymkswhbvdn",pos);
+            else
+                hit = sequences->at(i).find_first_not_of("ARNDCQEGHILKMFPSTWYVXarndcqeghilkmfpstwyvx",pos);
+
+            if(hit != string::npos)
+            {
+                if(isDna)
+                    sequences->at(i).at(hit) = 'N';
+                else
+                    sequences->at(i).at(hit) = 'X';
+                pos = hit;
+                changed++;
+            }
+            else
+            {
+                i++;
+            }
+        }
+
+        if(changed>0)
+        {
+            cout<<"Input data contained non-IUPAC characters. Those have been replaced with N or X.\n";
+        }
+
         if (treefile=="" && !MERGE || (MERGE && (treefile1=="" || treefile2=="") ) )
         {
             int time1 = time(0);
@@ -1024,7 +1056,6 @@ private:
 
 
                     ma.align_sequences(&tmp_names,&tmp_seqs);
-
 
                     if(!this->sequencesAligned(&tmp_seqs))
                     {

@@ -47,7 +47,7 @@ class BppAncestors
 public:
     BppAncestors();
     bool testExecutable();
-    void inferAncestors(AncestralNode *root,map<string,string> *aseqs,string *atree,bool isDna);
+    bool inferAncestors(AncestralNode *root,map<string,string> *aseqs,string *atree,bool isDna);
 };
 
 #endif // BPPANCESTORS_H

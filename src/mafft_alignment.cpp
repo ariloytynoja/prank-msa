@@ -98,7 +98,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
     m_output.close();
 
     stringstream command;
-    command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas  2>/dev/null";
+    command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas 2> /dev/null";
     if(NOISE>0)
         cout<<"cmd: "<<command.str()<<endl;
 
@@ -152,6 +152,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
         {
             sequence += temp;  // Sequence isolation
         }
+
     }
 
     // Addition of the last sequence in file
@@ -165,7 +166,23 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
 
     pclose(fpipe);
 
+
+    if(sequences->size()==0)
+    {
+
+        cout<<"\nError: Initial alignment with Mafft failed. The output generated was:\n";
+
+        command.str("");
+        command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas 2>&1";
+
+        system(command.str().c_str());
+
+        cout<<"\nNow exiting.\n";
+        exit(0);
+    }
+
     this->delete_files(r);
+
 }
 
 void Mafft_alignment::delete_files(int r)

@@ -24,6 +24,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <exception>
 #include <unistd.h>
 #include "bppancestors.h"
 #include "readfile.h"
@@ -91,7 +92,7 @@ bool BppAncestors::testExecutable()
     #endif
 }
 
-void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,string *atree,bool isDna)
+bool BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,string *atree,bool isDna)
 {
 
     string tmp_dir = this->get_temp_dir();
@@ -179,10 +180,10 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     map<string,string> tmp_names;
     for(;si!=sequences.end();si++,ni++)
     {
-        string name1 = *ni;
+        string name1 = *ni+":";
         stringstream name2;
         name2<<"seq"<<count++;
-        tmp_names.insert(make_pair(name1,name2.str()));
+        tmp_names.insert(make_pair(name1,name2.str()+":"));
         f_output<<">"<<name2.str()<<"\n"<<*si<<"\n";
     }
     f_output.close();
@@ -196,8 +197,10 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     for(map<string,string>::iterator it = tmp_names.begin();it != tmp_names.end(); it++)
     {
         size_t pos = 0;
-        if((pos = tree.find(it->first)) != std::string::npos)
-            tree.replace(pos, it->first.length(), it->second);
+        if((pos = tree.find("("+it->first)) != std::string::npos)
+            tree.replace(pos+1, it->first.length(), it->second);
+        if((pos = tree.find(","+it->first)) != std::string::npos)
+            tree.replace(pos+1, it->first.length(), it->second);
 
     }
 
@@ -248,42 +251,21 @@ void BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
     }
     pclose(fpipe);
 
-    /*
-    // This is not needed with the fixed bppancestor
-    //
-    command << " output.tree_ids.file="<<m_name.str();
-
-    if ( !(fpipe = (FILE*)popen(command.str().c_str(),"r")) )
-    {
-        cout<<"Problems with bppancestor pipe.\nExiting.\n";
-        exit(1);
-    }
-    while ( fgets( line, sizeof line, fpipe))
-    {
-        if(NOISE>1)
-            cout<<"BppAncestor: "+string(line);
-    }
-    pclose(fpipe);
-    */
-
     ReadFile rf;
-//    rf.readFile(o_name.str().c_str());
-    rf.readBppPhylip(o_name.str().c_str());
-    vector<string> s = rf.getSeqs();
-    vector<string> n = rf.getNames();
+    int rv = rf.readBppPhylip(o_name.str().c_str());
 
-    for(int i=0;i<n.size();i++)
-        aseqs->insert(aseqs->begin(),pair<string,string>("#"+n.at(i)+"#",s.at(i)));
+    if(rv>0)
+    {
+        vector<string> s = rf.getSeqs();
+        vector<string> n = rf.getNames();
 
-    /*
-    // This is not needed with the fixed bppancestor
-    //
-    ReadNewick rn;
-    *atree = rn.readFile(m_name.str().c_str());
-    */
+        for(int i=0;i<n.size();i++)
+            aseqs->insert(aseqs->begin(),pair<string,string>("#"+n.at(i)+"#",s.at(i)));
+    }
 
     this->delete_files(r);
 
+    return (rv>0);
 }
 
 void BppAncestors::delete_files(int r)

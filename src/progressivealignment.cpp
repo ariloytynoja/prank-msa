@@ -172,6 +172,11 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     //
     this->checkMatchingNames(root,&names,nsqs);
 
+    // BppAncestor cannot handle that big datasets
+    if(root->getTerminalNodeNumber()>500)
+    {
+        BPPANCESTORS = false;
+    }
 
     /////////////////////////////////
     // Different alignment options //
@@ -778,117 +783,85 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
 
         map<string,string> aseqs;
         string atree;
-        bppa.inferAncestors(root,&aseqs,&atree,isDna);
-
-        ReadNewick rn;
-        /*
-        // This is not needed with the fixed bppancestor
-        //
-        map<string,TreeNode*> anodes;
-        rn.buildTree(atree,&anodes);
-
-        AncestralNode* aroot = static_cast<AncestralNode*>(anodes[rn.getRoot()]);
-        aroot->fixTerminalNodenames();
-
-
-        map<string,string> subtrees;
-        root->getAllSubtreesWithNodename(&subtrees);
-
-        map<string,string> asubtrees;
-        aroot->getAllSubtreesWithNodename(&asubtrees);
-
-        map<string,string> asequences;
-
-        map<string,string>::iterator oldit = subtrees.begin();
-        for(;oldit!=subtrees.end();oldit++)
+        if( bppa.inferAncestors(root,&aseqs,&atree,isDna) )
         {
-            string name = oldit->second;
-            if(name == root->getNodeName())
-                continue;
 
-            string aname = asubtrees.find(oldit->first)->second;
+            ReadNewick rn;
 
-            aname.erase(aname.begin());
-            aname.erase(aname.length()-1);
-            asequences.insert(asequences.begin(),pair<string,string>(name,aseqs.find(aname)->second));
+            root->setAncSequenceStrings(&aseqs);
+
+            // BppAncestor works on unrooted trees; root needs to be done separately
+            //
+            vector<string> twoseqs;
+            twoseqs.push_back(root->getLChild()->getThisSequenceString());
+            twoseqs.push_back(root->getRChild()->getThisSequenceString());
+            vector<string> twonms;
+            twonms.push_back("left");
+            twonms.push_back("right");
+
+            stringstream tree;
+            tree << "(left:" << root->getLeftBrL()<<",right:"<<root->getRightBrL()<<");";
+
+            map<string,TreeNode*> twonodes;
+            rn.buildTree(tree.str(),&twonodes);
+
+            bool tmpPREALIGNED = PREALIGNED;
+            PREALIGNED = true;
+
+            bool tmpFOREVER = FOREVER;
+            FOREVER = false;
+
+            bool tmpSCREEN = SCREEN;
+            SCREEN = false;
+
+            int tmpNOISE = NOISE;
+            NOISE = -1;
+
+    //        cout<<twoseqs.at(0)<<endl<<twoseqs.at(1)<<endl;
+            AncestralNode* tworoot = static_cast<AncestralNode*>(twonodes[rn.getRoot()]);
+            int nsqs = 0;
+            tworoot->setCharString(&twonms,&twoseqs,&nsqs);
+
+            ReadAlignment ra;
+            ra.initialiseMatrices(twoseqs.at(0).length()+2);
+
+            tworoot->setTotalNodes();
+            tworoot->readAlignment();
+
+            FOREVER = tmpFOREVER;
+            PREALIGNED = tmpPREALIGNED;
+            NOISE = tmpNOISE;
+            SCREEN = tmpSCREEN;
+
+            string rootstr;
+            int len = twoseqs.at(0).length();
+            if(CODON)
+                len /= 3;
+            for(int i=0;i<len;i++)
+                rootstr += tworoot->getThisAncCharactersAt(i);
+
+            root->setThisAncSequenceString(rootstr);
+
+            vector<string> aseqs2;
+            this->getAncestralAlignmentMatrix(root,&aseqs2);
+            root->setAncSequenceGaps(&aseqs2);
+
+            if(NOISE>1)
+                cout<<"BppAncestor done\n";
+
+            return;
         }
-
-        root->setAncSequenceStrings(&asequences);
-        */
-
-        root->setAncSequenceStrings(&aseqs);
-
-        // BppAncestor works on unrooted trees; root needs to be done separately
-        //
-        vector<string> twoseqs;
-        twoseqs.push_back(root->getLChild()->getThisSequenceString());
-        twoseqs.push_back(root->getRChild()->getThisSequenceString());
-        vector<string> twonms;
-        twonms.push_back("left");
-        twonms.push_back("right");
-
-        stringstream tree;
-        tree << "(left:" << root->getLeftBrL()<<",right:"<<root->getRightBrL()<<");";
-
-        map<string,TreeNode*> twonodes;
-        rn.buildTree(tree.str(),&twonodes);
-
-        bool tmpPREALIGNED = PREALIGNED;
-        PREALIGNED = true;
-
-        bool tmpFOREVER = FOREVER;
-        FOREVER = false;
-
-        bool tmpSCREEN = SCREEN;
-        SCREEN = false;
-
-        int tmpNOISE = NOISE;
-        NOISE = -1;
-
-//        cout<<twoseqs.at(0)<<endl<<twoseqs.at(1)<<endl;
-        AncestralNode* tworoot = static_cast<AncestralNode*>(twonodes[rn.getRoot()]);
-        int nsqs = 0;
-        tworoot->setCharString(&twonms,&twoseqs,&nsqs);
-
-        ReadAlignment ra;
-        ra.initialiseMatrices(twoseqs.at(0).length()+2);
-
-        tworoot->setTotalNodes();
-        tworoot->readAlignment();
-
-        FOREVER = tmpFOREVER;
-        PREALIGNED = tmpPREALIGNED;
-        NOISE = tmpNOISE;
-        SCREEN = tmpSCREEN;
-
-        string rootstr;
-        int len = twoseqs.at(0).length();
-        if(CODON)
-            len /= 3;
-        for(int i=0;i<len;i++)
-            rootstr += tworoot->getThisAncCharactersAt(i);
-
-        root->setThisAncSequenceString(rootstr);
-
-
-        vector<string> aseqs2;
-        this->getAncestralAlignmentMatrix(root,&aseqs2);
-        root->setAncSequenceGaps(&aseqs2);
-
-        if(NOISE>1)
-            cout<<"BppAncestor done\n";
-
     }
-    else
-    {
-        vector<string> aseqs;
-        this->getAncestralAlignmentMatrix(root,&aseqs);
 
-        root->getLChild()->setAncSequenceStrings(&aseqs);
-        root->setThisAncSequenceString(&aseqs);
-        root->getRChild()->setAncSequenceStrings(&aseqs);
+    if(NOISE>0)
+        cout<<"BppAncestor not used. Inferring approximate ancestral sequences\n";
 
-    }
+    vector<string> aseqs;
+    this->getAncestralAlignmentMatrix(root,&aseqs);
+
+    root->getLChild()->setAncSequenceStrings(&aseqs);
+    root->setThisAncSequenceString(&aseqs);
+    root->getRChild()->setAncSequenceStrings(&aseqs);
 }
 
 void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)

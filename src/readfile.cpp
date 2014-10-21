@@ -146,14 +146,16 @@ int ReadFile::readBppPhylip(const char* filename)
         cout<<"Failed to open sequence file "<<filename<<". Exiting.\n\n";
         exit(-1);
     }
-    this->readBppPhylip(input);
+    int rv = this->readBppPhylip(input);
 
     if (names.size() == seqs.size())
-    return names.size();
+        return names.size();
     else
     {
-        cout<<"Reading sequence data failed. Found "<<names.size()<<" names but "<<seqs.size()<<" sequences. Exiting.\n\n";
-        exit(-1);
+        return rv;
+
+//        cout<<"Reading sequence data failed. Found "<<names.size()<<" names but "<<seqs.size()<<" sequences. Exiting.\n\n";
+//        exit(-1);
     }
 }
 
@@ -411,7 +413,7 @@ void ReadFile::readPhylip(std::istream & input)
         readSequential(temp,input,nseq,length);
 }
 
-void ReadFile::readBppPhylip(istream & input)
+int ReadFile::readBppPhylip(istream & input)
 {
     int nseq = -1;
     int length = -1;
@@ -424,8 +426,7 @@ void ReadFile::readBppPhylip(istream & input)
 
     if (nseq<1 || length<1)
     {
-        cout<<"Input file starts with a digit but not with two positive digits. Reading the file failed. Exiting.\n";
-        exit(-1);
+        return -1;
     }
 
     for (int i=0; i<nseq; i++)
@@ -450,6 +451,8 @@ void ReadFile::readBppPhylip(istream & input)
         names.push_back(name);
         seqs.push_back(sequence);
     }
+
+    return nseq;
 }
 
 void ReadFile::readInterleaved(string temp,istream & input,int nseq, int length)
