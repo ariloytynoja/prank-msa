@@ -860,9 +860,9 @@ private:
             int hit;
 
             if(isDna)
-                hit = sequences->at(i).find_first_not_of("ACGTURYMKSWHBVDNacgturymkswhbvdn",pos);
+                hit = sequences->at(i).find_first_not_of("ACGTURYMKSWHBVDNacgturymkswhbvdn-",pos);
             else
-                hit = sequences->at(i).find_first_not_of("ARNDCQEGHILKMFPSTWYVXarndcqeghilkmfpstwyvx",pos);
+                hit = sequences->at(i).find_first_not_of("ARNDCQEGHILKMFPSTWYVXarndcqeghilkmfpstwyvx-",pos);
 
             if(hit != string::npos)
             {
