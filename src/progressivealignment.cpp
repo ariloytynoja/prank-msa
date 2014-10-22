@@ -840,7 +840,11 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
             for(int i=0;i<len;i++)
                 rootstr += tworoot->getThisAncCharactersAt(i);
 
+            cout<<"BppAncestor done0\n";
+
             root->setThisAncSequenceString(rootstr);
+
+            cout<<"BppAncestor done1\n";
 
             vector<string> aseqs2;
             this->getAncestralAlignmentMatrix(root,&aseqs2);
@@ -851,6 +855,7 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
 
             return;
         }
+        cout<<"BppAncestor done2\n";
     }
 
     if(NOISE>0)
