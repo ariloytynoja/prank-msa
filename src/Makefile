@@ -7,11 +7,11 @@
 CC            = gcc
 CXX           = g++
 DEFINES       = 
-CFLAGS        = -m64 -pipe -O3 $(DEFINES)
-CXXFLAGS      = -m64 -pipe -O3 $(DEFINES)
+CFLAGS        = -pipe -O3 $(DEFINES)
+CXXFLAGS      = -pipe -O3 $(DEFINES)
 INCPATH       = -I. -I/usr/include
 LINK          = g++
-LFLAGS        = -m64
+LFLAGS        = 
 LIBS          = $(SUBLIBS)    
 AR            = ar cqs
 RANLIB        = 
