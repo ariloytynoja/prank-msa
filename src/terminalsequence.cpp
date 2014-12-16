@@ -48,6 +48,8 @@ TerminalSequence::TerminalSequence(string* s)
     string fullAlpha = hmm->getFullAlphabet();
     int sFullAlpha = fullAlpha.length();
 
+//    cout<<"sAlpha "<<sAlpha<<", sFullAlpha "<<sFullAlpha<<endl;
+
     map<string,int> codons;
 
     if (PREALIGNED || PARTLYALIGNED || UPDATE)
@@ -74,13 +76,15 @@ TerminalSequence::TerminalSequence(string* s)
             }
         }
 
-        for (int i=0; i<183; i+=3)
+        for (int i=0; i<sFullAlpha; i+=3)
         {
             codons.insert(make_pair(alpha.substr(i,3),i/3));
         }
-        codons.insert(make_pair("---",61));
 
-        sAlpha = 61;
+        sAlpha /= 3;
+
+        codons.insert(make_pair("---",sAlpha));
+
 
         bool stop_removed = false;
 
@@ -101,7 +105,10 @@ TerminalSequence::TerminalSequence(string* s)
             else if(i+3<S.length() || PREALIGNED)
                 charseq += "NNN";
             else
+            {
+//                cout<<"removing: "<<S.substr(i,3)<<endl;
                 stop_removed = true;
+            }
         }
 
         seqLength = realLength = charseq.size()/3;
@@ -111,6 +118,8 @@ TerminalSequence::TerminalSequence(string* s)
 
         if(NOISE>0 && gaps_removed)
             cout<<"Note: gaps were removed\n";
+
+//        cout<<charseq<<endl;
     }
 
     else   // Protein or DNA

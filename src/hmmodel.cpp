@@ -114,13 +114,14 @@ void HMModel::readModel(const char* filename)
     if (NOISE>1)
         cout<<"Alphabet ("<<as<<"): "<<alphabet<<endl;
 
-    // A hack for codonmodel
-    //
-    if (as==183)
+    if (as>=183)
     {
-        as=61;
+        as/=3;
         CODON=true;
+        fullAlphabet = alphabet+"NNN";
+        fas = as+1;
     }
+
 
     if (as==4)
     {
@@ -139,10 +140,9 @@ void HMModel::readModel(const char* filename)
         fullAlphabet = alphabet+"ZXBZJ";
         fas = fullAlphabet.length();
     }
-    else if (as==61)
+    else if (as>=61)
     {
-        fullAlphabet = "AAAAACAAGAATACAACCACGACTAGAAGCAGGAGTATAATCATGATTCAACACCAGCATCCACCCCCGCCTCGACGCCGGCGTCTACTCCTGCTTGAAGACGAGGATGCAGCCGCGGCTGGAGGCGGGGGTGTAGTCGTGGTTTACTATTCATCCTCGTCTTGCTGGTGTTTATTCTTGTTTNNN";
-        fas = 62;
+//        cout<<"codon model with as="<<as<<", fas="<<fas<<endl;
     }
     else
     {
@@ -265,21 +265,32 @@ void HMModel::readModel(const char* filename)
         mep->s(nextDouble(row),l);
     }
 
-    if (NOISE>1)
-        cout<<"Reading codon sites"<<endl;
-
-    row = nextNotComment(&in);
-    FOR(l,sn)
-    {
-        codon->s(nextInt(row),l);
-    }
-
-    if (NOISE>1)
-        cout<<"Reading prankster settings"<<endl;
 
     row = nextNotComment(&in);
     if (row!="")
     {
+        if (NOISE>1)
+            cout<<"Reading codon sites"<<endl;
+
+        FOR(l,sn)
+        {
+            codon->s(nextInt(row),l);
+        }
+    }
+    else
+    {
+        FOR(l,sn)
+        {
+            codon->s(0,l);
+        }
+    }
+
+    row = nextNotComment(&in);
+    if (row!="")
+    {
+        if (NOISE>1)
+            cout<<"Reading prankster settings"<<endl;
+
         FOR(l,sn)
         {
             drawPt->s(nextInt(row),l);
@@ -1423,7 +1434,7 @@ void HMModel::alignmentModel(AncestralNode *tn)
         }
     }
 
-    else if (as==61)
+    else if (as>=61)
     {
         int n;
         FOR(l,sn)
@@ -1431,69 +1442,69 @@ void HMModel::alignmentModel(AncestralNode *tn)
 
             if (NXis1)
             {
-                cPi->s(1.0,l,61);
-                logcPi->s(0.0,l,61);
+                cPi->s(1.0,l,as);
+                logcPi->s(0.0,l,as);
 
                 FOR(n,as)
                 {
 
                     double t = cPl->g(l,n,n);
 
-                    cPl->s(t,l,n,61);
-                    cPl->s(t,l,61,n);
+                    cPl->s(t,l,n,as);
+                    cPl->s(t,l,as,n);
 
                     t = log(t);
 
-                    logcPl->s(t,l,n,61);
-                    logcPl->s(t,l,61,n);
+                    logcPl->s(t,l,n,as);
+                    logcPl->s(t,l,as,n);
 
                     t = cPr->g(l,n,n);
 
-                    cPr->s(t,l,n,61);
-                    cPr->s(t,l,61,n);
+                    cPr->s(t,l,n,as);
+                    cPr->s(t,l,as,n);
 
                     t = log(t);
 
-                    logcPr->s(t,l,n,61);
-                    logcPr->s(t,l,61,n);
+                    logcPr->s(t,l,n,as);
+                    logcPr->s(t,l,as,n);
 
                 }
-                cPl->s(1.0,l,61,61);
-                logcPl->s(0.0,l,61,61);
+                cPl->s(1.0,l,as,as);
+                logcPl->s(0.0,l,as,as);
 
-                cPr->s(1.0,l,61,61);
-                logcPr->s(0.0,l,61,61);
+                cPr->s(1.0,l,as,as);
+                logcPr->s(0.0,l,as,as);
             }
             else
             {
-                cPi->s(1.0/61,l,61);
-                logcPi->s(log(1.0/61),l,61);
+                cPi->s(1.0/as,l,as);
+                logcPi->s(log(1.0/as),l,as);
 
                 FOR(n,as)
                 {
 
-                    double t = 1.0/(61*61);
+                    double t = 1.0/(as*as);
 
-                    cPl->s(t,l,n,61);
-                    cPr->s(t,l,n,61);
-                    cPl->s(t,l,61,n);
-                    cPr->s(t,l,61,n);
+                    cPl->s(t,l,n,as);
+                    cPr->s(t,l,n,as);
+                    cPl->s(t,l,as,n);
+                    cPr->s(t,l,as,n);
 
                     t = log(t);
 
-                    logcPl->s(t,l,n,61);
-                    logcPr->s(t,l,n,61);
-                    logcPl->s(t,l,61,n);
-                    logcPr->s(t,l,61,n);
+                    logcPl->s(t,l,n,as);
+                    logcPr->s(t,l,n,as);
+                    logcPl->s(t,l,as,n);
+                    logcPr->s(t,l,as,n);
                 }
-                double t = 1.0/(61*61);
+                double t = 1.0/(as*as);
 
-                cPl->s(t,l,61,61);
-                cPr->s(t,l,61,61);
+                cPl->s(t,l,as,as);
+                cPr->s(t,l,as,as);
 
                 t = log(t);
-                logcPl->s(t,l,61,61);
-                logcPr->s(t,l,61,61);
+                logcPl->s(t,l,as,as);
+                logcPr->s(t,l,as,as);
             }
         }
     }
