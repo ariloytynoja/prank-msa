@@ -673,6 +673,12 @@ void readArguments(int argc, char *argv[])
                 anchDropDist = atoi(string(argv[i]).substr(7).c_str());
             }
 
+            // ignore reverse anchors
+            else if (s=="-droprevanch")
+            {
+                dropRevAnch = true;
+            }
+
             // don't infer gaps caused by missing data
             else if (s=="-nopatchdata")
             {

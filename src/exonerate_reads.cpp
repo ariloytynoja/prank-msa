@@ -227,6 +227,17 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
     }
     pclose(fpipe);
 
+    if(dropRevAnch)
+    {
+        for(vector<hit>::iterator iter1 = hits->begin();iter1!=hits->end();)
+        {
+            if(iter1->t_strand == '-' || iter1->q_strand == '-')
+                hits->erase(iter1);
+            else
+                iter1++;
+        }
+    }
+
     sort (hits->begin(), hits->end(), Exonerate_reads::q_earlier);
 
     vector<hit>::iterator iter1 = hits->begin();
@@ -395,7 +406,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
         iter2++;
     }
 
-    this->delete_files(r);
+//    this->delete_files(r);
 }
 
 void Exonerate_reads::delete_files(int r)

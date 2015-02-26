@@ -167,6 +167,7 @@ extern int initialAnchDist;
 extern int minAnchDist;
 extern int anchSkipDist;
 extern int anchDropDist;
+extern bool dropRevAnch;
 
 extern bool PATCHMISSING;
 extern int missingLimit;

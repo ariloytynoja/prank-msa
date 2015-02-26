@@ -294,6 +294,9 @@ int anchSkipDist = 200;
 // anchor drop distance
 int anchDropDist = 10;
 
+// ignore reverse anchors
+bool dropRevAnch = false;
+
 // don't infer gaps caused by missing data
 bool PATCHMISSING = true;
 
