@@ -406,7 +406,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
         iter2++;
     }
 
-//    this->delete_files(r);
+    this->delete_files(r);
 }
 
 void Exonerate_reads::delete_files(int r)
