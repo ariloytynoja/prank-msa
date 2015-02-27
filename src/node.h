@@ -48,6 +48,8 @@ class Node
     bool isUnrooted;
 
     Node(std::string t,Node* p,int branch);
+
+    void checkBifurcation(std::string *t);
     void findMiddlePoint();
     void findMiddle(int branch);
     void divideTree(std::string tree,std::string* trees,float* distances);

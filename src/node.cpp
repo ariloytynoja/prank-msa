@@ -137,6 +137,37 @@ string Node::rootedTree()
     return mpTree;
 }
 
+void Node::checkBifurcation(string *t)
+{
+
+    string::iterator b = t->begin();
+    string::iterator e = t->end();
+
+    int open=0;
+    int end=0;
+    int comma = 0;
+
+    for (; b!=e; b++)
+    {
+        if ((*b)=='(')
+            open++;
+        if ((*b)==')')
+            end++;
+        if ((*b)==',')
+            comma++;
+    }
+
+    if (comma!=open || comma!=end)
+    {
+            cout<<"Correcting (arbitrarily) for multifurcating nodes."<<endl;
+
+            if(open==end+1 && open == comma)
+            {
+                t->append(":0.0)");
+            }
+    }
+}
+
 Node::Node(string t,Node* p,int branch)
 {
 //    cout<<t<<endl;
@@ -320,6 +351,8 @@ void Node::findMiddle(int branch)
 
 void Node::divideTree(string tree,string* trees,float* distance)
 {
+
+    checkBifurcation(&tree);
 
     trees[0] = "";
 
