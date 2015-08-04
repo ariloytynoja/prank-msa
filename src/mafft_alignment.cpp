@@ -175,7 +175,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
         command.str("");
         command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas 2>&1";
 
-        system(command.str().c_str());
+        int i = system(command.str().c_str());
 
         cout<<"\nNow exiting.\n";
         exit(0);
