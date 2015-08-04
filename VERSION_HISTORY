@@ -1,3 +1,9 @@
+v.150803
+- force linear order of alignment anchors
+- convert multifurcating trees to bifurcating ones
+- finish despite BppAncestor failing
+
+
 v.140603
 - now avoids crashes due to weird sequence names
 - now (codon) ancestral reconstructio also for translated alignments
