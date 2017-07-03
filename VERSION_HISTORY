@@ -1,3 +1,10 @@
+v.170427
+Changes by Nikolai Hecker
+- make the temp files thread safe
+- fix a compile issue with GCC 6.2.0
+- reduce the information written to stdout; disable with "-verbose"
+
+
 v.150803
 - force linear order of alignment anchors
 - convert multifurcating trees to bifurcating ones
