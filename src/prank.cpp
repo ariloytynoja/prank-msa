@@ -24,18 +24,60 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <unistd.h>
 #include "progressivealignment.h"
 #include "check_version.h"
 #include "prank.h"
 
 using namespace std;
 
+// stores current temporary directory will be created and removed in main
+char tmp_dir[1000] = "";
+bool verbose = false;
+
+//main
 int main(int argc, char *argv[])
 {
-    version = 150803;
+    version = 170427;
 
     readArguments(argc, argv);
     int time1 = time(0);
+
+    // character array for assigning system tmp path
+    char* tmpPath = NULL;  
+    //mkdtemp template
+    const char* mktemplate = "tmpdirprankmsaXXXXXX";
+
+     //create temporary directory
+     //get tmpPath from environment or assign tmpPath to NULL (if last getenv fails)
+     if( (tmpPath = getenv("TMPDIR")) == NULL)
+       {
+       if( (tmpPath = getenv("TMP")) == NULL)
+         {     
+           if( (tmpPath = getenv("TEMPDIR")) == NULL)
+             { 
+               tmpPath = getenv("TEMP");
+             } 
+         }
+       }
+   
+     // define temp dir based on whether tmpPath was found   
+     if(tmpPath == NULL)
+       {
+       sprintf(tmp_dir, "%s", mktemplate);
+       }
+     else
+       {
+       sprintf(tmp_dir, "%s/%s", tmpPath, mktemplate); 
+       }
+   
+     // call mkdtemp
+     if( (mkdtemp(tmp_dir) == NULL) )
+       {
+       perror("'mkdtemp' failed to generate temporary directory while creating ProgressiveAlignbment object.\n");
+       exit(EXIT_FAILURE);
+       }
+
 
     ProgressiveAlignment* pa = new ProgressiveAlignment(treefile,seqfile,dnafile);
     if (NOISE>=0)
@@ -43,6 +85,12 @@ int main(int argc, char *argv[])
 
     delete pa;
     delete hmm;
+
+    //unlink temporary directory
+    if( rmdir(tmp_dir) != 0)
+    {
+        perror("ERROR! failed removing temporary directory.");
+    }
 
     cout<<endl;
     exit(0);
@@ -111,6 +159,13 @@ void readArguments(int argc, char *argv[])
                 Check_version ch(version);
                 exit(0);
             }
+
+
+	    else if (s=="-verbose")
+            {
+	      verbose = true;
+            }
+
 
             /********* input/output: **********/
 
@@ -845,6 +900,7 @@ void printHelp(bool complete)
     if (complete)
         cout<<"  -dna=dna_sequence_file [DNA sequence file for backtranslation of protein alignment]"<<endl;
     cout<<"  -version [check for updates]"<<endl;
+    cout<<"  -verbose [print progress etc. during runtime]"<<endl;
     cout<<"\n  -help [show more options]"<<endl;
 
     cout<<""<<endl;

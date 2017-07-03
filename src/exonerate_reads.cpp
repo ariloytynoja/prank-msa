@@ -28,7 +28,7 @@ bool Exonerate_reads::test_executable()
     int status = -1;
 
     #if defined (__CYGWIN__)
-    char path[200];
+    char path[200] = "";
     int length = readlink("/proc/self/exe",path,200-1);
 	
     string epath = string(path).substr(0,length);
@@ -42,7 +42,7 @@ bool Exonerate_reads::test_executable()
 
     if(WEXITSTATUS(status) != 1)
     {
-        char path[200];
+        char path[200] = "";
         string epath;
 
         #if defined (__APPLE__)
@@ -117,17 +117,15 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
     ofstream q_output;
     ofstream t_output;
 
-    string tmp_dir = this->get_temp_dir();
+    stringstream q_name;
+    stringstream t_name;
 
     int r = rand();
     while(true)
     {
-
-        stringstream q_name;
-        stringstream t_name;
-
-        q_name <<tmp_dir<<"q"<<r<<".fas";
-        t_name <<tmp_dir<<"t"<<r<<".fas";
+        
+        q_name <<tmp_dir<<"/q"<<r<<".fas";
+        t_name <<tmp_dir<<"/t"<<r<<".fas";
 
         ifstream q_file(q_name.str().c_str());
         ifstream t_file(t_name.str().c_str());
@@ -200,7 +198,7 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
 //    # else
 //    command<<"exonerate  ";
 //    #endif
-    command << " -q "+tmp_dir+"q"<<r<<".fas -t "+tmp_dir+"t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
+    command << " -q " <<tmp_dir<<"/q"<<r<<".fas -t "<<tmp_dir<<"/t"<<r<<".fas --showalignment no --showsugar yes --showvulgar no 2>&1";
     if(NOISE>0)
         cout<<"cmd: "<<command.str()<<endl;
 
@@ -406,22 +404,10 @@ void Exonerate_reads::local_alignment(string* ls,string* rs, vector<hit> *hits, 
         iter2++;
     }
 
-    this->delete_files(r);
-}
+    //delete files 
+    if( remove( q_name.str().c_str() ) != 0 )
+      perror("Error deleting temporary file in Exonerate_reads::local_alignment");
+    if( remove( t_name.str().c_str() ) != 0 )
+	perror("Error deleting temporary file in Exonerate_reads::local_alignment");
 
-void Exonerate_reads::delete_files(int r)
-{
-
-    string tmp_dir = this->get_temp_dir();
-
-    stringstream q_name;
-    q_name <<tmp_dir<<"q"<<r<<".fas";
-
-    stringstream t_name;
-    t_name <<tmp_dir<<"t"<<r<<".fas";
-
-    if ( remove( q_name.str().c_str() ) != 0 )
-        perror( "Error deleting file" );
-    if ( remove( t_name.str().c_str() ) != 0 )
-        perror( "Error deleting file");
 }

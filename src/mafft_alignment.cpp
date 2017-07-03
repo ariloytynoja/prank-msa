@@ -20,7 +20,7 @@ Mafft_alignment::Mafft_alignment()
 bool Mafft_alignment::test_executable()
 {
     #if defined (__CYGWIN__)
-    char path[200];
+    char path[200] = "";
     int length = readlink("/proc/self/exe",path,200-1);
 
     string epath = string(path).substr(0,length);
@@ -33,7 +33,7 @@ bool Mafft_alignment::test_executable()
 
     # else
 
-    char path[200];
+    char path[200] = "";
     string epath;
 
     #if defined (__APPLE__)
@@ -70,14 +70,13 @@ bool Mafft_alignment::test_executable()
 void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequences)
 {
     ofstream m_output;
-    string tmp_dir = this->get_temp_dir();
+
+    stringstream m_name;
 
     int r = rand();
     while(true)
     {
-
-        stringstream m_name;
-        m_name <<tmp_dir<<"m"<<r<<".fas";
+        m_name <<tmp_dir<<"/m"<<r<<".fas";
         ifstream m_file(m_name.str().c_str());
 
         if(!m_file)
@@ -98,7 +97,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
     m_output.close();
 
     stringstream command;
-    command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas 2> /dev/null";
+    command << mafftpath<<"mafft "<<tmp_dir<<"/m"<<r<<".fas 2> /dev/null";
     if(NOISE>0)
         cout<<"cmd: "<<command.str()<<endl;
 
@@ -173,7 +172,7 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
         cout<<"\nError: Initial alignment with Mafft failed. The output generated was:\n";
 
         command.str("");
-        command << mafftpath<<"mafft "+tmp_dir+"m"<<r<<".fas 2>&1";
+        command << mafftpath<<"mafft "<<tmp_dir<<"/m"<<r<<".fas 2>&1";
 
         int i = system(command.str().c_str());
 
@@ -181,19 +180,8 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
         exit(0);
     }
 
-    this->delete_files(r);
+    //remove file
+    if( remove( m_name.str().c_str() ) != 0)
+      perror("Error deleting temporary file in Mafft_alignment::align_sequences");
 
-}
-
-void Mafft_alignment::delete_files(int r)
-{
-
-string tmp_dir = this->get_temp_dir();
-
-stringstream m_name;
-m_name <<tmp_dir<<"m"<<r<<".fas";
-
-
-if ( remove( m_name.str().c_str() ) != 0 )
-    perror( "Error deleting file" );
 }

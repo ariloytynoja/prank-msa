@@ -11,18 +11,6 @@ extern std::string tempdir;
 
 class Mafft_alignment
 {
-    std::string get_temp_dir()
-    {
-        std::string tmp_dir = "/tmp/";
-        if(tempdir != "")
-            tmp_dir = tempdir+"/";
-
-        struct stat st;
-        if(stat(tmp_dir.c_str(),&st) != 0)
-            tmp_dir = "";
-
-        return tmp_dir;
-    }
 
     std::string remove_last_whitespaces(const std::string & s)
     {
@@ -61,7 +49,6 @@ class Mafft_alignment
                || (c == '\f');
     }
 
-    void delete_files(int r);
 
 public:
     Mafft_alignment();

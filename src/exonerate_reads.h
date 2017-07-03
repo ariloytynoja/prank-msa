@@ -34,20 +34,6 @@ class Exonerate_reads
     }
 
     bool split_sugar_string(const std::string& row,hit *h);
-    void delete_files(int r);
-
-    std::string get_temp_dir()
-    {
-        std::string tmp_dir = "/tmp/";
-        if(tempdir != "")
-            tmp_dir = tempdir+"/";
-
-        struct stat st;
-        if(stat(tmp_dir.c_str(),&st) != 0)
-            tmp_dir = "";
-
-        return tmp_dir;
-    }
 
 public:
     Exonerate_reads();

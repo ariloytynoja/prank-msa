@@ -29,21 +29,6 @@ class BppAncestors
 {
     std::string bppdistpath;
 
-    std::string get_temp_dir()
-    {
-        std::string tmp_dir = "/tmp/";
-        if(tempdir != "")
-            tmp_dir = tempdir+"/";
-
-        struct stat st;
-        if(stat(tmp_dir.c_str(),&st) != 0)
-            tmp_dir = "";
-
-        return tmp_dir;
-    }
-
-    void delete_files(int r);
-
 public:
     BppAncestors();
     bool testExecutable();

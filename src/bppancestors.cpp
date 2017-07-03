@@ -44,7 +44,7 @@ bool BppAncestors::testExecutable()
 {
 
     #if defined (__CYGWIN__)
-    char path[200];
+    char path[200] = "";
     int length = readlink("/proc/self/exe",path,200-1);
 
     string epath = string(path).substr(0,length);
@@ -58,7 +58,7 @@ bool BppAncestors::testExecutable()
 
     # else
 
-    char path[200];
+    char path[200] = "";
     string epath;
 
     #if defined (__APPLE__)
@@ -94,13 +94,9 @@ bool BppAncestors::testExecutable()
 
 bool BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,string *atree,bool isDna)
 {
-
-    string tmp_dir = this->get_temp_dir();
-
     stringstream f_name;
     stringstream t_name;
     stringstream o_name;
-    stringstream m_name;
 
     int r = rand();
     while(true)
@@ -109,21 +105,18 @@ bool BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
         f_name.str("");
         t_name.str("");
         o_name.str("");
-        m_name.str("");
 
-        f_name <<tmp_dir<<"f"<<r<<".fas";
+        f_name <<tmp_dir<<"/f"<<r<<".fas";
         ifstream f_file(f_name.str().c_str());
 
-        t_name <<tmp_dir<<"t"<<r<<".tre";
+        t_name <<tmp_dir<<"/t"<<r<<".tre";
         ifstream t_file(t_name.str().c_str());
 
-        o_name <<tmp_dir<<"o"<<r<<".fas";
+        o_name <<tmp_dir<<"/o"<<r<<".fas";
         ifstream o_file(t_name.str().c_str());
 
-        m_name <<tmp_dir<<"m"<<r<<".tre";
-        ifstream m_file(t_name.str().c_str());
 
-        if(!f_file && !t_file && !o_file && !m_file)
+        if(!f_file && !t_file && !o_file )
         {
             ofstream f_tmp;
             f_tmp.open(f_name.str().c_str(), (ios::out) );
@@ -263,35 +256,13 @@ bool BppAncestors::inferAncestors(AncestralNode *root,map<string,string> *aseqs,
             aseqs->insert(aseqs->begin(),pair<string,string>("#"+n.at(i)+"#",s.at(i)));
     }
 
-    this->delete_files(r);
-
+    //delete files 
+    if ( remove( f_name.str().c_str() ) != 0)
+      perror("Error deleting temporary file in BppAncestors::inferAncestors");
+    if ( remove( t_name.str().c_str()) != 0 )
+      perror("Error deleting temporary file in BppAncestors::inferAncestors");
+    if ( remove( o_name.str().c_str()) != 0 )
+      perror("Error deleting temporary file in BppAncestors::inferAncestors");
+    
     return (rv>0);
-}
-
-void BppAncestors::delete_files(int r)
-{
-
-    string tmp_dir = this->get_temp_dir();
-
-    stringstream t_name;
-    t_name <<tmp_dir<<"t"<<r<<".tre";
-
-    stringstream f_name;
-    f_name <<tmp_dir<<"f"<<r<<".fas";
-
-    stringstream o_name;
-    o_name <<tmp_dir<<"o"<<r<<".fas";
-
-//    stringstream m_name;
-//    m_name <<tmp_dir<<"m"<<r<<".tre";
-
-    if ( remove( t_name.str().c_str() ) != 0 )
-        perror( "Error deleting file" );
-    if ( remove( f_name.str().c_str() ) != 0 )
-        perror( "Error deleting file");
-    if ( remove( o_name.str().c_str() ) != 0 )
-        perror( "Error deleting file");
-//    if ( remove( m_name.str().c_str() ) != 0 )
-//        perror( "Error deleting file");
-
 }

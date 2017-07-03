@@ -431,7 +431,7 @@ void Hirschberg::alignSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms)
     defineEnd();
 
     unsigned int ii = 0;
-    if (SCREEN && totalSites>0)
+    if (SCREEN && totalSites>0 && verbose == true)
     {
         FOR( ii,message.length())
         {
@@ -859,7 +859,7 @@ void Hirschberg::divideSeq()
 
     if (newsite->index()%reportLimit==0)
     {
-        if (SCREEN)
+        if (SCREEN && verbose == true)
         {
             unsigned int ii;
             FOR(ii,message.length())

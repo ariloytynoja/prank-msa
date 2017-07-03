@@ -181,4 +181,10 @@ extern float pwInitialMatrixSize;
 extern double sumLogs(double a, double b);
 extern std::string itos(int i);
 
+//global variable for temporary directory
+extern char tmp_dir[1000];
+
+//global variable for verbose flag
+extern bool verbose;
+
 #endif

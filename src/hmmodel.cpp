@@ -22,6 +22,7 @@
 #include <cmath>
 #include <ctime>
 #include <fstream>
+#include <iostream>
 #include "hmmodel.h"
 #include "eigen.h"
 
@@ -1510,7 +1511,7 @@ void HMModel::alignmentModel(AncestralNode *tn)
     }
     else
     {
-        cout<<"HMModel::alignmentModel: impossible 'as'"<<cout;
+      std::cout << "HMModel::alignmentModel: impossible 'as'";
         exit(-1);
     }
 

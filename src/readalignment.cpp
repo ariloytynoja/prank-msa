@@ -184,7 +184,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
     for (;; s++)
     {
 
-        if (SCREEN && totalSites>0 && countSites%reportLimit==0)
+        if (SCREEN && totalSites>0 && countSites%reportLimit==0 && verbose == true)
         {
             FOR(ii,message.length())
             {
@@ -1114,7 +1114,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
         newsite->setNeighbours(beg,end);
         end->prev();
 
-        if (SCREEN && totalSites>0 && countSites%reportLimit==0)
+        if (SCREEN && totalSites>0 && countSites%reportLimit==0 && verbose == true)
         {
             FOR(ii,message.length())
             {
