@@ -61,8 +61,8 @@ public:
     void initialise(float v = 0);
 
     float g(int xa, int ya=0, int za = 0, int wa = 0)
-    { /**/
-        if (!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;/**/
+    {
+        /*if (!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;*/
         assert(xa>=0);
         assert(xa<x);
         assert(ya>=0);
