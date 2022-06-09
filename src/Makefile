@@ -6,7 +6,7 @@
 
 CC            = gcc
 CXX           = g++
-DEFINES       = 
+DEFINES       = -DNDEBUG
 CFLAGS        = -m64 -pipe -O3 $(DEFINES)
 CXXFLAGS      = -m64 -pipe -O3 $(DEFINES)
 INCPATH       = -I. -I/usr/include

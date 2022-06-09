@@ -20,8 +20,6 @@
 #ifndef FLMATRIX_H
 #define FLMATRIX_H
 
-// #define NDEBUG
-
 #ifndef RFOR
 #define RFOR(i,n) for(i=n; i>=0; i--)
 #endif
