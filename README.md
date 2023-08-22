@@ -57,7 +57,6 @@ See below for the description of the most central program options.
     *   [Inference of ancestral sequences and ancestral events](#inference-of-ancestral-sequences-and-ancestral-events)
     *   [Finishing an alignment and merging two alignments](#finishing-an-alignment-and-merging-two-alignments)
     *   [Alignment reformatting and back-translation](#alignment-reformatting-and-back-translation)
-*   [Bug reporting](#reporting)
 *   [Methods](#methods)
 
 ### About PRANK alignments
