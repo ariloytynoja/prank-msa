@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://www.ebi.ac.uk/goldman-srv/hsaml/ms_alignment" xmlns="http://www.ebi.ac.uk/goldman-srv/hsaml/ms_alignment" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation>
+      File name : ms_alignment.xsd
+      Author : Nicolas Rodriguez and Ari Loytynoja
+      Description : XML Schema for multiple sequence alignments 
+                    This is designed for XML Schema version 1.0.
+      Version : 1
+      Modified : $Date: 2006/25/01 14:33:36 $
+      Revision: 
+
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:simpleType name="YesNo">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="yes|no"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Color">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="black"/>
+      <xsd:enumeration value="red"/>
+      <xsd:enumeration value="darkRed"/>
+      <xsd:enumeration value="green"/>
+      <xsd:enumeration value="darkGreen"/>
+      <xsd:enumeration value="blue"/>
+      <xsd:enumeration value="darkBlue"/>
+      <xsd:enumeration value="cyan"/>
+      <xsd:enumeration value="darkCyan"/>
+      <xsd:enumeration value="magenta"/>
+      <xsd:enumeration value="darkMagenta"/>
+      <xsd:enumeration value="yellow"/>
+      <xsd:enumeration value="darkYellow"/>
+      <xsd:enumeration value="gray"/>
+      <xsd:enumeration value="darkGray"/>
+      <xsd:enumeration value="lightGray"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="Style">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="bar"/>
+      <xsd:enumeration value="line"/>
+      <xsd:enumeration value="point"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="Newick">
+    <xsd:annotation>
+      <xsd:documentation>Alignment guide tree in Newick format</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="Sequence">
+    <xsd:annotation>
+      <xsd:documentation>Aligned sequence</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProbabilityData">
+    <xsd:annotation>
+      <xsd:documentation>Posterior probability of alignment structure state or alignment solution</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="id" type="xsd:ID"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Leaf">
+    <xsd:annotation>
+      <xsd:documentation>Terminal node of a phylogenetic tree</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="sequence" type="Sequence"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:string" use="required"/>
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="Node">
+    <xsd:annotation>
+      <xsd:documentation>Internal node of a phylogenetic tree</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="probability" type="ProbabilityData" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="ProbabilityInfo">
+    <xsd:annotation>
+      <xsd:documentation>Description of posterior probability category</xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="id" type="xsd:string" use="required"/>
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="color" type="Color"/>
+    <xsd:attribute name="style" type="Style"/>
+    <xsd:attribute name="offset" type="xsd:integer"/>
+    <xsd:attribute name="show" type="YesNo"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="SelectedSites">
+    <xsd:annotation>
+      <xsd:documentation>Boolean vector of sites to be selected/unselected</xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="SelectionCriteria">
+    <xsd:annotation>
+      <xsd:documentation>Description of the criteria resulting for the selecion </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+   <xsd:complexType name="Selection">
+    <xsd:annotation>
+      <xsd:documentation>Possible sub-selection of alignment sites for display and output</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="selected_sites" type="SelectedSites"/>
+    </xsd:sequence>
+    <xsd:sequence>
+      <xsd:element name="selection_criteria" type="SelectionCriteria"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+ <xsd:complexType name="Model">
+    <xsd:annotation>
+      <xsd:documentation>Instruction for display of posterior probability data</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="probability" type="ProbabilityInfo" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="Nodes">
+    <xsd:annotation>
+      <xsd:documentation>List of terminal and internal nodes</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="leaf" type="Leaf" maxOccurs="unbounded"/>
+      <xsd:element name="node" type="Node" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="MultipleAlignement">
+    <xsd:annotation>
+      <xsd:documentation>Prank multiple sequence alignment with tree, aligned sequences, alignment information and instructions for display</xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element name="newick" type="Newick"/>
+      <xsd:element name="nodes" type="Nodes"/>
+      <xsd:element name="selection" type="Selection" minOccurs="0"/>
+      <xsd:element name="model" type="Model"/>
+    </xsd:sequence>
+    <xsd:attribute name="level" type="xsd:positiveInteger" use="required" fixed="2"/>
+    <xsd:attribute name="version" type="xsd:positiveInteger" use="required" fixed="1"/>
+  </xsd:complexType>
+
+  <!--The following is the (only) top-level element allowed in an SBML document.-->
+  <xsd:element name="ms_alignement" type="MultipleAlignement"/>
+  <!--The end.-->
+</xsd:schema>
