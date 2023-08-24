@@ -10,7 +10,7 @@
 <hr>
 <p><img src="docs/data/prank_logo.png" alt=""></p>
 <ul>
-<li><a href="binaries">PRANK binaries</a></li>
+<li><a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">PRANK binaries</a></li>
 </ul>
 <p>Packed source code and pre-compiled binaries for Linux, Windows and OSX.</p>
 <ul>
@@ -120,8 +120,8 @@
  </p>
 <p>In the first case, the two alignments and the corresponding trees (for example, <a href="docs/data/alignment_1.fas">alignment_1.fas</a>, <a href="docs/data/alignment_2.fas">alignment_2.fas</a>, <a href="docs/data/tree_1.tre">tree_1.tre</a> and <a href="docs/data/tree_2.tre">tree_2.tre</a>) are defined as:  
  </p>
-<pre><code>prank -d1=alignment_1.fas -d2=alignment_2.fas -t1=tree_1.tre -t2=tree_2.tre -tree=&quot;(t1:0.1,t2:0.2);&quot;
-</code></pre>
+<pre>prank -d1=alignment_1.fas -d2=alignment_2.fas -t1=tree_1.tre -t2=tree_2.tre -tree=&quot;(t1:0.1,t2:0.2);&quot;
+</pre>
 <p>If no trees (<code>-t1=</code> and <code>-t2=</code>) are provided, PRANK will compute NJ trees for the two alignments and infer ancestors based on those. If no merge-tree (<code>-t=</code> or <code>-tree=</code>) is provided, the default branch length is used; that can be modified with option <code>-mergedist=</code>. The merging of the two alignments is based on the alignment of the two ancestors.  
  </p>
 <p>In the second case, the sequences belonging to the same group are indicated by ” group_XX” in the end of the name (where XX is unique for each group) and PRANK automatically finds the maximally large sub-trees consisting of sequences from the same group.  
