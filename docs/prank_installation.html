@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>PRANK</title>
+<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
 <h1 id="installation-of-prank">Installation of PRANK</h1>
@@ -20,7 +21,7 @@
 </ul>
 <p><a href="../index.html">Back to PRANK home.</a> </p>
 <h3 id="pre-compiled-executables-for-windows">Pre-compiled executables for Windows</h3>
-<p>A pre-compiled PRANK executable for Windows is available in the <a href="../binaries/">binaries folder</a>. The executable runs within the <a href="https://www.cygwin.com/">Cygwin environment</a>. Please follow <a href="https://cygwin.com/install.html">the instructions</a> and install the default (or a more complete) setup of Cygwin.</p>
+<p>A pre-compiled PRANK executable for Windows is available in the <a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">binaries folder</a>. The executable runs within the <a href="https://www.cygwin.com/">Cygwin environment</a>. Please follow <a href="https://cygwin.com/install.html">the instructions</a> and install the default (or a more complete) setup of Cygwin.</p>
 <p>Assuming that Cygwin is installed at “C:\cygwin64”, it is recommended to drop the file prank.cygwin.*.zip file to the directory “C:\cygwin64\home\username”. You can either unpack the zip file using a graphicla program, or (if you have installed Cygwin’s program “unzip”) open a Cygwin64 Terminal and type the commands:  
  </p>
 <pre><code>cd
@@ -50,7 +51,7 @@ explorer .
 <p>The easiest way to install PRANK (together with its helper programs MAFFT and Exonerate) is to use the package manager <a href="https://brew.sh">Homebrew</a>: </p>
 <pre><code>brew install brewsci/bio/prank
 </code></pre>
-<p>Alternatively, you can use a pre-compiled package that is available in the <a href="../binaries/">binaries folder</a>. The zip archive contains standalone executables for PRANK and the helper tools BppAncestor, Exonerate and MAFFT. It has been tested with MacOS version 12.1.</p>
+<p>Alternatively, you can use a pre-compiled package that is available in the <a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">binaries folder</a>. The zip archive contains standalone executables for PRANK and the helper tools BppAncestor, Exonerate and MAFFT. It has been tested with MacOS version 12.1.</p>
 <p>The package file can be downloaded and unpacked using graphical software, or on the command line:</p>
 <pre><code>curl -O http://wasabiapp.org/download/prank/prank.osx64.170427.zip
 unzip prank.osx64.170427.zip
@@ -69,7 +70,7 @@ cd prank-msa
 <p>Note that if the executables are moved or copied, the directory structure of the helper tools (e.g. mafftdir/bin) has to be retained.</p>
 <p>If you want to use a separate, system wide installation for any of the PRANK helper tools (instead of the version bundled with the package), you can just remove it from the prank directory (e.g. rm -rf mafft*  or rm exonerate). Installing the helper tools globally is described in a dedicated section below.</p>
 <h3 id="pre-compiled-executables-for-linux">Pre-compiled executables for Linux</h3>
-<p>The pre-compiled executables are available in the <a href="binaries/">binaries folder</a>.</p>
+<p>The pre-compiled executables are available in the <a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">binaries folder</a>.</p>
 <p>The PRANK executable for Linux has been compiled on Red Hat 5.10 (64bit) and confirmed to work also on Ubuntu 13.10 and CentOS 6.5. The package contains the PRANK executable and its manual page (read it with command man ./prank/prank.1) as well as BppAncestor, Exonerate and MAFFT executables and the necessary files for those to work correctly.</p>
 <p>Using the command line, the PRANK executable for Linux can be downloaded and unpacked with the commands:</p>
 <pre><code>mkdir ~/programs
@@ -106,7 +107,7 @@ chmod +x prank.sh
 ./prank.sh -d=infile.fas +F
 </code></pre>
 <h3 id="installation-of-prank-from-source-code">Installation of PRANK from source code</h3>
-<p>You can download a snapshot of the PRANK code from the <a href="../binaries/">binaries folder</a> and get the latest version using git as explained on the <a href="https://github.com/ariloytynoja/prank-msa">source code page</a>. On command line, the process looks like this (tested on Linux and MacOSX):</p>
+<p>You can download a snapshot of the PRANK code from the <a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">binaries folder</a> and get the latest version using git as explained on the <a href="https://github.com/ariloytynoja/prank-msa">source code page</a>. On command line, the process looks like this (tested on Linux and MacOSX):</p>
 <pre><code>wget http://wasabiapp.org/download/prank/prank.source.140603.tgz
 </code></pre>
 <p>or</p>

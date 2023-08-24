@@ -1,5 +1,26 @@
-body{
-    font-family:"Arial", Helvetica, sans-serif;
-    font-size: 90%;
+.top-buffer {
+  margin-top: 25px;
 }
 
+.small-buffer {
+  margin-top: 18px;
+}
+
+.bottom-buffer {
+  margin-bottom: 150px;
+}
+
+body {
+  font-size: 1.2em;
+  margin-left: 100px;
+  margin-right: 100px;
+  max-width: 1000px;
+}
+
+code {
+  background-color: #f5f5f5;
+}
+
+h1, h2, h3 {
+  color: #a333c8;
+}
