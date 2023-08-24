@@ -15,7 +15,7 @@ Installation of PRANK
 
 ### Pre-compiled executables for Windows
 
-A pre-compiled PRANK executable for Windows is available in the [binaries folder](binaries/). The executable runs within the [Cygwin environment](https://www.cygwin.com/). Please follow [the instructions](https://cygwin.com/install.html) and install the default (or a more complete) setup of Cygwin.
+A pre-compiled PRANK executable for Windows is available in the [binaries folder](../binaries/). The executable runs within the [Cygwin environment](https://www.cygwin.com/). Please follow [the instructions](https://cygwin.com/install.html) and install the default (or a more complete) setup of Cygwin.
 
 Assuming that Cygwin is installed at “C:\\cygwin64”, it is recommended to drop the file prank.cygwin.\*.zip file to the directory “C:\\cygwin64\\home\\username”. You can either unpack the zip file using a graphicla program, or (if you have installed Cygwin’s program “unzip”) open a Cygwin64 Terminal and type the commands:  
  
@@ -58,7 +58,7 @@ The easiest way to install PRANK (together with its helper programs MAFFT and Ex
 brew install brewsci/bio/prank
 ```
 
-Alternatively, you can use a pre-compiled package that is available in the [binaries folder](binaries/). The zip archive contains standalone executables for PRANK and the helper tools BppAncestor, Exonerate and MAFFT. It has been tested with MacOS version 12.1.
+Alternatively, you can use a pre-compiled package that is available in the [binaries folder](../binaries/). The zip archive contains standalone executables for PRANK and the helper tools BppAncestor, Exonerate and MAFFT. It has been tested with MacOS version 12.1.
 
 The package file can be downloaded and unpacked using graphical software, or on the command line:
 
@@ -93,7 +93,7 @@ If you want to use a separate, system wide installation for any of the PRANK hel
 
 ### Pre-compiled executables for Linux
 
-The pre-compiled executables are available in the [binaries folder](binaries/).
+The pre-compiled executables are available in the [binaries folder](../binaries/).
 
 The PRANK executable for Linux has been compiled on Red Hat 5.10 (64bit) and confirmed to work also on Ubuntu 13.10 and CentOS 6.5. The package contains the PRANK executable and its manual page (read it with command man ./prank/prank.1) as well as BppAncestor, Exonerate and MAFFT executables and the necessary files for those to work correctly.
 
@@ -154,7 +154,7 @@ chmod +x prank.sh
 
 ### Installation of PRANK from source code
 
-You can download a snapshot of the PRANK code from the [binaries folder](binaries/) and get the latest version using git as explained on the [source code page](https://github.com/ariloytynoja/prank-msa). On command line, the process looks like this (tested on Linux and MacOSX):
+You can download a snapshot of the PRANK code from the [binaries folder](../binaries/) and get the latest version using git as explained on the [source code page](https://github.com/ariloytynoja/prank-msa). On command line, the process looks like this (tested on Linux and MacOSX):
 
 ```
 wget http://wasabiapp.org/download/prank/prank.source.140603.tgz
