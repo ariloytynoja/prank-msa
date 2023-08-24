@@ -11,20 +11,19 @@
 }
 
 body {
-  font-size: 1.2em;
+  font-size: 1.1em;
   margin-left: 150px;
   margin-right: 150px;
   max-width: 900px;
   color: #555555;
   font-family:"Arial", Helvetica, sans-serif;
-  font-size: 90%;
+  line-height: 1.2;
 }
 
 code {
   background: #f4f4f4;
   color: #666;
   font-family: monospace;
-  #font-size: 15px;
 }
 
 h1, h2, h3 {
@@ -38,7 +37,6 @@ pre {
     color: #666;
     page-break-inside: avoid;
     font-family: monospace;
-    #font-size: 15px;
     line-height: 1.6;
     margin-bottom: 1.6em;
     max-width: 100%;
@@ -47,3 +45,5 @@ pre {
     display: block;
     word-wrap: break-word;
 }
+
+dt, dd { margin-top: 10px; }

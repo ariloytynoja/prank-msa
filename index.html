@@ -5,38 +5,28 @@
 <link rel="stylesheet" type="text/css" href="docs/style.css" />
 </head>
 <body>
-<p><img src="docs/data/prank_logo.png"  width="200px" alt=""></p>
 
+<h1 id="prank">PRANK</h1>
 <p>PRANK is a probabilistic multiple alignment program for DNA, codon and amino-acid sequences. It’s based on a novel algorithm that treats insertions correctly and avoids over-estimation of the number of deletion events. In addition, PRANK borrows ideas from maximum likelihood methods used in phylogenetics and correctly takes into account the evolutionary distances between sequences. Lastly, PRANK allows for defining a potential structure for sequences to be aligned and then, simultaneously with the alignment, predicts the locations of structural units in the sequences.</p>
 <hr>
-<ul>
-<li><a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">PRANK binaries</a></li>
-</ul>
-<p>Packed source code and pre-compiled binaries for Linux, Windows and OSX.</p>
-<ul>
-<li><a href="#using-prank">Using PRANK</a></li>
-</ul>
-<p>Instructions for the use of PRANK with example commands and test data.</p>
-<ul>
-<li><a href="docs/prank_installation.html">Installing PRANK</a></li>
-</ul>
-<p>Instructions to install and start using PRANK on different operating systems. Pre-compiled executables are provided for Windows, Mac OSX and Linux; the source code should compile on any system supporting the GNU C compiler package.</p>
-<ul>
-<li><a href="docs/prank_new_features.html">New features</a></li>
-</ul>
-<p>Brief description of the new features in the latest versions of the program.</p>
-<ul>
-<li><a href="docs/prank_known_issues.html">Known issues</a></li>
-</ul>
-<p>Known bugs and problems with the latest versions of the program.</p>
-<ul>
-<li><a href="docs/prank_structure_models.html">Structure models</a></li>
-</ul>
-<p>Generation of PRANK structure models.</p>
-<ul>
-<li><a href="docs/hsaml_format.html">HSAML format</a></li>
-</ul>
-<p>Definition of the XML-format used by PRANK.</p>
+
+<dl>
+<dt><a href="https://github.com/ariloytynoja/prank-msa/tree/master/binaries">PRANK binaries</a></dt>
+<dd>Packed source code and pre-compiled binaries for Linux, Windows and OSX.</dd>
+<dt><a href="#using-prank">Using PRANK</a></dt>
+<dd>Instructions for the use of PRANK with example commands and test data.</dd>
+<dt><a href="docs/prank_installation.html">Installing PRANK</a></dt>
+<dd>Instructions to install and start using PRANK on different operating systems. Pre-compiled executables are provided for Windows, Mac OSX and Linux; the source code should compile on any system supporting the GNU C compiler package.</dd>
+<dt><a href="docs/prank_new_features.html">New features</a></dt>
+<dd>Brief description of the new features in the latest versions of the program.</dd>
+<dt><a href="docs/prank_known_issues.html">Known issues</a></dt>
+<dd>Known bugs and problems with the latest versions of the program.</dd>
+<dt><a href="docs/prank_structure_models.html">Structure models</a></dt>
+<dd>Generation of PRANK structure models.</dd>
+<dt><a href="docs/hsaml_format.html">HSAML format</a></li>
+<dd>Definition of the XML-format used by PRANK.</dd>
+</dl>
+
 <hr>
 <h3 id="using-prank">Using PRANK</h3>
 <p>At the simplest, PRANK can be run with command:  
@@ -87,7 +77,7 @@
 <pre><code>prank -help
 </code></pre>
 <p>By default, PRANK writes the output alignments in FASTA format. With the option -f=format_name some other popular formats can be selected. See prank -help for details.</p>
-<p><a href="#using-prank">back to top</a></p>
+<p><a href="#prank">back to top</a></p>
 <h3 id="other-program-options">Other program options</h3>
 <h4 id="translated-alignment-and-codon-alignment">Translated alignment and codon alignment</h4>
 <p>PRANK can do translated alignments of protein-coding DNA sequences or align them using the codon model. Translation is selected with the options <code>-translate</code> (standard code) or <code>-mttranslate</code> (mitochondrial code), and the codon alignment with the option <code>-codon</code>. Using the example data <a href="docs/data/input_dna.fas">input_dna.fas</a>, the following commands make a translated alignment:  
@@ -149,7 +139,7 @@
 <pre><code>prank -convert -d=alignment_pep.fas -dna=input_dna.fas -o=alignment_dna -keep
 </code></pre>
 <p>converts a protein alignment in FASTA format to a DNA alignment in FASTA format.</p>
-<p><a href="#using-prank">back to top</a></p>
+<p><a href="#prank">back to top</a></p>
 <h2 id="methods">Methods</h2>
 <h4 id="models">Models</h4>
 <p>For DNA data, PRANK by default uses HKY model with empirical base frequencies and kappa=2. With the optional command parameters, it supports TN <a href="http://mbe.oxfordjournals.org/content/10/3/512.short">(Tamura and Nei, 1993)</a> and models below it (JC, K2P, FEL, HKY). For example, JC model is defined as <code>-kappa=1 -dnafreqs=0.25,0.25,0.25,0.25</code>. WAG <a href="http://mbe.oxfordjournals.org/content/18/5/691.short">(Whelan and Goldman, 2001)</a> is used for protein alignments.  
@@ -172,6 +162,6 @@
  </p>
 <h4 id="ancestral-reconstruction">Ancestral reconstruction</h4>
 <p>PRANK’s own ancestral reconstruction happens during progressive alignment and is based on descendant sequences only. To improve the ancestral reconstruction, PRANK uses BppAncestor from the BppSuite package <a href="http://www.biomedcentral.com/1471-2148/8/255">(Dutheil and Boussau, 2008)</a> to infer the character states and then combines these with the inferred character presence/absence information. PRANK’s optimization score is also based on these maximum likelihood inferences.</p>
-<p><a href="#using-prank">back to top</a></p>
+<p><a href="#prank">back to top</a></p>
 </body>
 </html>
