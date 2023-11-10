@@ -574,23 +574,6 @@ void AncestralSequence::cleanSpace()
 }
 
 
-// Get the probability of characters in different structures given the tree.
-// Takes into account the phylogeny.
-//
-double AncestralSequence::mlCharProbAt(int j,int i,int k)
-{
-    return mlCharProb->g(k,j,i);
-}
-
-// Same for insertions skipped
-//
-double AncestralSequence::mlCharProbAtF(int j,int i,int k)
-{
-    realIndex->g(i);
-
-    return mlCharProb->g(k,j,realIndex->g(i));
-}
-
 void AncestralSequence::writeSequence(string name)
 {
     char str[10];

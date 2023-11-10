@@ -177,9 +177,20 @@ public:
     void setChildGaps(Sequence *l,Sequence *r);
     void setRealIndex(bool left);
 
-    double mlCharProbAt(int j,int i,int k);
-    double mlCharProbAtF(int j,int i,int k);
+    // Get the probability of characters in different structures given the tree.
+    // Takes into account the phylogeny.
+    //
+    double mlCharProbAt(int j,int i,int k)
+    {
+        return mlCharProb->g(k,j,i);
+    }
 
+    // Same for insertions skipped
+    //
+    double mlCharProbAtF(int j,int i,int k)
+    {
+        return mlCharProb->g(k,j,realIndex->g(i));
+    }
 
     void cleanSpace();
 
