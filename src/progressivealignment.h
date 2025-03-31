@@ -537,23 +537,23 @@ private:
         }
 
 
-        if (DNA && !isDna)
+        if (DNA && !(*isDna))
         {
             cout<<"Warning autodetection suggests protein but DNA model forced.\n";
             *isDna = true;
         }
-        if (CODON && !isDna)
+        if (CODON && !(*isDna))
         {
             cout<<"Warning autodetection suggests protein but codon model forced.\n";
             *isDna = true;
         }
-        if (PROTEIN && isDna)
+        if (PROTEIN && *isDna)
         {
             cout<<"Warning autodetection suggests DNA but protein model forced.\n";
             *isDna = false;
         }
 
-        if(isDna)
+        if(*isDna)
         {
             DNA = true;
             PROTEIN = false;

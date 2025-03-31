@@ -97,7 +97,11 @@ void Mafft_alignment::align_sequences(vector<string> *names,vector<string> *sequ
     m_output.close();
 
     stringstream command;
-    command << mafftpath<<"mafft "<<tmp_dir<<"/m"<<r<<".fas 2> /dev/null";
+    if (PROTEIN) {
+        command << mafftpath<<"mafft --amino "<<tmp_dir<<"/m"<<r<<".fas 2> /dev/null";
+    }else{
+        command << mafftpath<<"mafft "<<tmp_dir<<"/m"<<r<<".fas 2> /dev/null";
+    }
     if(NOISE>0)
         cout<<"cmd: "<<command.str()<<endl;
 
