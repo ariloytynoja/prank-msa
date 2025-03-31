@@ -39,6 +39,8 @@
 #include "mafft_alignment.h"
 #include "exonerate_reads.h"
 #include "bppancestors.h"
+#include "raxmlancestors.h"
+#include "fasttree_tree.h"
 #include "readalignment.h"
 #include "hirschberg.h"
 
@@ -49,6 +51,8 @@ public:
     ~ProgressiveAlignment();
 
 private:
+
+    bool ancestorsInferred;
 
     Site *sites;
 
@@ -63,7 +67,7 @@ private:
 
     void readAlignment(AncestralNode *root,vector<string> *names,vector<string> *sequences,bool isDna,int longest,bool verbose=true,bool writeOutput=true,string outputSuffix="")
     {
-        if(PRINTSCOREONLY)
+        if(PRINTSCORE)
             verbose = false;
 
         if(!this->sequencesAligned(sequences))
@@ -220,7 +224,7 @@ private:
         {
             cout<<" - converting '"<<seqfile<<"' to '"<<outfile<<this->formatExtension(format)<<"'"<<endl<<endl;
         }
-        else if (PRINTSCOREONLY)
+        else if (PRINTSCORE)
         {
             cout<<" - computing score for '"<<seqfile<<"' and '"<<treefile<<"'"<<endl<<endl;
             if(NOISE==0) { NOISE=-1; SCREEN = false;}
@@ -277,22 +281,27 @@ private:
                 Exonerate_reads er;
                 bool exonerateOK = er.test_executable();
 
-                BppAncestors ba;
-                bool bppaOK = ba.testExecutable();
+                RaxmlAncestors ra;
+                bool rxmlaOK = ra.testExecutable();
 
-                if(mafftOK || exonerateOK || bppaOK)
+                FastTree_tree ft;
+                bool fsttOK = ft.test_executable();
+
+                if(mafftOK || exonerateOK || rxmlaOK)
                 {
                     cout<<" - external tools available:\n";
                     if(mafftOK)
                         cout<<"    MAFFT for initial alignment\n";
+                    if(FASTTREE && fsttOK)
+                        cout<<"    FastTree for guide tree estimation\n";
                     if(exonerateOK)
                         cout<<"    Exonerate for alignment anchoring\n";
-                    if(bppaOK)
-                        cout<<"    BppAncestor for ancestral state reconstruction\n";
+                    if(rxmlaOK)
+                        cout<<"    RAxML for ancestral state reconstruction\n";
                 }
                 cout<<endl;
 
-                if(treefile!="" && iterations>1)
+                if(treefile!="" && iterations>1 && !PREALIGNED)
                 {
                     cout<<"Warning: iterative search may change the guide tree. If you want to keep\n the phylogeny provided in '"<<treefile<<
                           "', please add option '-once'.\n\n";
@@ -348,6 +357,22 @@ private:
             cout<<"Names in sequence file "<<seqfile<<" and guide tree "<<treefile<<" do not match!"<<endl;
             exit(-1);
         }
+
+        vector<string> tnames;
+        root->getTerminalNames(&tnames);
+
+        for (int i=0; i<(int)tnames.size()-1; i++)
+        {
+            for (int j=i+1; j<(int)tnames.size(); j++)
+            {
+                if(tnames.at(i)==tnames.at(j))
+                {
+                    cout<<"Name '"<<tnames.at(i)<<"' is defined in the tree more than once.\n";
+                    exit(-1);
+                }
+            }
+        }
+
 
         // .. and make sure that the sequence data and the tree match!
         //
@@ -860,9 +885,9 @@ private:
             int hit;
 
             if(isDna)
-                hit = sequences->at(i).find_first_not_of("ACGTURYMKSWHBVDNacgturymkswhbvdn-",pos);
+                hit = sequences->at(i).find_first_not_of("ACGTURYMKSWHBVDNacgturymkswhbvdn-.",pos);
             else
-                hit = sequences->at(i).find_first_not_of("ARNDCQEGHILKMFPSTWYVXarndcqeghilkmfpstwyvx-",pos);
+                hit = sequences->at(i).find_first_not_of("ARNDCQEGHILKMFPSTWYVXarndcqeghilkmfpstwyvx-.",pos);
 
             if(hit != string::npos)
             {
@@ -1237,8 +1262,9 @@ private:
 
 //        this->setHMModel(sequences,isDna);
 
-
         Node* n = new Node(*tree);
+        *tree = n->print_tree();
+
         n->mark_sequences(names);
         int treeleaves = 0;
         int treematches = 0;

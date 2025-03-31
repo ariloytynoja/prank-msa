@@ -65,6 +65,7 @@ protected:
     float branchLength;   // length of the branch below
     bool terminal;        // is/not terminal node
     bool root;            // is/not root node
+    int namehash;
 
     std::string ln,rn,n3; // names of left, right and third (unrooted) branch
     float ld,rd,d3;       // lengths of those branches
@@ -202,6 +203,7 @@ public:
 
     virtual void getAllSubtrees(std::map<std::string,float> *subtrees) = 0;
     virtual void getAllSubtreesWithNodename(std::map<std::string,std::string> *subtrees) = 0;
+    virtual void getAllFullSubtreesWithNodename(std::map<std::string,std::string> *subtrees,bool treefirst) = 0;
     virtual void getSubtreeBelow(std::string *subtree) = 0;
     virtual void markRealignSubtrees(std::map<std::string,float> *subtrees) = 0;
 
@@ -243,6 +245,16 @@ public:
         while (*str)
         {
             hash = hash * 101  +  *str++;
+        }
+        return hash;
+    }
+
+    unsigned int hash2(const char* s,unsigned int seed = 0)
+    {
+        unsigned int hash = seed;
+        while (*s)
+        {
+            hash = hash * 101  +  *s++;
         }
         return hash;
     }
@@ -351,6 +363,66 @@ public:
 
 
     virtual bool updateInsertionSite(int i, bool has_parent) {}
+
+    std::string markNodes()
+    {
+        if (this->terminal)
+        {
+            namehash = hash2(nodeName.c_str());
+            return this->nodeName;
+        }
+        std::string name0 = lChild->markNodes();
+        std::string name1 = rChild->markNodes();
+
+        std::string namef = name0+name1;
+        if(name0>name1)
+            namef = name1+name0;
+
+        namehash = hash2(namef.c_str());
+
+        return namef;
+    }
+
+    void getNamehashNames(std::map<int,std::string> *h)
+    {
+        if(!terminal)
+        {
+            lChild->getNamehashNames(h);
+            rChild->getNamehashNames(h);
+        }
+        h->insert(make_pair(namehash,nodeName));
+        return;
+    }
+
+
+    void updateBranchLengths(std::map<std::string,float> *brls,int *found)
+    {
+        if(!terminal)
+        {
+            lChild->updateBranchLengths(brls,found);
+            rChild->updateBranchLengths(brls,found);
+        }
+
+        std::map<std::string,float>::iterator it = brls->find(nodeName);
+        if(it != brls->end())
+        {
+            branchLength = it->second;
+            (*found)++;
+        }
+    }
+
+    void updateTerminalNames()
+    {
+        if(!terminal)
+        {
+            lChild->updateTerminalNames();
+            rChild->updateTerminalNames();
+        }
+        else if(nodeName.substr(0,3)=="seq")
+        {
+            nodeName.replace(0,3,"Seq");
+        }
+    }
 };
 
 #endif

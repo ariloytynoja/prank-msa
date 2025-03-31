@@ -1,3 +1,17 @@
+v.250331
+Fixes by Michael Hiller
+- nuc vs. aa detection and information passed to Mafft
+Fixes by Martin Larralde
+- speed ups by removal of unnecessary calls
+
+
+v.170703
+Many changes not previously uploaded to GitHub, for example:
+- guide tree inference with FastTree 
+- ancestral states with RAxML
+- possible re-estimation of branch lengths
+ 
+
 v.170427
 Changes by Nikolai Hecker
 - make the temp files thread safe

@@ -55,7 +55,7 @@ extern bool MERGE;
 extern bool TREESTRING;
 extern bool PARTLYALIGNED;
 extern bool PREALIGNED;
-extern bool PRINTSCOREONLY;
+extern bool PRINTSCORE;
 extern bool UPDATE;
 extern bool UPDATESECOND;
 extern float updateTolerance;
@@ -67,6 +67,7 @@ extern bool TREEFROMALIGNMENT;
 extern bool TREEONLY;
 extern bool SCOREMAFFT;
 extern bool BPPANCESTORS;
+extern bool MLANCESTORS;
 
 extern int format;
 
@@ -162,6 +163,8 @@ extern int FBW;
 extern bool SKIPINS;
 
 extern bool EXONERATE;
+extern bool FASTTREE;
+extern bool RAXMLREBL;
 
 extern int initialAnchDist;
 extern int minAnchDist;

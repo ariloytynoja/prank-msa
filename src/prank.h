@@ -69,7 +69,7 @@ bool TREESTRING = false;
 bool PARTLYALIGNED = false;
 
 bool PREALIGNED = false;
-bool PRINTSCOREONLY = false;
+bool PRINTSCORE = false;
 
 bool UPDATE = false;
 bool UPDATESECOND = true;
@@ -92,7 +92,8 @@ bool TREEONLY = false;
 // compute score for mafft alignment
 bool SCOREMAFFT = false;
 
-// estimate ancestors with bppancestors
+// estimate ancestors with raxml / bppancestors
+bool MLANCESTORS = true;
 bool BPPANCESTORS = true;
 
 // merge two alignments
@@ -305,6 +306,12 @@ int missingLimit = 1000;
 
 // skip gaps in anchoring ancestral seqs (?)
 bool SKIPGAPANCH = true;
+
+/********* technical: guide tree & branch lengths **********/
+
+bool FASTTREE = true;
+
+bool RAXMLREBL = false;
 
 /********* technical: memory & speed efficiency **********/
 

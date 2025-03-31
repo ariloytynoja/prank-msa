@@ -198,7 +198,7 @@ int ReadFile::readFile(const char* inputfile)
 
     else
     {
-        cout<<"Input file format unrecognized. Only FASTA format supported. Exiting.\n\n";
+        cout<<"Input file format not recognized as Fasta, Nexus or Phylip. Format not supported. Exiting.\n\n";
         exit(-1);
     }
 
@@ -208,8 +208,8 @@ int ReadFile::readFile(const char* inputfile)
 
         string temp = seqs.at(i);
         transform( temp.begin(), temp.end(), temp.begin(), (int(*)(int))toupper );
-        seqs.at(i) = temp;
 
+        seqs.at(i) = temp;
         if ((int)seqs.at(i).length()<1)
         {
             cout<<"Failed to read sequence "<<names.at(i)<<". Exiting.\n\n";
@@ -217,6 +217,7 @@ int ReadFile::readFile(const char* inputfile)
         }
 
         string name = names.at(i);
+
         while (nameset.find(name) != nameset.end())
         {
             cout<<"Sequence name "<<name<<" is defined more than once! Adding suffix '.1'.\n";

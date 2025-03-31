@@ -20,6 +20,7 @@
 
 #include <cstdio>
 #include "guidetree.h"
+#include "fasttree_tree.h"
 #include "pwhirschberg.h"
 #include "pwsite.h"
 #include "config.h"
@@ -31,6 +32,7 @@ using namespace std;
 void GuideTree::computeTree(vector<string>* sequences,vector<string>* names,IntMatrix* substScores)
 {   
     bool isDna = (substScores->X()<=5);
+
     int ns = sequences->size();
 
     string full_alphabet = "ARNDCQEGHILKMFPSTWYVX";
@@ -300,6 +302,17 @@ void GuideTree::computeTree(vector<string>* seqs,vector<string>* names,bool isDn
 
         return;
     }
+
+    if(FASTTREE)
+    {
+        FastTree_tree ft;
+        if(ft.test_executable())
+        {
+            this->tree = ft.infer_phylogeny(names,seqs,!isDna);
+            return;
+        }
+    }
+
 
     int ns = seqs->size();
     FlMatrix* distance = new FlMatrix(ns,ns,"pw distances");

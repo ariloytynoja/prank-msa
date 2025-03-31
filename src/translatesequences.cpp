@@ -193,12 +193,23 @@ bool TranslateSequences::translateDNA(std::vector<std::string> *names,std::vecto
     vector<string>::iterator nit = names->begin();
     vector<string>::iterator pit = protein->begin();
 
+//    map<string,string>::iterator it = dnaSequences->begin();
+//    for(;it!=dnaSequences->end();it++)
+//        cout<<it->first<<endl;
+
     for (; pit!=protein->end(); pit++,nit++)
     {
+        string dnaname = *nit;
 
 //        string dnaSeq = dnaSeqs.find(*nit)->second;
-        string dnaSeq = dnaSequences->find(*nit)->second;
 
+        if(dnaSequences->find(dnaname) == dnaSequences->end()
+                && dnaname.substr(0,3)=="Seq")
+        {
+            dnaname.at(0)='s';
+        }
+
+        string dnaSeq = dnaSequences->find(dnaname)->second;
         string nuc = "";
 
 //        cout<<endl<<*nit<<endl<<*pit<<endl<<dnaSeq<<endl;

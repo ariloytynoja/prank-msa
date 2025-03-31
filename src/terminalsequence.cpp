@@ -70,7 +70,7 @@ TerminalSequence::TerminalSequence(string* s)
 
             if (s->size()%3!=0)
             {
-                cout<<s->size()<<" "<<*s<<endl;
+//                cout<<s->size()<<" "<<*s<<endl;
                 cout<<"codon sequence length is not multiple of three!"<<endl;
                 exit(0);
             }
@@ -80,7 +80,6 @@ TerminalSequence::TerminalSequence(string* s)
         {
             codons.insert(make_pair(alpha.substr(i,3),i/3));
         }
-
         sAlpha /= 3;
 
         codons.insert(make_pair("---",sAlpha));
@@ -96,14 +95,18 @@ TerminalSequence::TerminalSequence(string* s)
 
         for (int i=0; i<(int)S.length(); i+=3)
         {
-            ci = codons.find(S.substr(i,3))->second;
+            ci=-1;
+            if(codons.find(S.substr(i,3)) != codons.end())
+                ci = codons.find(S.substr(i,3))->second;
 
             if (ci>=0 && ci<sAlpha)
                 charseq += S.substr(i,3);
             else if (S.substr(i,3)=="---" || S.substr(i,3)=="...")
                 ;
             else if(i+3<S.length() || PREALIGNED)
+            {
                 charseq += "NNN";
+            }
             else
             {
 //                cout<<"removing: "<<S.substr(i,3)<<endl;
@@ -129,7 +132,10 @@ TerminalSequence::TerminalSequence(string* s)
         {
             for (int i=0; i<(int)s->length(); i++)
             {
-                ci = fullAlpha.find(toupper(s->at(i)));
+                ci=-1;
+                if(fullAlpha.find(toupper(s->at(i))) != string::npos)
+                    ci = fullAlpha.find(toupper(s->at(i)));
+
                 if (ci>=0 && ci<sFullAlpha)
                     charseq += s->at(i);
                 else
@@ -144,7 +150,9 @@ TerminalSequence::TerminalSequence(string* s)
         {
             for (int i=0; i<(int)s->length(); i++)
             {
-                ci = fullAlpha.find(toupper(s->at(i)));
+                ci=-1;
+                if(fullAlpha.find(toupper(s->at(i))) != string::npos)
+                    ci = fullAlpha.find(toupper(s->at(i)));
                 if (ci>=0 && ci<sFullAlpha)
                     charseq += s->at(i);
                 else

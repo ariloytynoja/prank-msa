@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <cstdlib>
+#include <cctype>
 #include <string>
 #include <map>
 #include <iostream>
@@ -123,12 +124,13 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
 
     }
     else
-    {
+    { 
         cout<<"Problem with the guidetee: brackets ("<<open<<","<<end<<") and commas ("<<comma<<") don't match)"<<endl<<endl;
         exit(-1);
     }
 
     int count = 1;
+    int biggest = 0;
     string r;
 
 
@@ -181,17 +183,19 @@ void ReadNewick::buildTree(string s,map<string,TreeNode*>* nodes)
                     b--;
 
 //                    cout<<"tag "<<tag<<endl;
-                    // An attempt to get around a BppAncestor bug: not needed anymore
+                    // For RAxML ancestor tree
                     stringstream tc;
-//                    char * pEnd;
-//                    if(tag!="" && strtol(tag.c_str(),&pEnd,10)>0)
-//                    {
-//                        tc<<"#"<<tag<<"#";
-//                    }
-//                    else
-//                    {
+                    char * pEnd;
+                    if(tag == "ROOT")
+                        tc<<"#ROOT#";
+                    else if(tag!="" && is_number(tag) && strtol(tag.c_str(),&pEnd,10)>0)
+                    {
+                        tc<<"#"<<tag<<"#";
+                    }
+                    else
+                    {
                         tc<<"#"<<count++<<"#";
-//                    }
+                    }
 
                     AncestralNode *tn = new AncestralNode(n);
                     tn->setNodeName(tc.str());

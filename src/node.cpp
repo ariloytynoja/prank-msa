@@ -28,9 +28,6 @@
 
 using namespace std;
 
-std::string mpTree;
-float halfLength;
-float maxSpan;
 extern float defaultBranchLength;
 
 Node::~Node()
@@ -61,8 +58,17 @@ Node::~Node()
 
 int Node::count = 1;
 
-Node::Node(string t)
+int Node::warned = 0;
+
+bool Node::warnings = true;
+
+std::string Node::mpTree = "";
+
+Node::Node(string t, bool root)
 {
+
+    warnings = root;
+
     mpTree = "";
     maxLength = 0.0;
     maxSpan = 0.0;
@@ -83,6 +89,8 @@ Node::Node(string t)
 
     tree = t;
 
+    warned = false;
+
     for (unsigned int i = 0; i < tree.size(); i++)
     {
       if(tree[i] == ' ')
@@ -99,6 +107,9 @@ Node::Node(string t)
         tree.erase(start,stop-start+1);
     }
 
+    checkBifurcation(&tree);
+
+//    cout<<"tree "<<tree<<endl;
     divideTree(tree,subTrees,subDistances);
 
     subDistances[0] = abs(subDistances[0]);
@@ -111,10 +122,12 @@ Node::Node(string t)
 
     revTrees[0] = subTrees[1]+":"+num;
     revTrees[1] = subTrees[0]+":"+num;
+    reverseTree = "";
 
     child0 = new Node(subTrees[0],this,0);
+    child0->set_distance_to_parent(subDistances[0]);
     child1 = new Node(subTrees[1],this,1);
-
+    child1->set_distance_to_parent(subDistances[1]);
 
     float currPair = subDistances[0]+child0->maxLength+subDistances[1]+child1->maxLength;
     if (currPair > maxSpan)
@@ -122,9 +135,15 @@ Node::Node(string t)
         maxSpan = currPair;
     }
 
+    dist_to_parent = 0;
 
-    findMiddlePoint();
+    if(root)
+        findMiddlePoint();
+    else
+        mpTree = "("+child0->tree+":"+num+","+child1->tree+":"+num+");";
 
+//    cout<<child0->tree<<"\n"<<child1->tree<<"\n"<<num<<"\n\n";
+//    cout<<"mp "<<mpTree<<endl;
 }
 
 string Node::rootedTree()
@@ -159,12 +178,50 @@ void Node::checkBifurcation(string *t)
 
     if (comma!=open || comma!=end)
     {
+        if(warnings && warned==0)
+        {
             cout<<"Correcting (arbitrarily) for multifurcating nodes."<<endl;
+            warned++;
+        }
 
-            if(open==end+1 && open == comma)
+        string tmp = *t;
+        if(tmp.at(0)=='(')
+            tmp.erase(0,1);
+        while(tmp.at(tmp.length()-1)!=')')
+            tmp.erase(tmp.length()-1);
+        if(tmp.at(tmp.length()-1)==')')
+            tmp.erase(tmp.length()-1);
+
+//        cout<<open<<" "<<end<<" "<<comma<<" "<<tmp<<endl;
+        vector<string> strees;
+
+        int po=0;
+        string fr = "";
+        for(int i=0;i<tmp.length();i++)
+        {
+            if(tmp.at(i)=='(')
+                po++;
+            if(tmp.at(i)==')')
+                po--;
+            if(tmp.at(i)==',' && po==0)
             {
-                t->append(":0.0)");
+                strees.push_back(fr);
+
+                fr = "";
+                continue;
             }
+            fr += tmp.at(i);
+        }
+        strees.push_back(fr);
+
+        string str = strees.at(0);
+        for(int i=1;i<strees.size()-1;i++)
+        {
+          str = "("+str+","+strees.at(i)+"):0.0";
+        }
+        str = "("+str+","+strees.at(strees.size()-1)+")";
+
+        *t = str;
     }
 }
 
@@ -205,11 +262,14 @@ Node::Node(string t,Node* p,int branch)
         char num1[10];
         sprintf(num1,"%.5f",subDistances[1]);
 
-        revTrees[0] = "("+parent->revTrees[branch]+","+subTrees[1]+":"+num1+"):"+num0;
-        revTrees[1] = "("+parent->revTrees[branch]+","+subTrees[0]+":"+num0+"):"+num1;
+        revTrees[0] = "("+subTrees[1]+":"+num1+","+parent->revTrees[branch]+"):"+num0;
+        revTrees[1] = "("+subTrees[0]+":"+num0+","+parent->revTrees[branch]+"):"+num1;
+        reverseTree = parent->revTrees[branch];
 
         child0 = new Node(subTrees[0],this,0);
+        child0->set_distance_to_parent(subDistances[0]);
         child1 = new Node(subTrees[1],this,1);
+        child1->set_distance_to_parent(subDistances[1]);
 
 
         float currPair = subDistances[0]+child0->maxLength+subDistances[1]+child1->maxLength;
@@ -651,3 +711,25 @@ void Node::prune_up()
     }
 //    cout<<"prune up out "<<this->get_name()<<endl;
 }
+
+string Node::markNodes()
+{
+    if (this->is_leaf())
+    {
+        namehash = hash(name.c_str());
+        return this->name;
+    }
+    string name0 = child0->markNodes();
+    string name1 = child1->markNodes();
+
+    string namef = name0+name1;
+    if(name0>name1)
+        namef = name1+name0;
+
+    namehash = hash(namef.c_str());
+
+//    cout<<name<<" "<<namef<<" "<<namehash<<endl;
+
+    return namef;
+}
+

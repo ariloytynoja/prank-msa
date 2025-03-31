@@ -1104,7 +1104,7 @@ bool ReadAlignment::readSeqs(Sequence* s1,Sequence* s2,PhyloMatchScore *pms,Tree
             return false;
 
 //            cout<<"something wrong"<<endl;
-//            cout<<"ns: "<<s<<"; "<<proc<<" "<<state<<"; ("<<i<<" "<<j<<"): "<<newsite->index()<<endl;
+//            cout<<"ns: "<<s<<"; "<<proc<<" "<<state<<"; ("<<i<<"/"<<sl2<<" "<<j<<"/"<<sl1<<"): "<<newsite->index()<<endl;
 //            exit(-1);
         }
         countSites++;

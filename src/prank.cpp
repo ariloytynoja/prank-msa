@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <limits.h>
 #include <cstdlib>
 #include <cmath>
 #include <fstream>
@@ -35,48 +36,52 @@ using namespace std;
 char tmp_dir[1000] = "";
 bool verbose = false;
 
-//main
 int main(int argc, char *argv[])
 {
-    version = 170427;
+    version = 250331;
 
     readArguments(argc, argv);
     int time1 = time(0);
 
     // character array for assigning system tmp path
-    char* tmpPath = NULL;  
+    char* tmpPath = NULL;
     //mkdtemp template
     const char* mktemplate = "tmpdirprankmsaXXXXXX";
 
-     //create temporary directory
-     //get tmpPath from environment or assign tmpPath to NULL (if last getenv fails)
-     if( (tmpPath = getenv("TMPDIR")) == NULL)
-       {
-       if( (tmpPath = getenv("TMP")) == NULL)
-         {     
-           if( (tmpPath = getenv("TEMPDIR")) == NULL)
-             { 
-               tmpPath = getenv("TEMP");
-             } 
-         }
-       }
-   
-     // define temp dir based on whether tmpPath was found   
-     if(tmpPath == NULL)
-       {
-       sprintf(tmp_dir, "%s", mktemplate);
-       }
-     else
-       {
-       sprintf(tmp_dir, "%s/%s", tmpPath, mktemplate); 
-       }
-   
-     // call mkdtemp
-     if( (mkdtemp(tmp_dir) == NULL) )
-       {
-       perror("'mkdtemp' failed to generate temporary directory while creating ProgressiveAlignbment object.\n");
-       exit(EXIT_FAILURE);
-       }
+    //create temporary directory
+    //get tmpPath from environment or assign tmpPath to NULL (if last getenv fails)
+    if( (tmpPath = getenv("TMPDIR")) == NULL)
+    {
+        if( (tmpPath = getenv("TMP")) == NULL)
+        {
+            if( (tmpPath = getenv("TEMPDIR")) == NULL)
+            {
+                tmpPath = getenv("TEMP");
+            }
+        }
+    }
+
+    // define temp dir based on whether tmpPath was found
+    if(tmpPath == NULL)
+    {
+        sprintf(tmp_dir, "%s", mktemplate);
+    }
+    else
+    {
+        sprintf(tmp_dir, "%s/%s", tmpPath, mktemplate);
+    }
+
+    // call mkdtemp
+    if( (mkdtemp(tmp_dir) == NULL) )
+    {
+        perror("'mkdtemp' failed to generate temporary directory while creating ProgressiveAlignbment object.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char *abspath;
+    abspath = realpath(tmp_dir, NULL);
+    strncpy(tmp_dir,abspath,1000);
+    free(abspath);
 
 
     ProgressiveAlignment* pa = new ProgressiveAlignment(treefile,seqfile,dnafile);
@@ -160,12 +165,10 @@ void readArguments(int argc, char *argv[])
                 exit(0);
             }
 
-
-	    else if (s=="-verbose")
+            else if (s=="-verbose")
             {
-	      verbose = true;
+                verbose = true;
             }
-
 
             /********* input/output: **********/
 
@@ -247,13 +250,11 @@ void readArguments(int argc, char *argv[])
             else if (s=="-keep")
             {
                 PREALIGNED = true;
-                PRINTSCOREONLY = false;
             }
 
             else if (s=="-score")
             {
-                PREALIGNED = true;
-                PRINTSCOREONLY = true;
+                PRINTSCORE = true;
             }
 
             else if (s=="-update")
@@ -315,6 +316,12 @@ void readArguments(int argc, char *argv[])
             else if (s=="-nobppa")
             {
                 BPPANCESTORS = false;
+            }
+
+            // do not estimate ancestors with raxml
+            else if (s=="-nomlanc")
+            {
+                MLANCESTORS = false;
             }
 
             // output alignment format
@@ -755,6 +762,20 @@ void readArguments(int argc, char *argv[])
                     cout<<endl<<"unaccepted combination: -F -gapanch; disabling -gapanch"<<endl;
             }
 
+            /********* technical: guide tree **********/
+
+            // use FastTree for guidetree computation
+            else if (s=="-nofasttree")
+            {
+                FASTTREE = false;
+            }
+
+            // use FastTree for guidetree computation
+            else if (s=="-raxmlrebl")
+            {
+                RAXMLREBL = true;
+            }
+
             /********* technical: memory & speed efficiency **********/
 
             // matrix resize factor
@@ -832,8 +853,11 @@ void printHelp(bool complete)
     cout<<"  -showall [output all of these]"<<endl;
     if (complete)
     {
+        cout<<"  -raxmlrebl [recompute branch lengths for prealigned data]"<<endl;
+        cout<<"  -nomafft [no MAFFT initial alignment]"<<endl;
+        cout<<"  -nofasttree [no FastTree guidetree]"<<endl;
         cout<<"  -noanchors [no Exonerate anchoring]"<<endl;
-        cout<<"  -nomafft [no MAFFT guide tree]"<<endl;
+        cout<<"  -nomlanc [no RAxML ancestors]"<<endl;
         cout<<"  -scoremafft [score also MAFFT alignment]"<<endl;
     }
     cout<<"  -support [compute posterior support]"<<endl;
@@ -900,7 +924,6 @@ void printHelp(bool complete)
     if (complete)
         cout<<"  -dna=dna_sequence_file [DNA sequence file for backtranslation of protein alignment]"<<endl;
     cout<<"  -version [check for updates]"<<endl;
-    cout<<"  -verbose [print progress etc. during runtime]"<<endl;
     cout<<"\n  -help [show more options]"<<endl;
 
     cout<<""<<endl;

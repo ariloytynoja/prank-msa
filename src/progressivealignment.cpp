@@ -36,6 +36,8 @@
 #include "exonerate_reads.h"
 #include "mafft_alignment.h"
 #include "bppancestors.h"
+#include "raxmlancestors.h"
+#include "raxmlrebl.h"
 
 using namespace std;
 
@@ -48,13 +50,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     //
     if (NOISE>=0)
         this->showInfo();
-
-    Exonerate_reads er;
-    if (!CONVERT && EXONERATE && !er.test_executable())
-    {
-//        cout<<"The executable for Exonerate not found. Fast alignment anchoring is not used.\n";
-        EXONERATE = false;
-    }
 
     // Backtranslate predefined protein alignment to DNA and exit.
     //
@@ -72,6 +67,15 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         exit(0);
     }
 
+    Exonerate_reads er;
+    if (EXONERATE && !er.test_executable())
+    {
+//        cout<<"The executable for Exonerate not found. Fast alignment anchoring is not used.\n";
+        EXONERATE = false;
+    }
+
+
+    ancestorsInferred = false;
 
     // Get the sequence data
     //
@@ -90,16 +94,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         isDna = false;
     }
 
-
-//    map<string,string> org_stuff;
-//    for(int i=0;i<names.size();i++)
-//        org_stuff.insert(org_stuff.begin(),pair<string,string>(names.at(i),sequences.at(i)));
-//    cout<<"org "<<org_stuff.size()<<endl;
-
-
-//    cout<<"check 1\n";
-//    this->checkStuff(&org_stuff,&names,&sequences);
-//    cout<<"check 1\n";
 
 
     // Make setting and set the alignment model
@@ -154,9 +148,6 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
     AncestralNode* root = static_cast<AncestralNode*>(nodes[rn.getRoot()]);
 
-//    string tmpstr;
-//    root->getNewickBrl(&tmpstr);
-//    cout<<tmpstr<<endl;
 
     // If an old tree is provided, mark the shared sub-trees
     //
@@ -178,6 +169,8 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
         BPPANCESTORS = false;
     }
 
+    root->updateTerminalNames();
+
     /////////////////////////////////
     // Different alignment options //
     /////////////////////////////////
@@ -187,14 +180,27 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     //
     if (PREALIGNED)
     {
+        if(RAXMLREBL)
+        {
+            RaxmlRebl rr;
+            if(rr.testExecutable())
+            {
+                rr.inferBranchLengths(root,&names,&sequences,isDna);
+
+            }
+
+        }
+
         this->readAlignment(root,&names,&sequences,isDna,longest);
 
-        int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
-        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
 
-        cout<<"\nAlignment score: "<<bestScore;
-        if(PRINTSCOREONLY)
+        if(PRINTSCORE)
         {
+            int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
+            int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
+
+            cout<<"\nAlignment score: "<<bestScore;
+
             if(nInsDel>0)
                 cout<<" [ "<<nSubst<<" subst., "<<nIns<<" ins., "<<nDel<<" del., "<<nInsDel<<" indel. ]"<<endl<<endl;
             else
@@ -211,9 +217,12 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->partlyAlign(root,&names,&sequences,isDna,longest);
 
-        int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
-        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
-        cout<<"\nAlignment score: "<<bestScore<<endl;
+        if(PRINTSCORE)
+        {
+            int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
+            int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
+            cout<<"\nAlignment score: "<<bestScore<<endl;
+        }
     }
 
     // Alignment based on an old tree: re-align nodes that have changed
@@ -222,9 +231,12 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
     {
         this->updateAlignment(root,&names,&sequences,isDna,longest);
 
-        int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
-        int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
-        cout<<"\nAlignment score: "<<bestScore<<endl;
+        if(PRINTSCORE)
+        {
+            int nSubst; int nIns; int nDel; int nInsDel; bool noSuffix=true;
+            int bestScore = this->computeParsimonyScore(root,isDna,-1,&nSubst,&nIns,&nDel,&nInsDel,noSuffix);
+            cout<<"\nAlignment score: "<<bestScore<<endl;
+        }
     }
 
     // Regular alignment
@@ -272,6 +284,7 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
 
         while (thisIteration<=iterations)
         {
+            ancestorsInferred = false;
 
             map<string,float> subtreesOld;
             if (UPDATESECOND)
@@ -282,6 +295,11 @@ ProgressiveAlignment::ProgressiveAlignment(string treefile,string seqfile,string
             GuideTree gt;
             gt.computeTree(&sequences,&names,isDna);
             tree = gt.getTree();
+
+
+            Node* n = new Node(tree);
+            tree = n->print_tree();
+            delete n;
 
             if (NOISE>0)
                 cout<<tree<<endl;
@@ -492,6 +510,7 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
             if (WRITEANCSEQ)
                 this->printAncestral(root,filename,isDna,verbose);
+
         }
     }
     else
@@ -506,11 +525,13 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
 
             this->setAlignedSequences(root);
             this->reconstructAncestors(root,isDna);
+
             if (WRITEXML)
                 this->printXml(root,filename,false);
 
             if (WRITEANCSEQ)
                 this->printAncestral(root,filename+".pep",isDna,verbose);
+
         }
 
         vector<string> dSeqs;
@@ -520,6 +541,11 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
             exit(-1);
         }
 
+        if(format!=17 && !(WRITEXML || WRITEANCSEQ)) {
+            file = filename+".nuc"+formatExtension(format);
+            wfa.writeSeqs(file.c_str(),nms,&dSeqs,format);
+            return;
+        }
 
         bool tmpCODON = CODON;
         bool tmpisDna = isDna;
@@ -572,7 +598,6 @@ void ProgressiveAlignment::printAlignment(AncestralNode *root,vector<string> *nm
         }
 
         ReadAlignment ra;
-        ra.cleanUp();
         ra.initialiseMatrices(longest+2);
 
         codonRoot->setTotalNodes();
@@ -774,6 +799,29 @@ void ProgressiveAlignment::printXml(AncestralNode *root,string filename,bool tra
 
 void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
 {
+    RaxmlAncestors rxmla;
+    if(MLANCESTORS && rxmla.testExecutable() && root->getTerminalNodeNumber()>3)
+    {
+        if(NOISE>0)
+            cout<<"Using RAxML to infer ancestral sequences\n";
+
+        map<string,string> aseqs;
+        string atree;
+
+        bool worked = rxmla.inferAncestors(root,&aseqs,&atree,isDna);
+
+        if(worked) {
+            root->setAncSequenceStrings(&aseqs);
+
+            vector<string> aseqs2;
+            this->getAncestralAlignmentMatrix(root,&aseqs2);
+            root->setAncSequenceGaps(&aseqs2);
+
+            ancestorsInferred = true;
+
+            return;
+        }
+    }
 
     BppAncestors bppa;
     if(BPPANCESTORS && bppa.testExecutable())
@@ -854,7 +902,7 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
     }
 
     if(NOISE>0)
-        cout<<"BppAncestor not used. Inferring approximate ancestral sequences\n";
+        cout<<"RAxML not used. Inferring approximate ancestral sequences\n";
 
     vector<string> aseqs;
     this->getAncestralAlignmentMatrix(root,&aseqs);
@@ -874,11 +922,11 @@ void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)
 int ProgressiveAlignment::computeParsimonyScore(AncestralNode *root,bool isDna,int bestScore,int *nSubst,int *nIns,int *nDel,int *nInsDel,bool noSuffix)
 {
 
-//    if (! (WRITEXML || WRITEANCSEQ))
-//    {
+    if (! ancestorsInferred )
+    {
         this->setAlignedSequences(root);
         this->reconstructAncestors(root,isDna);
-//    }
+    }
 
     string alpha = hmm->getFullAlphabet();
     int sAlpha = alpha.length();

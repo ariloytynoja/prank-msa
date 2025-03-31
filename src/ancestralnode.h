@@ -60,6 +60,7 @@ public:
 
     void getAllSubtrees(std::map<std::string,float> *subtrees);
     void getAllSubtreesWithNodename(std::map<std::string,std::string> *subtrees);
+    void getAllFullSubtreesWithNodename(std::map<std::string,std::string> *subtrees, bool treefirst);
     void getSubtreeBelow(std::string *subtree);
     void markRealignSubtrees(std::map<std::string,float> *subtrees);
 

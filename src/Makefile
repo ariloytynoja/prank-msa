@@ -71,7 +71,10 @@ SOURCES       = writefile.cpp \
 		check_version.cpp \
 		exonerate_reads.cpp \
 		mafft_alignment.cpp \
-		bppancestors.cpp 
+		bppancestors.cpp \
+		raxmlancestors.cpp \
+		fasttree_tree.cpp \
+		raxmlrebl.cpp 
 OBJECTS       = writefile.o \
 		treenode.o \
 		translatesequences.o \
@@ -104,7 +107,10 @@ OBJECTS       = writefile.o \
 		check_version.o \
 		exonerate_reads.o \
 		mafft_alignment.o \
-		bppancestors.o
+		bppancestors.o \
+		raxmlancestors.o \
+		fasttree_tree.o \
+		raxmlrebl.o
 DESTDIR       = 
 TARGET        = prank
 
@@ -158,15 +164,7 @@ compiler_clean:
 ####### Compile
 
 writefile.o: writefile.cpp writefile.h \
-		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		intmatrix.h \
-		flmatrix.h \
-		dbmatrix.h \
-		boolmatrix.h \
-		ancestralsequence.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writefile.o writefile.cpp
 
 treenode.o: treenode.cpp config.h \
@@ -175,14 +173,14 @@ treenode.o: treenode.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
+		writefile.h \
 		treenode.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
-		ancestralsequence.h \
-		writefile.h \
 		hirschberg.h \
 		phylomatchscore.h \
+		ancestralsequence.h \
 		terminalsequence.h \
 		fullprobability.h \
 		postprobability.h \
@@ -195,12 +193,7 @@ translatesequences.o: translatesequences.cpp translatesequences.h \
 		dbmatrix.h \
 		flmatrix.h \
 		intmatrix.h \
-		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		boolmatrix.h \
-		ancestralsequence.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o translatesequences.o translatesequences.cpp
 
 terminalsequence.o: terminalsequence.cpp terminalsequence.h \
@@ -212,9 +205,7 @@ terminalsequence.o: terminalsequence.cpp terminalsequence.h \
 		boolmatrix.h \
 		config.h \
 		hmmodel.h \
-		ancestralnode.h \
-		treenode.h \
-		ancestralsequence.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o terminalsequence.o terminalsequence.cpp
 
 terminalnode.o: terminalnode.cpp terminalnode.h \
@@ -228,8 +219,7 @@ terminalnode.o: terminalnode.cpp terminalnode.h \
 		terminalsequence.h \
 		config.h \
 		hmmodel.h \
-		ancestralnode.h \
-		ancestralsequence.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o terminalnode.o terminalnode.cpp
 
 site.o: site.cpp site.h \
@@ -238,10 +228,7 @@ site.o: site.cpp site.h \
 		dbmatrix.h \
 		boolmatrix.h \
 		hmmodel.h \
-		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		ancestralsequence.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o site.o site.cpp
 
 sequence.o: sequence.cpp sequence.h \
@@ -261,7 +248,6 @@ readnewick.o: readnewick.cpp readnewick.h \
 		dbmatrix.h \
 		boolmatrix.h \
 		ancestralnode.h \
-		ancestralsequence.h \
 		node.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readnewick.o readnewick.cpp
 
@@ -295,11 +281,6 @@ pwhirschberg.o: pwhirschberg.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		boolmatrix.h \
-		ancestralsequence.h \
 		pwhirschberg.h \
 		pwsite.h \
 		exonerate_reads.h
@@ -316,7 +297,6 @@ progressivealignment.o: progressivealignment.cpp readnewick.h \
 		readfile.h \
 		writefile.h \
 		ancestralnode.h \
-		ancestralsequence.h \
 		guidetree.h \
 		progressivealignment.h \
 		config.h \
@@ -324,12 +304,16 @@ progressivealignment.o: progressivealignment.cpp readnewick.h \
 		translatesequences.h \
 		node.h \
 		mafft_alignment.h \
-		hirschberg.h \
-		phylomatchscore.h \
-		terminalsequence.h \
-		readalignment.h \
 		exonerate_reads.h \
-		bppancestors.h
+		bppancestors.h \
+		raxmlancestors.h \
+		fasttree_tree.h \
+		readalignment.h \
+		phylomatchscore.h \
+		ancestralsequence.h \
+		terminalsequence.h \
+		hirschberg.h \
+		raxmlrebl.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o progressivealignment.o progressivealignment.cpp
 
 prank.o: prank.cpp progressivealignment.h \
@@ -343,7 +327,6 @@ prank.o: prank.cpp progressivealignment.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
-		ancestralsequence.h \
 		readfile.h \
 		writefile.h \
 		readnewick.h \
@@ -351,6 +334,15 @@ prank.o: prank.cpp progressivealignment.h \
 		translatesequences.h \
 		node.h \
 		mafft_alignment.h \
+		exonerate_reads.h \
+		bppancestors.h \
+		raxmlancestors.h \
+		fasttree_tree.h \
+		readalignment.h \
+		phylomatchscore.h \
+		ancestralsequence.h \
+		terminalsequence.h \
+		hirschberg.h \
 		check_version.h \
 		prank.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o prank.o prank.cpp
@@ -361,13 +353,12 @@ postprobability.o: postprobability.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
+		postprobability.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
-		ancestralsequence.h \
-		postprobability.h \
 		phylomatchscore.h \
+		ancestralsequence.h \
 		terminalsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o postprobability.o postprobability.cpp
 
@@ -377,12 +368,11 @@ phylomatchscore.o: phylomatchscore.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
+		phylomatchscore.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
 		ancestralsequence.h \
-		phylomatchscore.h \
 		terminalsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o phylomatchscore.o phylomatchscore.cpp
 
@@ -397,11 +387,6 @@ hmmodel.o: hmmodel.cpp hmmodel.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		boolmatrix.h \
-		ancestralsequence.h \
 		eigen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hmmodel.o hmmodel.cpp
 
@@ -411,31 +396,26 @@ hirschberg.o: hirschberg.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
+		exonerate_reads.h \
+		hirschberg.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
-		ancestralsequence.h \
-		exonerate_reads.h \
-		hirschberg.h \
 		phylomatchscore.h \
+		ancestralsequence.h \
 		terminalsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hirschberg.o hirschberg.cpp
 
 guidetree.o: guidetree.cpp guidetree.h \
 		flmatrix.h \
 		intmatrix.h \
-		pwhirschberg.h \
-		pwsite.h \
+		fasttree_tree.h \
 		config.h \
 		hmmodel.h \
 		dbmatrix.h \
 		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		boolmatrix.h \
-		ancestralsequence.h \
+		pwhirschberg.h \
+		pwsite.h \
 		translatesequences.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o guidetree.o guidetree.cpp
 
@@ -445,13 +425,12 @@ fullprobability.o: fullprobability.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
+		fullprobability.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
-		ancestralsequence.h \
-		fullprobability.h \
 		phylomatchscore.h \
+		ancestralsequence.h \
 		terminalsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fullprobability.o fullprobability.cpp
 
@@ -470,12 +449,11 @@ characterprobability.o: characterprobability.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
+		characterprobability.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
 		ancestralsequence.h \
-		characterprobability.h \
 		terminalsequence.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o characterprobability.o characterprobability.cpp
 
@@ -491,8 +469,7 @@ ancestralsequence.o: ancestralsequence.cpp ancestralsequence.h \
 		boolmatrix.h \
 		config.h \
 		hmmodel.h \
-		ancestralnode.h \
-		treenode.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ancestralsequence.o ancestralsequence.cpp
 
 ancestralnode.o: ancestralnode.cpp config.h \
@@ -501,14 +478,14 @@ ancestralnode.o: ancestralnode.cpp config.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
+		writefile.h \
 		treenode.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h \
-		ancestralsequence.h \
-		writefile.h \
 		hirschberg.h \
 		phylomatchscore.h \
+		ancestralsequence.h \
 		terminalsequence.h \
 		fullprobability.h \
 		postprobability.h \
@@ -527,11 +504,6 @@ exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		boolmatrix.h \
-		ancestralsequence.h \
 		translatesequences.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o exonerate_reads.o exonerate_reads.cpp
 
@@ -541,29 +513,63 @@ mafft_alignment.o: mafft_alignment.cpp mafft_alignment.h \
 		dbmatrix.h \
 		flmatrix.h \
 		intmatrix.h \
-		ancestralnode.h \
-		treenode.h \
-		sequence.h \
-		site.h \
-		boolmatrix.h \
-		ancestralsequence.h
+		ancestralnode.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mafft_alignment.o mafft_alignment.cpp
 
 bppancestors.o: bppancestors.cpp bppancestors.h \
 		ancestralnode.h \
+		config.h \
+		hmmodel.h \
+		dbmatrix.h \
+		flmatrix.h \
+		intmatrix.h \
+		readfile.h \
+		readnewick.h \
 		treenode.h \
 		sequence.h \
 		site.h \
-		intmatrix.h \
-		flmatrix.h \
-		dbmatrix.h \
-		boolmatrix.h \
-		ancestralsequence.h \
+		boolmatrix.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bppancestors.o bppancestors.cpp
+
+raxmlancestors.o: raxmlancestors.cpp raxmlancestors.h \
+		ancestralnode.h \
 		config.h \
 		hmmodel.h \
+		dbmatrix.h \
+		flmatrix.h \
+		intmatrix.h \
 		readfile.h \
-		readnewick.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bppancestors.o bppancestors.cpp
+		readnewick.h \
+		treenode.h \
+		sequence.h \
+		site.h \
+		boolmatrix.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o raxmlancestors.o raxmlancestors.cpp
+
+fasttree_tree.o: fasttree_tree.cpp fasttree_tree.h \
+		config.h \
+		hmmodel.h \
+		dbmatrix.h \
+		flmatrix.h \
+		intmatrix.h \
+		ancestralnode.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fasttree_tree.o fasttree_tree.cpp
+
+raxmlrebl.o: raxmlrebl.cpp raxmlrebl.h \
+		ancestralnode.h \
+		config.h \
+		hmmodel.h \
+		dbmatrix.h \
+		flmatrix.h \
+		intmatrix.h \
+		node.h \
+		readfile.h \
+		readnewick.h \
+		treenode.h \
+		sequence.h \
+		site.h \
+		boolmatrix.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o raxmlrebl.o raxmlrebl.cpp
 
 ####### Manpages
 

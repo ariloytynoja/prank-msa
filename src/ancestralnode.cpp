@@ -696,8 +696,23 @@ bool AncestralNode::readThisNode()
     }
     if(not success)
     {
-        cout<<"Reading the alignment file failed. Exiting.\n\n";
-        exit(-1);
+        cout<<"\nReading the alignment failed. Trying in log-space.\n";
+
+        LOGVALUES = true;
+        delete pms;
+        pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
+
+        success = ra->readSeqs(lChild->getSequence(),rChild->getSequence(),pms,this,&path);
+
+        if(not success)
+        {
+            cout<<"Reading the alignment file failed. Exiting.\n\n";
+            exit(-1);
+        }
+
+        LOGVALUES = false;
+        delete pms;
+        pms = new PhyloMatchScore(lChild->getSequence(),rChild->getSequence());
     }
 
 
@@ -923,6 +938,20 @@ void AncestralNode::getSubtreeBelow(std::string *subtree)
     else
         *subtree = rightSubtree+","+leftSubtree;
 }
+
+void AncestralNode::getAllFullSubtreesWithNodename(map<string,string> *subtrees,bool treefirst)
+{
+    getLChild()->getAllFullSubtreesWithNodename(subtrees,treefirst);
+    getRChild()->getAllFullSubtreesWithNodename(subtrees,treefirst);
+
+    string subtree = "";
+    this->getSubtreeBelow(&subtree);
+    if(treefirst)
+        subtrees->insert(make_pair(subtree,this->getNodeName()));
+    else
+        subtrees->insert(make_pair(this->getNodeName(),subtree));
+}
+
 
 void AncestralNode::markRealignSubtrees(map<string,float> *subtrees)
 {
