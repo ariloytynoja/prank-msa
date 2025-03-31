@@ -20,8 +20,6 @@
 #ifndef INTMATRIX_H
 #define INTMATRIX_H
 
-// #define NDEBUG
-
 #ifndef RFOR
 #define RFOR(i,n) for(i=n; i>=0; i--)
 #endif
@@ -60,8 +58,8 @@ public:
     void initialise(int v = 0);
 
     int g(int xa, int ya=0, int za = 0, int wa = 0)
-    { /**/
-        if (!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;/**/
+    {
+        /*if (!(xa>=0&&ya>=0&&za>=0&&wa>=0&&xa<x&&ya<y&&za<z&&wa<w))std::cout<<name<<" "<<xa<<" "<<ya<<" "<<za<<" "<<wa<<std::endl;*/
         assert(xa>=0);
         assert(xa<x);
         assert(ya>=0);
