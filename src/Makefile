@@ -4,14 +4,15 @@
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC           ?= gcc
+CXX          ?= g++
 DEFINES       = -DNDEBUG
-CFLAGS        = -m64 -pipe -O3 $(DEFINES)
-CXXFLAGS      = -m64 -pipe -O3 $(DEFINES)
+CPPFLAGS     += $(DEFINES)
+CFLAGS       += -pipe -O3
+CXXFLAG      += -pipe -O3
 INCPATH       = -I. -I/usr/include
-LINK          = g++
-LFLAGS        = -m64
+LINK         ?= $(CXX)
+#LFLAGS       = -m64
 LIBS          = $(SUBLIBS)    
 AR            = ar cqs
 RANLIB        = 
@@ -122,19 +123,19 @@ first: all
 .SUFFIXES: .o .c .cpp .cc .cxx .C
 
 .cpp.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .cc.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .cxx.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .C.o:
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
 
 .c.o:
-	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(INCPATH) -o "$@" "$<"
 
 ####### Build rules
 
@@ -142,7 +143,7 @@ first: all
 all: Makefile $(TARGET) $(MANPAGES)
 
 $(TARGET):  $(OBJECTS)  
-	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
+	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS) $(LDFLAGS)
 
 
 clean:compiler_clean 
@@ -165,7 +166,7 @@ compiler_clean:
 
 writefile.o: writefile.cpp writefile.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o writefile.o writefile.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o writefile.o writefile.cpp
 
 treenode.o: treenode.cpp config.h \
 		hmmodel.h \
@@ -185,7 +186,7 @@ treenode.o: treenode.cpp config.h \
 		fullprobability.h \
 		postprobability.h \
 		characterprobability.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o treenode.o treenode.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o treenode.o treenode.cpp
 
 translatesequences.o: translatesequences.cpp translatesequences.h \
 		config.h \
@@ -194,7 +195,7 @@ translatesequences.o: translatesequences.cpp translatesequences.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o translatesequences.o translatesequences.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o translatesequences.o translatesequences.cpp
 
 terminalsequence.o: terminalsequence.cpp terminalsequence.h \
 		sequence.h \
@@ -206,7 +207,7 @@ terminalsequence.o: terminalsequence.cpp terminalsequence.h \
 		config.h \
 		hmmodel.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o terminalsequence.o terminalsequence.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o terminalsequence.o terminalsequence.cpp
 
 terminalnode.o: terminalnode.cpp terminalnode.h \
 		treenode.h \
@@ -220,7 +221,7 @@ terminalnode.o: terminalnode.cpp terminalnode.h \
 		config.h \
 		hmmodel.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o terminalnode.o terminalnode.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o terminalnode.o terminalnode.cpp
 
 site.o: site.cpp site.h \
 		intmatrix.h \
@@ -229,7 +230,7 @@ site.o: site.cpp site.h \
 		boolmatrix.h \
 		hmmodel.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o site.o site.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o site.o site.cpp
 
 sequence.o: sequence.cpp sequence.h \
 		site.h \
@@ -237,7 +238,7 @@ sequence.o: sequence.cpp sequence.h \
 		flmatrix.h \
 		dbmatrix.h \
 		boolmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sequence.o sequence.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o sequence.o sequence.cpp
 
 readnewick.o: readnewick.cpp readnewick.h \
 		treenode.h \
@@ -249,10 +250,10 @@ readnewick.o: readnewick.cpp readnewick.h \
 		boolmatrix.h \
 		ancestralnode.h \
 		node.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readnewick.o readnewick.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o readnewick.o readnewick.cpp
 
 readfile.o: readfile.cpp readfile.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readfile.o readfile.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o readfile.o readfile.cpp
 
 readalignment.o: readalignment.cpp readalignment.h \
 		sequence.h \
@@ -268,12 +269,12 @@ readalignment.o: readalignment.cpp readalignment.h \
 		config.h \
 		hmmodel.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o readalignment.o readalignment.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o readalignment.o readalignment.cpp
 
 pwsite.o: pwsite.cpp pwsite.h \
 		flmatrix.h \
 		intmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pwsite.o pwsite.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o pwsite.o pwsite.cpp
 
 pwhirschberg.o: pwhirschberg.cpp config.h \
 		hmmodel.h \
@@ -284,7 +285,7 @@ pwhirschberg.o: pwhirschberg.cpp config.h \
 		pwhirschberg.h \
 		pwsite.h \
 		exonerate_reads.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o pwhirschberg.o pwhirschberg.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o pwhirschberg.o pwhirschberg.cpp
 
 progressivealignment.o: progressivealignment.cpp readnewick.h \
 		treenode.h \
@@ -314,7 +315,7 @@ progressivealignment.o: progressivealignment.cpp readnewick.h \
 		terminalsequence.h \
 		hirschberg.h \
 		raxmlrebl.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o progressivealignment.o progressivealignment.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o progressivealignment.o progressivealignment.cpp
 
 prank.o: prank.cpp progressivealignment.h \
 		config.h \
@@ -345,7 +346,7 @@ prank.o: prank.cpp progressivealignment.h \
 		hirschberg.h \
 		check_version.h \
 		prank.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o prank.o prank.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o prank.o prank.cpp
 
 postprobability.o: postprobability.cpp config.h \
 		hmmodel.h \
@@ -360,7 +361,7 @@ postprobability.o: postprobability.cpp config.h \
 		phylomatchscore.h \
 		ancestralsequence.h \
 		terminalsequence.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o postprobability.o postprobability.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o postprobability.o postprobability.cpp
 
 phylomatchscore.o: phylomatchscore.cpp config.h \
 		hmmodel.h \
@@ -374,13 +375,13 @@ phylomatchscore.o: phylomatchscore.cpp config.h \
 		boolmatrix.h \
 		ancestralsequence.h \
 		terminalsequence.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o phylomatchscore.o phylomatchscore.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o phylomatchscore.o phylomatchscore.cpp
 
 node.o: node.cpp node.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o node.o node.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o node.o node.cpp
 
 intmatrix.o: intmatrix.cpp intmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o intmatrix.o intmatrix.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o intmatrix.o intmatrix.cpp
 
 hmmodel.o: hmmodel.cpp hmmodel.h \
 		dbmatrix.h \
@@ -388,7 +389,7 @@ hmmodel.o: hmmodel.cpp hmmodel.h \
 		intmatrix.h \
 		ancestralnode.h \
 		eigen.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hmmodel.o hmmodel.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o hmmodel.o hmmodel.cpp
 
 hirschberg.o: hirschberg.cpp config.h \
 		hmmodel.h \
@@ -404,7 +405,7 @@ hirschberg.o: hirschberg.cpp config.h \
 		phylomatchscore.h \
 		ancestralsequence.h \
 		terminalsequence.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o hirschberg.o hirschberg.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o hirschberg.o hirschberg.cpp
 
 guidetree.o: guidetree.cpp guidetree.h \
 		flmatrix.h \
@@ -417,7 +418,7 @@ guidetree.o: guidetree.cpp guidetree.h \
 		pwhirschberg.h \
 		pwsite.h \
 		translatesequences.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o guidetree.o guidetree.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o guidetree.o guidetree.cpp
 
 fullprobability.o: fullprobability.cpp config.h \
 		hmmodel.h \
@@ -432,16 +433,16 @@ fullprobability.o: fullprobability.cpp config.h \
 		phylomatchscore.h \
 		ancestralsequence.h \
 		terminalsequence.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fullprobability.o fullprobability.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o fullprobability.o fullprobability.cpp
 
 flmatrix.o: flmatrix.cpp flmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o flmatrix.o flmatrix.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o flmatrix.o flmatrix.cpp
 
 eigen.o: eigen.cpp eigen.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o eigen.o eigen.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o eigen.o eigen.cpp
 
 dbmatrix.o: dbmatrix.cpp dbmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o dbmatrix.o dbmatrix.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o dbmatrix.o dbmatrix.cpp
 
 characterprobability.o: characterprobability.cpp config.h \
 		hmmodel.h \
@@ -455,10 +456,10 @@ characterprobability.o: characterprobability.cpp config.h \
 		boolmatrix.h \
 		ancestralsequence.h \
 		terminalsequence.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o characterprobability.o characterprobability.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o characterprobability.o characterprobability.cpp
 
 boolmatrix.o: boolmatrix.cpp boolmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o boolmatrix.o boolmatrix.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o boolmatrix.o boolmatrix.cpp
 
 ancestralsequence.o: ancestralsequence.cpp ancestralsequence.h \
 		sequence.h \
@@ -470,7 +471,7 @@ ancestralsequence.o: ancestralsequence.cpp ancestralsequence.h \
 		config.h \
 		hmmodel.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ancestralsequence.o ancestralsequence.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o ancestralsequence.o ancestralsequence.cpp
 
 ancestralnode.o: ancestralnode.cpp config.h \
 		hmmodel.h \
@@ -492,10 +493,10 @@ ancestralnode.o: ancestralnode.cpp config.h \
 		characterprobability.h \
 		terminalnode.h \
 		readalignment.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ancestralnode.o ancestralnode.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o ancestralnode.o ancestralnode.cpp
 
 check_version.o: check_version.cpp check_version.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o check_version.o check_version.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o check_version.o check_version.cpp
 
 exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h \
 		config.h \
@@ -505,7 +506,7 @@ exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h \
 		intmatrix.h \
 		ancestralnode.h \
 		translatesequences.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o exonerate_reads.o exonerate_reads.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o exonerate_reads.o exonerate_reads.cpp
 
 mafft_alignment.o: mafft_alignment.cpp mafft_alignment.h \
 		config.h \
@@ -514,7 +515,7 @@ mafft_alignment.o: mafft_alignment.cpp mafft_alignment.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mafft_alignment.o mafft_alignment.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o mafft_alignment.o mafft_alignment.cpp
 
 bppancestors.o: bppancestors.cpp bppancestors.h \
 		ancestralnode.h \
@@ -529,7 +530,7 @@ bppancestors.o: bppancestors.cpp bppancestors.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o bppancestors.o bppancestors.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o bppancestors.o bppancestors.cpp
 
 raxmlancestors.o: raxmlancestors.cpp raxmlancestors.h \
 		ancestralnode.h \
@@ -544,7 +545,7 @@ raxmlancestors.o: raxmlancestors.cpp raxmlancestors.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o raxmlancestors.o raxmlancestors.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o raxmlancestors.o raxmlancestors.cpp
 
 fasttree_tree.o: fasttree_tree.cpp fasttree_tree.h \
 		config.h \
@@ -553,7 +554,7 @@ fasttree_tree.o: fasttree_tree.cpp fasttree_tree.h \
 		flmatrix.h \
 		intmatrix.h \
 		ancestralnode.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fasttree_tree.o fasttree_tree.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o fasttree_tree.o fasttree_tree.cpp
 
 raxmlrebl.o: raxmlrebl.cpp raxmlrebl.h \
 		ancestralnode.h \
@@ -569,7 +570,7 @@ raxmlrebl.o: raxmlrebl.cpp raxmlrebl.h \
 		sequence.h \
 		site.h \
 		boolmatrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o raxmlrebl.o raxmlrebl.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o raxmlrebl.o raxmlrebl.cpp
 
 ####### Manpages
 
