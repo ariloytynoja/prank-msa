@@ -21,8 +21,8 @@
 #ifndef ANCESTRALNODE_H
 #define ANCESTRALNODE_H
 
-#include <treenode.h>
-#include <ancestralsequence.h>
+#include "treenode.h"
+#include "ancestralsequence.h"
 
 class AncestralNode : public TreeNode
 {
@@ -112,14 +112,13 @@ public:
     void setPermanentInsertion(int i);
     void printChildAlignment(TreeNode *node,std::string filename);
 
-    void setAncSequenceStrings(std::vector<std::string> *aseqs)
+    void setAncSequenceStrings(std::vector<std::string>::iterator &aseqs)
     {
         lChild->setAncSequenceStrings(aseqs);
-
-        alignedseqstr = aseqs->at(0);
-        aseqs->erase(aseqs->begin());
-
         rChild->setAncSequenceStrings(aseqs);
+
+        alignedseqstr = *aseqs;
+        ++aseqs;
     }
 
     void setAncSequenceStrings(std::map<std::string,std::string> *aseqs)

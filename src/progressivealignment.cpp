@@ -907,9 +907,9 @@ void ProgressiveAlignment::reconstructAncestors(AncestralNode *root,bool isDna)
     vector<string> aseqs;
     this->getAncestralAlignmentMatrix(root,&aseqs);
 
-    root->getLChild()->setAncSequenceStrings(&aseqs);
-    root->setThisAncSequenceString(&aseqs);
-    root->getRChild()->setAncSequenceStrings(&aseqs);
+    auto it = aseqs.begin();
+    // recurses the tree in post-order
+    root->setAncSequenceStrings(it);
 }
 
 void ProgressiveAlignment::setAlignedSequences(AncestralNode *root)

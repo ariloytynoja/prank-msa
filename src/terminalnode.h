@@ -95,7 +95,7 @@ public:
     void getIndelEvents(std::vector<indelEvent> *indels){}
     void getSubstEvents(std::vector<substEvent> *substs){}
 
-    void setAncSequenceStrings(std::vector<std::string>*){}
+    void setAncSequenceStrings(std::vector<std::string>::iterator&){}
     void getAncSequenceStrings(std::vector<std::string>*){}
 
     void setAncSequenceGaps(std::vector<std::string>*){}

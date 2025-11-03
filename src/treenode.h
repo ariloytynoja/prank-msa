@@ -283,7 +283,7 @@ public:
     virtual void getMLAncestralSeqs(std::vector<std::string>* ,std::vector<std::string>* ) {}
 
     virtual void setPermanentInsertion(int ) {}
-    virtual void setAncSequenceStrings(std::vector<std::string>*){}
+    virtual void setAncSequenceStrings(std::vector<std::string>::iterator&){}
     virtual void setAncSequenceStrings(std::map<std::string,std::string>*){}
     virtual void getAncSequenceStrings(std::vector<std::string>*){}
     virtual void setAlignedSequenceStrings(std::vector<std::string>*){}
