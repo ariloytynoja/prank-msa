@@ -63,7 +63,7 @@ Alternatively, you can use a pre-compiled package that is available in the [bina
 The package file can be downloaded and unpacked using graphical software, or on the command line:
 
 ```
-curl -O http://wasabiapp.org/download/prank/prank.osx64.170427.zip
+curl -O https://github.com/ariloytynoja/prank-msa/raw/refs/heads/master/binaries/prank.osx64.170427.zip
 unzip prank.osx64.170427.zip
 ```
 
@@ -102,8 +102,8 @@ Using the command line, the PRANK executable for Linux can be downloaded and unp
 ```
 mkdir ~/programs
 cd ~/programs
-wget http://wasabiapp.org/download/prank/prank.linux64.140603.tgz
-tar prank.linux64.140603.tgz
+wget https://github.com/ariloytynoja/prank-msa/raw/refs/heads/master/binaries/prank.linux64.251117.tgz
+tar xf prank.linux64.251117.tgz
 ./prank/bin/prank
 ```
 
@@ -157,15 +157,15 @@ chmod +x prank.sh
 You can download a snapshot of the PRANK code from the [binaries folder](../binaries/) and get the latest version using git as explained on the [source code page](https://github.com/ariloytynoja/prank-msa). On command line, the process looks like this (tested on Linux and MacOSX):
 
 ```
-wget http://wasabiapp.org/download/prank/prank.source.140603.tgz
+wget https://github.com/ariloytynoja/prank-msa/raw/refs/heads/master/binaries/prank.source.251117.tgz
 ```
 or
 ```
-curl -O http://wasabiapp.org/download/prank/prank.source.140603.tgz
+curl -O https://github.com/ariloytynoja/prank-msa/raw/refs/heads/master/binaries/prank.source.251117.tgz
 ```
 
 ```
-tar xvzf prank.source.140603.tgz
+tar xvzf prank.source.251117.tgz
 cd prank-msa/src
 make
 ./prank
