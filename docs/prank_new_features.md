@@ -2,6 +2,10 @@
 ### New features in the latest version of PRANK
 
 [Back to PRANK home.](../README.md)  
+
+#### v.251117
+
+Bug fix: traverse post- instead of in-order for approximate ancestral sequence computation with option -showanc.
  
 #### v.170427
 
