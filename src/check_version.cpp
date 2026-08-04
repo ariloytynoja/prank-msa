@@ -17,7 +17,7 @@ using namespace std;
 Check_version::Check_version(int version)
 {
 
-    cout<<"\nThis is PRANK v."<<version<<".\nChecking if updates are available at http://http://code.google.com/p/prank-msa.\n";
+    cout<<"\nThis is PRANK v."<<version<<".\nChecking if updates are available at https://github.com/ariloytynoja/prank-msa.\n";
 
     struct sockaddr_in *remote;
     char buf[BUFSIZ+1];
@@ -68,10 +68,21 @@ Check_version::Check_version(int version)
     memset(buf, 0, sizeof(buf));
     int htmlstart = 0;
     char * htmlcontent;
+    // The status line arrives at the head of the first chunk.  It has to be
+    // checked: the endpoint below no longer serves this file, and an error
+    // page parsed as a changelog is reported to the user as "Found updates".
+    string status_line;
+    bool  status_seen = false;
     while ((tmpres = recv(sock, buf, BUFSIZ, 0)) > 0)
     {
         if (htmlstart == 0)
         {
+            if (!status_seen)
+            {
+                status_seen = true;
+                const char *eol = strstr(buf, "\r\n");
+                status_line.assign(buf, eol ? (size_t)(eol - buf) : strlen(buf));
+            }
             /* Under certain conditions this will not work.
             * If the \r\n\r\n part is splitted into two messages
             * it will fail to detect the beginning of HTML content
@@ -97,6 +108,20 @@ Check_version::Check_version(int version)
     if (tmpres < 0)
     {
         perror("Error receiving data");
+    }
+
+    // Anything other than 200 means we did not get the version file.  Say so,
+    // rather than parsing the error page and announcing imaginary updates.
+    if (status_line.find(" 200") == string::npos)
+    {
+        cout<<"\nCould not check for updates";
+        if (!status_line.empty())
+            cout<<" (server said: "<<status_line<<")";
+        cout<<".\n\n";
+        free(remote);
+        free(ip);
+        close(sock);
+        return;
     }
 
     bool print_this = true;
