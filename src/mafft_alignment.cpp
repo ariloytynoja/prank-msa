@@ -27,7 +27,7 @@ bool Mafft_alignment::test_executable()
     if (epath.find("/")!=std::string::npos)
         epath = epath.substr(0,epath.rfind("/")+1);
     mafftpath = epath;
-    epath = epath+"sh.exe "+epath+"mafft -h >/dev/null 2>/dev/null";
+    epath = epath+"sh.exe "+epath+"mafft -h </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
     return WEXITSTATUS(status) == 1;
 
@@ -53,14 +53,14 @@ bool Mafft_alignment::test_executable()
     #endif
 
     mafftpath = epath;
-    epath = epath+"mafft -h >/dev/null 2>/dev/null";
+    epath = epath+"mafft -h </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
 
     if(WEXITSTATUS(status) == 1)
         return true;
 
     mafftpath = "";
-    status = system("mafft -h >/dev/null 2>/dev/null");
+    status = system("mafft -h </dev/null >/dev/null 2>/dev/null");
 
     return WEXITSTATUS(status) == 1;
 

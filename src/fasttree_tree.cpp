@@ -50,7 +50,7 @@ bool FastTree_tree::test_executable()
     if (epath.find("/")!=std::string::npos)
         epath = epath.substr(0,epath.rfind("/")+1);
     progpath = epath;
-    epath = epath+"fasttree >/dev/null 2>/dev/null";
+    epath = epath+"fasttree </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
 
     return WEXITSTATUS(status) == 0;
@@ -81,7 +81,7 @@ bool FastTree_tree::test_executable()
     gethostname(hostname, 1023);
 
     progpath = epath;
-    epath = epath+"fasttree >/dev/null 2>/dev/null";
+    epath = epath+"fasttree </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
     if(WEXITSTATUS(status) == 0)
         return true;
@@ -90,7 +90,7 @@ bool FastTree_tree::test_executable()
         return true;
 
     progpath = "";
-    status = system("fasttree >/dev/null 2>/dev/null");
+    status = system("fasttree </dev/null >/dev/null 2>/dev/null");
 
     if(WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2")==0)
         return true;
