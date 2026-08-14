@@ -744,7 +744,12 @@ void Hirschberg::divideSeq()
             fwdzM->s(beg->vitf(),beg->vitfS());
         else
         {
-            cout<<"hirschberg initialisation: impossible fwd state '"<<beg->vitfM()<<"'"<<endl;
+            cout<<"hirschberg initialisation: impossible fwd state '"<<beg->vitfM()<<"'"
+                <<" at site "<<beg->index()<<" (seq1 "<<beg->cInd1()<<", seq2 "<<beg->cInd2()<<")"<<endl;
+            cout<<"No forward matrix was initialised for this state, so continuing would"
+                <<" align using uninitialised values. Please report this input and command"
+                <<" line at https://github.com/ariloytynoja/prank-msa/issues"<<endl;
+            exit(-1);
         }
     }
 
@@ -851,7 +856,12 @@ void Hirschberg::divideSeq()
             bwdzM->s(end->vitb(),end->vitbS());
         else
         {
-            cout<<"hirschberg initialisation: impossible bwd state '"<<end->vitbM()<<"'"<<endl;
+            cout<<"hirschberg initialisation: impossible bwd state '"<<end->vitbM()<<"'"
+                <<" at site "<<end->index()<<" (seq1 "<<end->cInd1()<<", seq2 "<<end->cInd2()<<")"<<endl;
+            cout<<"No backward matrix was initialised for this state, so continuing would"
+                <<" align using uninitialised values. Please report this input and command"
+                <<" line at https://github.com/ariloytynoja/prank-msa/issues"<<endl;
+            exit(-1);
         }
     }
 
