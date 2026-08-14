@@ -957,7 +957,7 @@ void PwHirschberg::getMidSite(int s1,int e1,int s2,int e2)
 
 bool PwHirschberg::rndBool()
 {
-    int p = (int)rand()/(int)RAND_MAX;
+    double p = (double)rand()/(double)RAND_MAX;
     if (p>0.5)
         return true;
     else
