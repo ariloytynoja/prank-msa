@@ -820,6 +820,18 @@ void readArguments(int argc, char *argv[])
         exit(0);
     }
 
+    // -reproducible asks for a repeatable run, so it needs a repeatable seed.
+    // Without one it reseeds from Hirschberg's constructor default, which is
+    // time(NULL) -- constant within a run, different on the next one -- so the
+    // flag reseeded diligently to a value that still varied and the run was not
+    // reproducible. Supplying a fixed default here also switches on the
+    // deterministic per-node seeding already present in
+    // AncestralNode::alignSequences (gated on rnd_seed>0), which derives each
+    // node's seed from a hash of its terminal names and is therefore
+    // independent of node visit order. An explicit -seed=# still wins.
+    if (REPRODUCIBLE && rnd_seed<=0)
+        rnd_seed = 1;
+
     // define a seed for random numbers
     if (rnd_seed>0)
         srand(rnd_seed);
@@ -912,7 +924,8 @@ void printHelp(bool complete)
         cout<<"  -fixedbranches=# [use fixed branch lengths]"<<endl;
         cout<<"  -maxbranches=# [set maximum branch length]"<<endl;
         cout<<"  -realbranches [disable branch length truncation]"<<endl;
-        cout<<"  -seed=# [set random number seed]"<<endl;
+        cout<<"  -seed=# [set random number seed; without it the seed comes from the clock]"<<endl;
+        cout<<"  -reproducible [repeatable output: implies a fixed seed unless -seed=# is given]"<<endl;
     }
     cout<<"  -translate [translate to protein]"<<endl;
     cout<<"  -mttranslate [translate to protein using mt table]"<<endl;
