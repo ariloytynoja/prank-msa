@@ -10,7 +10,11 @@ DEFINES       = -DNDEBUG
 CPPFLAGS     += $(DEFINES)
 CFLAGS       += -pipe -O3
 CXXFLAG      += -pipe -O3
-INCPATH       = -I. -I/usr/include
+# -I. only. An explicit -I/usr/include is redundant with any compiler's own
+# search path, and actively wrong when the compiler is not the system one:
+# it forces the SYSTEM libc headers into a build whose libstdc++ came from
+# elsewhere. prank links no external library, so it needs no -I but its own.
+INCPATH       = -I.
 LINK         ?= $(CXX)
 #LFLAGS       = -m64
 LIBS          = $(SUBLIBS)    
