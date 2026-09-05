@@ -50,7 +50,7 @@ bool FastTree_tree::test_executable()
     if (epath.find("/")!=std::string::npos)
         epath = epath.substr(0,epath.rfind("/")+1);
     progpath = epath;
-    epath = epath+"fasttree </dev/null >/dev/null 2>/dev/null";
+    epath = epath+fasttreeexec+" -help </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
 
     return WEXITSTATUS(status) == 0;
@@ -98,13 +98,13 @@ bool FastTree_tree::test_executable()
     // stdin stays redirected: harmless here since `-help` returns before
     // reading input, and it keeps every probe in this file consistent.
     progpath = epath;
-    epath = epath+"fasttree -help </dev/null >/dev/null 2>/dev/null";
+    epath = epath+fasttreeexec+" -help </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
     if(WEXITSTATUS(status) == 0)
         return true;
 
     progpath = "";
-    status = system("fasttree -help </dev/null >/dev/null 2>/dev/null");
+    status = system((fasttreeexec+" -help </dev/null >/dev/null 2>/dev/null").c_str());
 
     return WEXITSTATUS(status) == 0;
 
@@ -142,7 +142,7 @@ string FastTree_tree::infer_phylogeny(std::vector<string> *names,std::vector<str
     f_output.close();
 
     stringstream command;
-    command << progpath<<"fasttree -quiet -nopr -nosupport ";
+    command << progpath<<fasttreeexec<<" -quiet -nopr -nosupport ";
     if(is_protein)
         command << f_name.str() << " 2>/dev/null";
     else
