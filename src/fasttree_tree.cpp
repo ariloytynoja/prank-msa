@@ -76,24 +76,35 @@ bool FastTree_tree::test_executable()
 
     #endif
 
-    char hostname[1024];
-    hostname[1023] = '\0';
-    gethostname(hostname, 1023);
-
+    // Probe with `-help`, which exits 0.
+    //
+    // Run with no arguments FastTree prints its usage and exits *1*, so the
+    // `WEXITSTATUS(status) == 0` test below could never succeed for it and
+    // FastTree read as absent on every machine. The two
+    // `WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2") == 0` clauses
+    // that used to sit here accepted the real exit status, but only on one
+    // named host, so everywhere else this function returned false and prank
+    // silently fell back to its own guide tree.
+    //
+    // `-help` is documented ("run FastTree without any arguments or with the
+    // -help option") and exits 0, so the existing predicate becomes correct
+    // and the hostname special case is no longer needed.
+    //
+    // Measured: FastTree 2.1.11 and 2.2.0 both exit 1 with no arguments;
+    // 2.1.11 exits 0 for `-help`. A version whose `-help` did not exit 0
+    // would simply read as absent, i.e. today's behaviour, so this cannot
+    // regress a working setup.
+    //
+    // stdin stays redirected: harmless here since `-help` returns before
+    // reading input, and it keeps every probe in this file consistent.
     progpath = epath;
-    epath = epath+"fasttree </dev/null >/dev/null 2>/dev/null";
+    epath = epath+"fasttree -help </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
     if(WEXITSTATUS(status) == 0)
         return true;
 
-    if(WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2")==0)
-        return true;
-
     progpath = "";
-    status = system("fasttree </dev/null >/dev/null 2>/dev/null");
-
-    if(WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2")==0)
-        return true;
+    status = system("fasttree -help </dev/null >/dev/null 2>/dev/null");
 
     return WEXITSTATUS(status) == 0;
 
