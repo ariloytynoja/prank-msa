@@ -57,6 +57,17 @@ string tempdir = "";
 string mafftpath = "";
 string exoneratepath = "";
 
+// The FastTree executable to look for and run. A NAME resolved through PATH,
+// or an absolute path. Not the same kind of thing as mafftpath/exoneratepath
+// above, which are directory prefixes this code discovers for itself.
+//
+// It has to be settable because upstream distributes FastTree, FastTreeMP and
+// FastTreeUPGMA, and none of those is spelled "fasttree" -- some distributions
+// add a lowercase name, which is the only reason the hard-coded default finds
+// anything. FastTreeUPGMA also builds UPGMA trees rather than approximately-ML
+// ones, so which binary is used is a modelling choice and cannot be guessed.
+string fasttreeexec = "fasttree";
+
 // structure model file
 string hmmname = "";
 HMModel *hmm;

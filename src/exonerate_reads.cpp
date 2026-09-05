@@ -62,7 +62,7 @@ bool Exonerate_reads::test_executable()
         #endif
         
         exoneratepath = epath;
-        epath = epath+"exonerate >/dev/null 2>/dev/null";
+        epath = epath+"exonerate </dev/null >/dev/null 2>/dev/null";
 
         status = system(epath.c_str());
     }
@@ -75,7 +75,7 @@ bool Exonerate_reads::test_executable()
     }
 
     exoneratepath = "";
-    status = system("`exonerate  >/dev/null 2>/dev/null`");
+    status = system("`exonerate  </dev/null >/dev/null 2>/dev/null`");
 
     if(WEXITSTATUS(status) == 1 && NOISE>0)
         cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";
