@@ -1543,6 +1543,15 @@ string AncestralNode::getThisAncCharactersAt(int i)
             cout<<"impossible index: site "<<i<<", "<<mi<<endl;
         }
     }
+
+    // Reached only through the two "impossible index" branches above: no
+    // character could be chosen at this site. Falling off the end of a
+    // function that returns a string is undefined behaviour, and the caller
+    // appends the result to the ancestral sequence, so stop here, as
+    // Hirschberg::divideSeq() does for its impossible states.
+    cout<<"No ancestral character could be chosen at site "<<i<<". Please report this input"
+        <<" and command line at https://github.com/ariloytynoja/prank-msa/issues"<<endl;
+    exit(-1);
 }
 
 void AncestralNode::getAllCharactersAt(vector<string>* col,int i,bool parentIns, bool parentPermIns)
