@@ -770,6 +770,28 @@ void readArguments(int argc, char *argv[])
                 FASTTREE = false;
             }
 
+            // name or path of the FastTree executable
+            //
+            // Upstream ships FastTree, FastTreeMP and FastTreeUPGMA; none of
+            // them is called "fasttree", so the hard-coded default finds a
+            // binary only where a distribution has added that name. Naming it
+            // is also the only way to choose between them, and that is a real
+            // choice: FastTreeMP is the multithreaded build, while
+            // FastTreeUPGMA computes UPGMA rather than approximately-ML trees.
+            //
+            // Tested before it is used, so a bad value falls back to prank's
+            // own guide tree exactly as a missing FastTree does. It only names
+            // the program: it does not undo -nofasttree, in either order.
+            else if (s.substr(0,10)=="-fasttree=")
+            {
+                fasttreeexec = string(argv[i]).substr(10);
+                if (fasttreeexec.empty())
+                {
+                    cout<<"Error: -fasttree= needs the name or path of the FastTree executable."<<endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+
             // use FastTree for guidetree computation
             else if (s=="-raxmlrebl")
             {
@@ -856,6 +878,7 @@ void printHelp(bool complete)
         cout<<"  -raxmlrebl [recompute branch lengths for prealigned data]"<<endl;
         cout<<"  -nomafft [no MAFFT initial alignment]"<<endl;
         cout<<"  -nofasttree [no FastTree guidetree]"<<endl;
+        cout<<"  -fasttree=name [FastTree executable; e.g. FastTree or FastTreeMP]"<<endl;
         cout<<"  -noanchors [no Exonerate anchoring]"<<endl;
         cout<<"  -nomlanc [no RAxML ancestors]"<<endl;
         cout<<"  -scoremafft [score also MAFFT alignment]"<<endl;

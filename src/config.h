@@ -46,6 +46,7 @@ extern string outfile;
 extern string tempdir;
 extern string mafftpath;
 extern string exoneratepath;
+extern string fasttreeexec;
 
 extern string hmmname;
 extern HMModel *hmm;

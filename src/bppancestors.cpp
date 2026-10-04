@@ -51,7 +51,7 @@ bool BppAncestors::testExecutable()
     if (epath.find("/")!=std::string::npos)
         epath = epath.substr(0,epath.rfind("/")+1);
     bppdistpath = epath;
-    epath = epath+"bppancestor >/dev/null 2>/dev/null";
+    epath = epath+"bppancestor </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
 
     return WEXITSTATUS(status) == 0;
@@ -78,14 +78,14 @@ bool BppAncestors::testExecutable()
     #endif
 
     bppdistpath = epath;
-    epath = epath+"bppancestor >/dev/null 2>/dev/null";
+    epath = epath+"bppancestor </dev/null >/dev/null 2>/dev/null";
     int status = system(epath.c_str());
 
     if(WEXITSTATUS(status) == 0)
         return true;
 
     bppdistpath = "";
-    status = system("bppancestor >/dev/null 2>/dev/null");
+    status = system("bppancestor </dev/null >/dev/null 2>/dev/null");
 
     return WEXITSTATUS(status) == 0;
 

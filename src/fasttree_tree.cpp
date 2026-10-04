@@ -20,7 +20,6 @@
 
 #include "fasttree_tree.h"
 #include <netdb.h>
-#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <unistd.h>
@@ -39,6 +38,20 @@ FastTree_tree::FastTree_tree()
 {
 }
 
+// The FastTree program as ONE shell word, for the system()/popen() command
+// lines below. -fasttree=NAME may be a path, and a path may hold a space or a
+// quote; unquoted, the shell would split it and the probe would report
+// FastTree absent. A value with a '/' is used as given; a bare name is
+// prefixed with `prefix`, the directory being tried ("" for a PATH lookup).
+static string fasttree_command(const string &prefix)
+{
+    string prog = fasttreeexec.find('/') != string::npos ? fasttreeexec : prefix + fasttreeexec;
+    string quoted = "'";
+    for(size_t i = 0; i < prog.size(); i++)
+        quoted += prog[i] == '\'' ? string("'\\''") : string(1, prog[i]);
+    return quoted + "'";
+}
+
 bool FastTree_tree::test_executable()
 {
     #if defined (__CYGWIN__)
@@ -50,8 +63,7 @@ bool FastTree_tree::test_executable()
     if (epath.find("/")!=std::string::npos)
         epath = epath.substr(0,epath.rfind("/")+1);
     progpath = epath;
-    epath = epath+"fasttree >/dev/null 2>/dev/null";
-    int status = system(epath.c_str());
+    int status = system((fasttree_command(epath)+" -help </dev/null >/dev/null 2>/dev/null").c_str());
 
     return WEXITSTATUS(status) == 0;
 
@@ -76,24 +88,39 @@ bool FastTree_tree::test_executable()
 
     #endif
 
-    char hostname[1024];
-    hostname[1023] = '\0';
-    gethostname(hostname, 1023);
-
-    progpath = epath;
-    epath = epath+"fasttree >/dev/null 2>/dev/null";
-    int status = system(epath.c_str());
-    if(WEXITSTATUS(status) == 0)
-        return true;
-
-    if(WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2")==0)
-        return true;
+    // Probe with `-help`, which exits 0.
+    //
+    // Run with no arguments FastTree prints its usage and exits *1*, so the
+    // `WEXITSTATUS(status) == 0` test below could never succeed for it and
+    // FastTree read as absent on every machine. The two
+    // `WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2") == 0` clauses
+    // that used to sit here accepted the real exit status, but only on one
+    // named host, so everywhere else this function returned false and prank
+    // silently fell back to its own guide tree.
+    //
+    // `-help` is documented ("run FastTree without any arguments or with the
+    // -help option") and exits 0, so the existing predicate becomes correct
+    // and the hostname special case is no longer needed.
+    //
+    // Measured: FastTree 2.1.11 and 2.2.0 both exit 1 with no arguments;
+    // 2.1.11 exits 0 for `-help`. A version whose `-help` did not exit 0
+    // would simply read as absent, i.e. today's behaviour, so this cannot
+    // regress a working setup.
+    //
+    // stdin stays redirected: harmless here since `-help` returns before
+    // reading input, and it keeps every probe in this file consistent.
+    // Beside prank's binary first, unless the executable was named by path.
+    int status;
+    if(fasttreeexec.find('/') == string::npos)
+    {
+        progpath = epath;
+        status = system((fasttree_command(epath)+" -help </dev/null >/dev/null 2>/dev/null").c_str());
+        if(WEXITSTATUS(status) == 0)
+            return true;
+    }
 
     progpath = "";
-    status = system("fasttree >/dev/null 2>/dev/null");
-
-    if(WEXITSTATUS(status) == 1 && strcmp(hostname, "wasabi2")==0)
-        return true;
+    status = system((fasttree_command("")+" -help </dev/null >/dev/null 2>/dev/null").c_str());
 
     return WEXITSTATUS(status) == 0;
 
@@ -131,7 +158,7 @@ string FastTree_tree::infer_phylogeny(std::vector<string> *names,std::vector<str
     f_output.close();
 
     stringstream command;
-    command << progpath<<"fasttree -quiet -nopr -nosupport ";
+    command << fasttree_command(progpath)<<" -quiet -nopr -nosupport ";
     if(is_protein)
         command << f_name.str() << " 2>/dev/null";
     else
