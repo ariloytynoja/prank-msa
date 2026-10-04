@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <unistd.h>
 #include "raxmlrebl.h"
+#include "tool_probe.h"
 #include "readfile.h"
 #include "readnewick.h"
 #include "node.h"
@@ -79,19 +80,9 @@ bool RaxmlRebl::testExecutable()
 
     #endif
 
-    raxmlpath = epath;
-    epath = epath+"raxml -h >/dev/null 2>/dev/null";
-    int status = system(epath.c_str());
-
-
-    if(WEXITSTATUS(status) == 0)
-        return true;
-
-    raxmlpath = "";
-    status = system("raxml -h >/dev/null 2>/dev/null");
-
-
-    return WEXITSTATUS(status) == 0;
+    // Look for raxml; do not RUN it -- see tool_probe.h. Two system(3) calls
+    // go, one beside prank's binary and one on $PATH.
+    return prank_tool_probe::find_tool(epath, "raxml", &raxmlpath);
 
     #endif
 }

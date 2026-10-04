@@ -1,4 +1,5 @@
 #include "exonerate_reads.h"
+#include "tool_probe.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -25,48 +26,19 @@ Exonerate_reads::Exonerate_reads()
 bool Exonerate_reads::test_executable()
 {
 
+    #if defined (__CYGWIN__)
+
     int status = -1;
 
-    #if defined (__CYGWIN__)
     char path[200] = "";
     int length = readlink("/proc/self/exe",path,200-1);
-	
+
     string epath = string(path).substr(0,length);
     if (epath.find("/")!=std::string::npos)
         epath = epath.substr(0,epath.rfind("/")+1);
     exoneratepath = epath;
     epath = epath+"exonerate.exe > /dev/null 2>/dev/null";
     status = system(epath.c_str());
-
-    #else
-
-    if(WEXITSTATUS(status) != 1)
-    {
-        char path[200] = "";
-        string epath;
-
-        #if defined (__APPLE__)
-        uint32_t size = sizeof(path);
-        _NSGetExecutablePath(path, &size);
-        epath = string(path);
-        if (epath.find("/")!=std::string::npos)
-            epath = epath.substr(0,epath.rfind("/")+1);
-        //epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
-
-        #else
-        int length = readlink("/proc/self/exe",path,200-1);
-        epath = string(path).substr(0,length);
-        if (epath.find("/")!=std::string::npos)
-            epath = epath.substr(0,epath.rfind("/")+1);
-
-        #endif
-        
-        exoneratepath = epath;
-        epath = epath+"exonerate >/dev/null 2>/dev/null";
-
-        status = system(epath.c_str());
-    }
-    #endif
 
     if(WEXITSTATUS(status) == 1) {
         if(NOISE>0)
@@ -81,6 +53,54 @@ bool Exonerate_reads::test_executable()
         cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";
 
     return WEXITSTATUS(status) == 1;
+
+    #else
+
+    char path[200] = "";
+    string epath;
+
+    #if defined (__APPLE__)
+    uint32_t size = sizeof(path);
+    _NSGetExecutablePath(path, &size);
+    epath = string(path);
+    if (epath.find("/")!=std::string::npos)
+        epath = epath.substr(0,epath.rfind("/")+1);
+    //epath = "DYLD_LIBRARY_PATH="+epath+" "+epath;
+
+    #else
+    int length = readlink("/proc/self/exe",path,200-1);
+    epath = string(path).substr(0,length);
+    if (epath.find("/")!=std::string::npos)
+        epath = epath.substr(0,epath.rfind("/")+1);
+
+    #endif
+
+    // Look for exonerate; do not RUN it -- see tool_probe.h. Two system(3)
+    // calls go per issue of this probe, one beside prank's binary and one on
+    // $PATH, and the probe is issued twice per process: 4 execs of a real
+    // aligner to ask a question access(X_OK) answers.
+    //
+    // The $PATH attempt this replaces was
+    //
+    //     system("`exonerate  >/dev/null 2>/dev/null`")
+    //
+    // -- the whole command in BACKTICKS. That looks like a typo and is not:
+    // POSIX says a command consisting only of substitutions takes the exit
+    // status of the last one, so the status tested really was exonerate's.
+    // Verified rather than assumed: `sh -c '\`exit 7\`'` returns 7. Noted here
+    // because the obvious "fix" -- dropping the backticks -- would be a
+    // no-op, and the obvious reading -- that it was broken -- is wrong.
+    if(prank_tool_probe::find_tool(epath, "exonerate", &exoneratepath))
+    {
+        if(NOISE>0)
+            cout<<"Using Exonerate to anchor alignments. Use option '-noanchors' to disable.\n";
+        return true;
+    }
+
+    exoneratepath = "";
+    return false;
+
+    #endif
 }
 
 bool Exonerate_reads::split_sugar_string(const string& row,hit *h)

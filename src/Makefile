@@ -499,6 +499,7 @@ check_version.o: check_version.cpp check_version.h
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o check_version.o check_version.cpp
 
 exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h \
+		tool_probe.h \
 		config.h \
 		hmmodel.h \
 		dbmatrix.h \
@@ -533,6 +534,7 @@ bppancestors.o: bppancestors.cpp bppancestors.h \
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o bppancestors.o bppancestors.cpp
 
 raxmlancestors.o: raxmlancestors.cpp raxmlancestors.h \
+		tool_probe.h \
 		ancestralnode.h \
 		config.h \
 		hmmodel.h \
@@ -557,6 +559,7 @@ fasttree_tree.o: fasttree_tree.cpp fasttree_tree.h \
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o fasttree_tree.o fasttree_tree.cpp
 
 raxmlrebl.o: raxmlrebl.cpp raxmlrebl.h \
+		tool_probe.h \
 		ancestralnode.h \
 		config.h \
 		hmmodel.h \
