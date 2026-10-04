@@ -1,4 +1,5 @@
 #include "mafft_alignment.h"
+#include "tool_probe.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -52,17 +53,11 @@ bool Mafft_alignment::test_executable()
 
     #endif
 
-    mafftpath = epath;
-    epath = epath+"mafft -h >/dev/null 2>/dev/null";
-    int status = system(epath.c_str());
-
-    if(WEXITSTATUS(status) == 1)
-        return true;
-
-    mafftpath = "";
-    status = system("mafft -h >/dev/null 2>/dev/null");
-
-    return WEXITSTATUS(status) == 1;
+    // Look for mafft; do not RUN it. `mafft` is a shell script, so the two
+    // `system("mafft -h ...")` calls this replaces cost ~80 further execs
+    // between them -- see tool_probe.h for the measurement and for what the
+    // change gives up.
+    return prank_tool_probe::find_tool(epath, "mafft", &mafftpath);
 
     #endif
 }

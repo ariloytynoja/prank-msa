@@ -509,6 +509,7 @@ exonerate_reads.o: exonerate_reads.cpp exonerate_reads.h \
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(INCPATH) -o exonerate_reads.o exonerate_reads.cpp
 
 mafft_alignment.o: mafft_alignment.cpp mafft_alignment.h \
+		tool_probe.h \
 		config.h \
 		hmmodel.h \
 		dbmatrix.h \
