@@ -17,7 +17,11 @@ using namespace std;
 Check_version::Check_version(int version)
 {
 
-    cout<<"\nThis is PRANK v."<<version<<".\nChecking if updates are available at http://http://code.google.com/p/prank-msa.\n";
+    // Say which server is asked. The version file is still fetched from the
+    // old Google Code host, which no longer serves it (see the status check
+    // below); the project itself lives on GitHub.
+    cout<<"\nThis is PRANK v."<<version<<".\nChecking if updates are available at prank-msa.googlecode.com"
+        <<" (PRANK is developed at https://github.com/ariloytynoja/prank-msa).\n";
 
     struct sockaddr_in *remote;
     char buf[BUFSIZ+1];
@@ -25,7 +29,9 @@ Check_version::Check_version(int version)
     int sock = create_tcp_socket();
     char *ip = get_ip("prank-msa.googlecode.com");
 
-    remote = (struct sockaddr_in *)malloc(sizeof(struct sockaddr_in *));
+    // The whole struct, zeroed (sin_zero must be): sizeof the POINTER was
+    // 8 bytes, and connect() below reads sizeof(struct sockaddr) = 16.
+    remote = (struct sockaddr_in *)calloc(1, sizeof(struct sockaddr_in));
     remote->sin_family = AF_INET;
     int tmpres = inet_pton(AF_INET, ip, (void *)(&(remote->sin_addr.s_addr)));
     if ( tmpres < 0)
@@ -68,10 +74,27 @@ Check_version::Check_version(int version)
     memset(buf, 0, sizeof(buf));
     int htmlstart = 0;
     char * htmlcontent;
+    // The status line arrives first.  It has to be checked: the endpoint
+    // below no longer serves this file, and an error page parsed as a
+    // changelog is reported to the user as "Found updates".  It is collected
+    // until its CRLF arrives, which need not be in the first chunk.
+    string head;
+    string status_line;
+    bool  status_seen = false;
     while ((tmpres = recv(sock, buf, BUFSIZ, 0)) > 0)
     {
         if (htmlstart == 0)
         {
+            if (!status_seen)
+            {
+                head.append(buf, tmpres);
+                string::size_type eol = head.find("\r\n");
+                if (eol != string::npos || head.size() > 1024)
+                {
+                    status_seen = true;
+                    status_line = head.substr(0, eol == string::npos ? head.size() : eol);
+                }
+            }
             /* Under certain conditions this will not work.
             * If the \r\n\r\n part is splitted into two messages
             * it will fail to detect the beginning of HTML content
@@ -97,6 +120,32 @@ Check_version::Check_version(int version)
     if (tmpres < 0)
     {
         perror("Error receiving data");
+    }
+
+    if (!status_seen)
+        status_line = head;
+
+    // Anything other than 200 means we did not get the version file.  Say so,
+    // rather than parsing the error page and announcing imaginary updates.
+    // The code is the second field of "HTTP/1.x 200 OK".
+    int status_code = 0;
+    {
+        istringstream fields(status_line);
+        string protocol;
+        fields >> protocol >> status_code;
+        if (protocol.compare(0, 5, "HTTP/") != 0)
+            status_code = 0;
+    }
+    if (status_code != 200)
+    {
+        cout<<"\nCould not check for updates";
+        if (!status_line.empty())
+            cout<<" (server said: "<<status_line<<")";
+        cout<<".\n\n";
+        free(remote);
+        free(ip);
+        close(sock);
+        return;
     }
 
     bool print_this = true;
