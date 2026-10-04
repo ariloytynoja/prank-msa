@@ -555,7 +555,14 @@ void readArguments(int argc, char *argv[])
             // seed for random number generator
             else if (s.substr(0,6)=="-seed=")
             {
+                // Only a positive seed is used (rnd_seed<=0 means "none"), so a
+                // zero or negative one would be ignored without a word.
                 rnd_seed = atoi(string(argv[i]).substr(6).c_str());
+                if (rnd_seed <= 0)
+                {
+                    cout<<"Error: -seed= needs a positive integer."<<endl;
+                    exit(EXIT_FAILURE);
+                }
             }
 
             else if (s=="-reproducible")
@@ -820,6 +827,21 @@ void readArguments(int argc, char *argv[])
         exit(0);
     }
 
+    // -reproducible asks for a repeatable run, so it needs a repeatable seed.
+    // Without one it reseeds from Hirschberg's constructor default, which is
+    // time(NULL) -- constant within a run, different on the next one -- so the
+    // flag reseeded diligently to a value that still varied and the run was not
+    // reproducible. Supplying a fixed default here also switches on the
+    // deterministic per-node seeding already present in
+    // AncestralNode::alignSequences (gated on rnd_seed>0), which derives each
+    // node's seed from a hash of its terminal names, so for a given guide tree
+    // the result does not depend on the order the nodes are visited. (A guide
+    // tree inferred from the input can itself depend on the input order.)
+    // Every tie is then broken the same way on every run -- which need not be
+    // any of the alignments unseeded runs produce. An explicit -seed=# wins.
+    if (REPRODUCIBLE && rnd_seed<=0)
+        rnd_seed = 1;
+
     // define a seed for random numbers
     if (rnd_seed>0)
         srand(rnd_seed);
@@ -912,7 +934,8 @@ void printHelp(bool complete)
         cout<<"  -fixedbranches=# [use fixed branch lengths]"<<endl;
         cout<<"  -maxbranches=# [set maximum branch length]"<<endl;
         cout<<"  -realbranches [disable branch length truncation]"<<endl;
-        cout<<"  -seed=# [set random number seed]"<<endl;
+        cout<<"  -seed=# [set random number seed, a positive integer; without it the seed comes from the clock]"<<endl;
+        cout<<"  -reproducible [repeatable output: ties broken the same way every run; a fixed seed unless -seed=# is given]"<<endl;
     }
     cout<<"  -translate [translate to protein]"<<endl;
     cout<<"  -mttranslate [translate to protein using mt table]"<<endl;
